@@ -122,3 +122,81 @@ async def test_default_profile_includes_story(monkeypatch: pytest.MonkeyPatch) -
     async with Client(server) as client:
         names = {t.name for t in await client.list_tools()}
     assert "shortcut_get_story" in names  # core profile includes story
+
+
+@pytest.mark.asyncio
+@respx.mock
+async def test_all_profile_exposes_full_read_surface(monkeypatch: pytest.MonkeyPatch) -> None:
+    from fastmcp import Client
+
+    monkeypatch.setenv("SHORTCUT_API_TOKEN", "x")
+    monkeypatch.setenv("SHORTCUT_PROFILE", "all")
+    respx.get("https://api.app.shortcut.com/api/v3/member").mock(
+        return_value=httpx.Response(200, json={"id": "u1", "name": "tester"})
+    )
+    server = create_server()
+    async with Client(server) as client:
+        names = {t.name for t in await client.list_tools()}
+    for expected in [
+        "shortcut_get_story",
+        "shortcut_list_story_history",
+        "shortcut_list_story_comments",
+        "shortcut_get_story_comment",
+        "shortcut_get_story_task",
+        "shortcut_get_story_link",
+        "shortcut_list_epics",
+        "shortcut_get_epic",
+        "shortcut_list_epic_stories",
+        "shortcut_list_epic_comments",
+        "shortcut_get_epic_comment",
+        "shortcut_get_epic_workflow",
+        "shortcut_list_iterations",
+        "shortcut_list_iteration_stories",
+        "shortcut_list_objectives",
+        "shortcut_list_objective_epics",
+        "shortcut_list_members",
+        "shortcut_get_current_member",
+        "shortcut_list_groups",
+        "shortcut_list_group_stories",
+        "shortcut_list_workflows",
+        "shortcut_get_workflow",
+        "shortcut_list_labels",
+        "shortcut_list_label_stories",
+        "shortcut_list_label_epics",
+        "shortcut_list_projects",
+        "shortcut_list_project_stories",
+        "shortcut_list_files",
+        "shortcut_list_linked_files",
+        "shortcut_search_stories",
+        "shortcut_search_epics",
+        "shortcut_search_iterations",
+        "shortcut_search_objectives",
+        "shortcut_search",
+        "shortcut_query_stories",
+    ]:
+        assert expected in names, f"missing tool: {expected}"
+    # All names must be read-only (no write/destructive tools registered in v0.2)
+    assert len(names) >= 40
+
+
+@pytest.mark.asyncio
+@respx.mock
+async def test_core_profile_is_smaller_than_all(monkeypatch: pytest.MonkeyPatch) -> None:
+    from fastmcp import Client
+
+    monkeypatch.setenv("SHORTCUT_API_TOKEN", "x")
+    respx.get("https://api.app.shortcut.com/api/v3/member").mock(
+        return_value=httpx.Response(200, json={"id": "u1", "name": "tester"})
+    )
+    core_server = create_server()
+    async with Client(core_server) as c:
+        core_names = {t.name for t in await c.list_tools()}
+
+    monkeypatch.setenv("SHORTCUT_PROFILE", "all")
+    all_server = create_server()
+    async with Client(all_server) as c:
+        all_names = {t.name for t in await c.list_tools()}
+
+    assert core_names < all_names  # strict subset
+    assert "shortcut_list_projects" in all_names
+    assert "shortcut_list_projects" not in core_names
