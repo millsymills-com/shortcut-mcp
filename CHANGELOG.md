@@ -7,6 +7,28 @@ This project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- **v0.3 write tier — 38 write tools across all resource modules**, gated by
+  `SHORTCUT_MODE=readwrite` (hidden entirely in readonly mode):
+  - `story`: create, update, archive, unarchive, add labels, add owners,
+    bulk create, bulk update, create from template (9 tools)
+  - `story_comment`: create, update, add/remove emoji reaction (4 tools)
+  - `story_task`: create, update (2 tools)
+  - `story_link`: create, update (2 tools)
+  - `epic`: create, update, archive, unarchive (4 tools)
+  - `epic_comment`: create, reply, update (3 tools)
+  - `iteration`: create, update (2 tools)
+  - `objective`: create, update (2 tools)
+  - `group`: create, update (2 tools)
+  - `label`: create, update (2 tools)
+  - `project`: create, update (2 tools)
+  - `file`: upload (multipart), update metadata (2 tools)
+  - `linked_file`: create, update (2 tools)
+- **`require_writes` runtime guard** — write tools raise `PermissionError` if
+  called outside a `readwrite` context, even if somehow invoked directly.
+- **Multipart upload + DELETE-with-body client support** in `ShortcutClient`.
+
 ## [0.2.0] - 2026-05-23
 
 ### Added

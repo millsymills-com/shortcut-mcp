@@ -232,3 +232,116 @@ async def test_core_profile_is_smaller_than_all(monkeypatch: pytest.MonkeyPatch)
     assert core_names < all_names  # strict subset
     assert "shortcut_list_projects" in all_names
     assert "shortcut_list_projects" not in core_names
+
+
+@pytest.mark.asyncio
+@respx.mock
+async def test_readonly_hides_all_writes(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Default readonly mode + profile=all must expose exactly 43 read tools and no writes."""
+    from fastmcp import Client
+
+    monkeypatch.setenv("SHORTCUT_API_TOKEN", "x")
+    monkeypatch.setenv("SHORTCUT_PROFILE", "all")
+    respx.get("https://api.app.shortcut.com/api/v3/member").mock(
+        return_value=httpx.Response(200, json={"id": "u1", "name": "tester"})
+    )
+    server = create_server()
+    async with server._lifespan(server), Client(server) as client:
+        names = {t.name for t in await client.list_tools()}
+
+    # Representative write tools must all be absent.
+    representative_writes = {
+        "shortcut_create_story",
+        "shortcut_update_epic",
+        "shortcut_upload_file",
+        "shortcut_create_label",
+        "shortcut_add_story_comment_reaction",
+    }
+    assert not representative_writes & names, (
+        f"Write tools unexpectedly visible in readonly mode: {representative_writes & names}"
+    )
+    assert len(names) == 43, f"Expected 43 read tools, got {len(names)}: {sorted(names)}"
+
+
+@pytest.mark.asyncio
+@respx.mock
+async def test_readwrite_exposes_write_surface(monkeypatch: pytest.MonkeyPatch) -> None:
+    """SHORTCUT_MODE=readwrite + profile=all must expose all 81 tools (43 read + 38 write)."""
+    from fastmcp import Client
+
+    monkeypatch.setenv("SHORTCUT_API_TOKEN", "x")
+    monkeypatch.setenv("SHORTCUT_MODE", "readwrite")
+    monkeypatch.setenv("SHORTCUT_PROFILE", "all")
+    respx.get("https://api.app.shortcut.com/api/v3/member").mock(
+        return_value=httpx.Response(200, json={"id": "u1", "name": "tester"})
+    )
+    server = create_server()
+    async with server._lifespan(server), Client(server) as client:
+        names = {t.name for t in await client.list_tools()}
+
+    expected_writes = {
+        "shortcut_add_story_comment_reaction",
+        "shortcut_add_story_labels",
+        "shortcut_add_story_owners",
+        "shortcut_archive_epic",
+        "shortcut_archive_story",
+        "shortcut_bulk_create_stories",
+        "shortcut_bulk_update_stories",
+        "shortcut_create_epic",
+        "shortcut_create_epic_comment",
+        "shortcut_create_epic_comment_reply",
+        "shortcut_create_group",
+        "shortcut_create_iteration",
+        "shortcut_create_label",
+        "shortcut_create_linked_file",
+        "shortcut_create_objective",
+        "shortcut_create_project",
+        "shortcut_create_story",
+        "shortcut_create_story_comment",
+        "shortcut_create_story_from_template",
+        "shortcut_create_story_link",
+        "shortcut_create_story_task",
+        "shortcut_remove_story_comment_reaction",
+        "shortcut_unarchive_epic",
+        "shortcut_unarchive_story",
+        "shortcut_update_epic",
+        "shortcut_update_epic_comment",
+        "shortcut_update_file",
+        "shortcut_update_group",
+        "shortcut_update_iteration",
+        "shortcut_update_label",
+        "shortcut_update_linked_file",
+        "shortcut_update_objective",
+        "shortcut_update_project",
+        "shortcut_update_story",
+        "shortcut_update_story_comment",
+        "shortcut_update_story_link",
+        "shortcut_update_story_task",
+        "shortcut_upload_file",
+    }
+    assert expected_writes <= names, f"Missing write tools: {expected_writes - names}"
+    assert len(names) == 81, f"Expected 81 tools (43 read + 38 write), got {len(names)}: {sorted(names)}"
+
+
+@pytest.mark.asyncio
+@respx.mock
+async def test_writes_still_absent_without_destructive(monkeypatch: pytest.MonkeyPatch) -> None:
+    """No delete_* tools exist yet (v0.4 scope) — guard against accidental scope creep.
+
+    archive_story / archive_epic are valid v0.3 write tools and must not be flagged.
+    Only names that START WITH shortcut_delete are out of scope.
+    """
+    from fastmcp import Client
+
+    monkeypatch.setenv("SHORTCUT_API_TOKEN", "x")
+    monkeypatch.setenv("SHORTCUT_MODE", "readwrite")
+    monkeypatch.setenv("SHORTCUT_PROFILE", "all")
+    respx.get("https://api.app.shortcut.com/api/v3/member").mock(
+        return_value=httpx.Response(200, json={"id": "u1", "name": "tester"})
+    )
+    server = create_server()
+    async with server._lifespan(server), Client(server) as client:
+        names = {t.name for t in await client.list_tools()}
+
+    delete_tools = {n for n in names if n.startswith("shortcut_delete")}
+    assert not delete_tools, f"Unexpected v0.4 delete tools found: {delete_tools}"
