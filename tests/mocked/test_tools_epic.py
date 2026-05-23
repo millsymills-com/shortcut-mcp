@@ -133,3 +133,18 @@ async def test_archive_epic_puts_archived_true(monkeypatch: pytest.MonkeyPatch) 
     assert not result.is_error
     body = json.loads(route.calls.last.request.content)
     assert body == {"archived": True}
+
+
+@pytest.mark.asyncio
+@respx.mock
+async def test_unarchive_epic_puts_archived_false(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("SHORTCUT_API_TOKEN", "x")
+    monkeypatch.setenv("SHORTCUT_MODE", "readwrite")
+    respx.get(f"{BASE}/member").mock(return_value=httpx.Response(200, json={"id": "u"}))
+    route = respx.put(f"{BASE}/epics/1").mock(return_value=httpx.Response(200, json={"id": 1, "archived": False}))
+    server = create_server()
+    async with Client(server) as client:
+        result = await client.call_tool("shortcut_unarchive_epic", {"epic_id": 1})
+    assert not result.is_error
+    body = json.loads(route.calls.last.request.content)
+    assert body == {"archived": False}

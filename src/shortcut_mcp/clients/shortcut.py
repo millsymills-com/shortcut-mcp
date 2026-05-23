@@ -10,7 +10,7 @@ if TYPE_CHECKING:
     from types import TracebackType
 
 import httpx
-from httpx._multipart import MultipartStream
+from httpx._multipart import MultipartStream  # private API: used to recover the multipart boundary in upload()
 from tenacity import (
     AsyncRetrying,
     retry_if_exception_type,

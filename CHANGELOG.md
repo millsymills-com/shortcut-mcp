@@ -25,8 +25,8 @@ This project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   - `project`: create, update (2 tools)
   - `file`: upload (multipart), update metadata (2 tools)
   - `linked_file`: create, update (2 tools)
-- **`require_writes` runtime guard** — write tools raise `PermissionError` if
-  called outside a `readwrite` context, even if somehow invoked directly.
+- **`require_writes` runtime guard** — write tools raise `ToolError` (`mode_denied`)
+  if called outside a `readwrite` context, even if somehow invoked directly.
 - **Multipart upload + DELETE-with-body client support** in `ShortcutClient`.
 
 ## [0.2.0] - 2026-05-23
