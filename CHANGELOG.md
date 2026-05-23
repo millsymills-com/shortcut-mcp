@@ -7,6 +7,8 @@ This project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-05-23
+
 ### Added
 
 - **Complete read surface — 43 read tools across 17 resource modules:**

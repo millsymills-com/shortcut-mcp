@@ -58,6 +58,42 @@ async def test_search_epics_routes_to_search_epics_endpoint(monkeypatch):
 
 @pytest.mark.asyncio
 @respx.mock
+async def test_search_iterations_routes_to_endpoint(monkeypatch):
+    monkeypatch.setenv("SHORTCUT_API_TOKEN", "x")
+    respx.get(f"{BASE}/member").mock(return_value=httpx.Response(200, json={"id": "u"}))
+    respx.get(f"{BASE}/search/iterations").mock(
+        return_value=httpx.Response(
+            200,
+            json={"data": [{"id": 7, "name": "Sprint", "status": "started", "drop": 1}], "next": None, "total": 1},
+        )
+    )
+    server = create_server()
+    async with Client(server) as client:
+        result = await client.call_tool("shortcut_search_iterations", {"query": "x"})
+    assert not result.is_error
+    assert result.data["items"] == [{"id": 7, "name": "Sprint", "status": "started"}]
+
+
+@pytest.mark.asyncio
+@respx.mock
+async def test_search_objectives_routes_to_endpoint(monkeypatch):
+    monkeypatch.setenv("SHORTCUT_API_TOKEN", "x")
+    respx.get(f"{BASE}/member").mock(return_value=httpx.Response(200, json={"id": "u"}))
+    respx.get(f"{BASE}/search/objectives").mock(
+        return_value=httpx.Response(
+            200,
+            json={"data": [{"id": 8, "name": "Q3", "state": "active", "drop": 1}], "next": None, "total": 1},
+        )
+    )
+    server = create_server()
+    async with Client(server) as client:
+        result = await client.call_tool("shortcut_search_objectives", {"query": "x"})
+    assert not result.is_error
+    assert result.data["items"] == [{"id": 8, "name": "Q3", "state": "active"}]
+
+
+@pytest.mark.asyncio
+@respx.mock
 async def test_global_search_returns_stories_and_epics_shape(monkeypatch):
     monkeypatch.setenv("SHORTCUT_API_TOKEN", "x")
     respx.get(f"{BASE}/member").mock(return_value=httpx.Response(200, json={"id": "u"}))

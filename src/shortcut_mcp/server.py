@@ -128,9 +128,9 @@ def create_server(config: ShortcutConfig | None = None) -> FastMCP:
         name="shortcut-mcp",
         instructions=(
             "Shortcut MCP server — read workflows, epics, iterations, labels, "
-            "members, and stories from a Shortcut workspace. Read-only in v0.1; "
-            "writes and destructive ops are gated behind SHORTCUT_MODE and "
-            "SHORTCUT_ALLOW_DESTRUCTIVE."
+            "members, and stories from a Shortcut workspace. Read-only in v0.2 "
+            "(full read surface); writes and destructive ops are gated behind "
+            "SHORTCUT_MODE and SHORTCUT_ALLOW_DESTRUCTIVE."
         ),
         lifespan=_build_lifespan(config),
     )

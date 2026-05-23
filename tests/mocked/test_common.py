@@ -48,6 +48,11 @@ def test_require_destructive_blocks_without_flag(monkeypatch):
         require_destructive(ctx)  # type: ignore[arg-type]  # ty: ignore[invalid-argument-type]
 
 
+def test_require_destructive_allows_when_enabled(monkeypatch):
+    ctx = _StubCtx(_cfg(monkeypatch, SHORTCUT_MODE="readwrite", SHORTCUT_ALLOW_DESTRUCTIVE="true"))
+    require_destructive(ctx)  # type: ignore[arg-type]  # ty: ignore[invalid-argument-type]
+
+
 def test_shaped_list_truncates_and_reports():
     rows = [{"id": i, "name": f"s{i}", "extra": "drop"} for i in range(5)]
     out = shaped_list(rows, lambda r: {"id": r["id"], "name": r["name"]}, limit=3, total=99)

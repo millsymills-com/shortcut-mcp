@@ -1,4 +1,4 @@
-"""Story tools. v0.1: shortcut_get_story (the tracer bullet)."""
+"""Story read tools."""
 
 from __future__ import annotations
 
