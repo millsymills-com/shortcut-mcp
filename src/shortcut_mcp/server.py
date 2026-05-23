@@ -14,7 +14,7 @@ import httpx
 from fastmcp import FastMCP
 
 from shortcut_mcp.clients.shortcut import ShortcutClient
-from shortcut_mcp.config import ShortcutConfig
+from shortcut_mcp.config import ALL_MODULES, ShortcutConfig
 from shortcut_mcp.errors import ShortcutError, _classify_startup_error
 
 logger = logging.getLogger(__name__)
@@ -106,5 +106,10 @@ def create_server(config: ShortcutConfig | None = None) -> FastMCP:
         server.disable(tags={"destructive"})
     if not config.authenticated:
         server.disable(tags={"shortcut"})
+
+    enabled = config.enabled_modules
+    for module_name in ALL_MODULES:
+        if module_name not in enabled:
+            server.disable(tags={f"mod:{module_name}"})
 
     return server

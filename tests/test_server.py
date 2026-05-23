@@ -91,3 +91,34 @@ def test_lifespan_disables_all_when_token_missing(monkeypatch: pytest.MonkeyPatc
     server = create_server()
     # Built without auth: registration completes but shortcut tag disabled.
     assert "shortcut" in _disabled_tags(server)
+
+
+@pytest.mark.asyncio
+@respx.mock
+async def test_allowlist_excluding_story_hides_get_story(monkeypatch: pytest.MonkeyPatch) -> None:
+    from fastmcp import Client
+
+    monkeypatch.setenv("SHORTCUT_API_TOKEN", "x")
+    monkeypatch.setenv("SHORTCUT_TOOLS", "search")  # story not in allowlist
+    respx.get("https://api.app.shortcut.com/api/v3/member").mock(
+        return_value=httpx.Response(200, json={"id": "u1", "name": "tester"})
+    )
+    server = create_server()
+    async with Client(server) as client:
+        names = {t.name for t in await client.list_tools()}
+    assert "shortcut_get_story" not in names
+
+
+@pytest.mark.asyncio
+@respx.mock
+async def test_default_profile_includes_story(monkeypatch: pytest.MonkeyPatch) -> None:
+    from fastmcp import Client
+
+    monkeypatch.setenv("SHORTCUT_API_TOKEN", "x")
+    respx.get("https://api.app.shortcut.com/api/v3/member").mock(
+        return_value=httpx.Response(200, json={"id": "u1", "name": "tester"})
+    )
+    server = create_server()
+    async with Client(server) as client:
+        names = {t.name for t in await client.list_tools()}
+    assert "shortcut_get_story" in names  # core profile includes story
