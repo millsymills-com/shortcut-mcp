@@ -1,4 +1,4 @@
-"""Label read tools."""
+"""Label read and write tools."""
 
 from __future__ import annotations
 
@@ -10,14 +10,17 @@ from shortcut_mcp.clients.shortcut import _seg
 from shortcut_mcp.tools._common import (
     get_client,
     read_tags,
+    require_writes,
     shape_epic_summary,
     shape_label_summary,
     shape_story_summary,
     shaped_list,
+    write_tags,
 )
 
 _MODULE = "label"
 _READ_ANN = {"readOnlyHint": True, "openWorldHint": True}
+_WRITE_ANN: dict[str, Any] = {"readOnlyHint": False, "destructiveHint": False}
 
 
 def register(server: FastMCP) -> None:
@@ -59,3 +62,51 @@ def register(server: FastMCP) -> None:
     async def shortcut_list_label_epics(ctx: Context, label_id: int, limit: int = 50) -> dict[str, Any]:
         rows = await get_client(ctx).get(f"/labels/{_seg(str(label_id))}/epics")
         return shaped_list(rows, shape_epic_summary, limit=limit)
+
+    @server.tool(
+        name="shortcut_create_label",
+        description="Create a new Shortcut label. Returns the created label object.",
+        tags=write_tags(_MODULE),
+        annotations={**_WRITE_ANN, "idempotentHint": False},
+    )
+    async def shortcut_create_label(
+        ctx: Context,
+        name: str,
+        color: str | None = None,
+        description: str | None = None,
+    ) -> dict[str, Any]:
+        require_writes(ctx)
+        body: dict[str, Any] = {"name": name}
+        if color is not None:
+            body["color"] = color
+        if description is not None:
+            body["description"] = description
+        return await get_client(ctx).post("/labels", json=body)
+
+    @server.tool(
+        name="shortcut_update_label",
+        description="Update fields on an existing Shortcut label.",
+        tags=write_tags(_MODULE),
+        annotations={**_WRITE_ANN, "idempotentHint": True},
+    )
+    async def shortcut_update_label(
+        ctx: Context,
+        label_id: int,
+        name: str | None = None,
+        color: str | None = None,
+        description: str | None = None,
+        archived: bool | None = None,
+    ) -> dict[str, Any]:
+        require_writes(ctx)
+        body: dict[str, Any] = {}
+        if name is not None:
+            body["name"] = name
+        if color is not None:
+            body["color"] = color
+        if description is not None:
+            body["description"] = description
+        if archived is not None:
+            body["archived"] = archived
+        client = get_client(ctx)
+        result = await client.put(f"/labels/{_seg(str(label_id))}", json=body)
+        return result if result is not None else {"id": label_id}

@@ -181,7 +181,7 @@ def register(server: FastMCP) -> None:
         tags=write_tags(_MODULE),
         annotations={**_WRITE_ANN, "idempotentHint": False},
     )
-    async def shortcut_bulk_create_stories(ctx: Context, stories: list[dict[str, Any]]) -> dict[str, Any] | list[Any]:
+    async def shortcut_bulk_create_stories(ctx: Context, stories: list[dict[str, Any]]) -> list[dict[str, Any]]:
         require_writes(ctx)
         return await get_client(ctx).post("/stories/bulk", json={"stories": stories})
 
@@ -198,7 +198,7 @@ def register(server: FastMCP) -> None:
         workflow_state_id: int | None = None,
         epic_id: int | None = None,
         iteration_id: int | None = None,
-    ) -> dict[str, Any] | list[Any] | None:
+    ) -> list[dict[str, Any]] | None:
         require_writes(ctx)
         body: dict[str, Any] = {"story_ids": story_ids}
         if archived is not None:
