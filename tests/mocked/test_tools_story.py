@@ -1,4 +1,4 @@
-"""Mocked tests for the shortcut_get_story tool.
+"""Mocked tests for story read and write tools.
 
 FastMCP 3.3.1 invocation pattern (discovered in Task 13):
 - `await server.get_tool(name)` returns a FunctionTool (it's async).
@@ -13,6 +13,8 @@ FastMCP 3.3.1 invocation pattern (discovered in Task 13):
 
 from __future__ import annotations
 
+import json
+
 import httpx
 import pytest
 import respx
@@ -20,15 +22,19 @@ from fastmcp import Client
 
 from shortcut_mcp.server import create_server
 
+BASE = "https://api.app.shortcut.com/api/v3"
+
+
+def _mock_member() -> None:
+    respx.get(f"{BASE}/member").mock(return_value=httpx.Response(200, json={"id": "user-1"}))
+
 
 @pytest.mark.asyncio
 @respx.mock
 async def test_get_story_returns_story_payload(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setenv("SHORTCUT_API_TOKEN", "x")
-    respx.get("https://api.app.shortcut.com/api/v3/member").mock(
-        return_value=httpx.Response(200, json={"id": "user-1"})
-    )
-    respx.get("https://api.app.shortcut.com/api/v3/stories/1234").mock(
+    _mock_member()
+    respx.get(f"{BASE}/stories/1234").mock(
         return_value=httpx.Response(
             200,
             json={
@@ -51,10 +57,8 @@ async def test_get_story_returns_story_payload(monkeypatch: pytest.MonkeyPatch) 
 @respx.mock
 async def test_get_story_propagates_404(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setenv("SHORTCUT_API_TOKEN", "x")
-    respx.get("https://api.app.shortcut.com/api/v3/member").mock(return_value=httpx.Response(200, json={"id": "u"}))
-    respx.get("https://api.app.shortcut.com/api/v3/stories/9999").mock(
-        return_value=httpx.Response(404, json={"message": "not found"})
-    )
+    _mock_member()
+    respx.get(f"{BASE}/stories/9999").mock(return_value=httpx.Response(404, json={"message": "not found"}))
     server = create_server()
     async with Client(server) as client:
         result = await client.call_tool("shortcut_get_story", {"story_id": 9999}, raise_on_error=False)
@@ -65,12 +69,243 @@ async def test_get_story_propagates_404(monkeypatch: pytest.MonkeyPatch) -> None
 @respx.mock
 async def test_list_story_history_returns_items(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setenv("SHORTCUT_API_TOKEN", "x")
-    base = "https://api.app.shortcut.com/api/v3"
-    respx.get(f"{base}/member").mock(return_value=httpx.Response(200, json={"id": "u"}))
-    respx.get(f"{base}/stories/7/history").mock(return_value=httpx.Response(200, json=[{"id": "h1"}, {"id": "h2"}]))
+    _mock_member()
+    respx.get(f"{BASE}/stories/7/history").mock(return_value=httpx.Response(200, json=[{"id": "h1"}, {"id": "h2"}]))
     server = create_server()
     async with Client(server) as client:
         result = await client.call_tool("shortcut_list_story_history", {"story_id": 7})
     assert not result.is_error
     assert result.data["items"][0]["id"] == "h1"
     assert result.data["truncated"] is False
+
+
+# ---------------------------------------------------------------------------
+# Write tool tests
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.asyncio
+@respx.mock
+async def test_create_story_posts_and_returns_id(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("SHORTCUT_API_TOKEN", "x")
+    monkeypatch.setenv("SHORTCUT_MODE", "readwrite")
+    _mock_member()
+    route = respx.post(f"{BASE}/stories").mock(return_value=httpx.Response(201, json={"id": 1, "name": "S"}))
+    server = create_server()
+    async with Client(server) as client:
+        result = await client.call_tool("shortcut_create_story", {"name": "S", "workflow_state_id": 500})
+    assert not result.is_error
+    assert result.data["id"] == 1
+    body = json.loads(route.calls.last.request.content)
+    assert body["name"] == "S"
+    assert body["workflow_state_id"] == 500
+
+
+@pytest.mark.asyncio
+@respx.mock
+async def test_create_story_includes_optional_fields(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("SHORTCUT_API_TOKEN", "x")
+    monkeypatch.setenv("SHORTCUT_MODE", "readwrite")
+    _mock_member()
+    route = respx.post(f"{BASE}/stories").mock(return_value=httpx.Response(201, json={"id": 2, "name": "T"}))
+    server = create_server()
+    async with Client(server) as client:
+        result = await client.call_tool(
+            "shortcut_create_story",
+            {
+                "name": "T",
+                "workflow_state_id": 500,
+                "labels": ["bug", "backend"],
+                "owner_ids": ["u1"],
+            },
+        )
+    assert not result.is_error
+    body = json.loads(route.calls.last.request.content)
+    assert body["labels"] == [{"name": "bug"}, {"name": "backend"}]
+    assert body["owner_ids"] == ["u1"]
+
+
+@pytest.mark.asyncio
+@respx.mock
+async def test_update_story_returns_id(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("SHORTCUT_API_TOKEN", "x")
+    monkeypatch.setenv("SHORTCUT_MODE", "readwrite")
+    _mock_member()
+    respx.put(f"{BASE}/stories/5").mock(return_value=httpx.Response(200, json={"id": 5}))
+    server = create_server()
+    async with Client(server) as client:
+        result = await client.call_tool("shortcut_update_story", {"story_id": 5, "name": "Updated"})
+    assert not result.is_error
+    assert result.data["id"] == 5
+
+
+@pytest.mark.asyncio
+@respx.mock
+async def test_update_story_tolerates_empty_put_response(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("SHORTCUT_API_TOKEN", "x")
+    monkeypatch.setenv("SHORTCUT_MODE", "readwrite")
+    _mock_member()
+    respx.put(f"{BASE}/stories/5").mock(return_value=httpx.Response(204))
+    server = create_server()
+    async with Client(server) as client:
+        result = await client.call_tool("shortcut_update_story", {"story_id": 5, "name": "Updated"})
+    assert not result.is_error
+    assert result.data["id"] == 5
+
+
+@pytest.mark.asyncio
+@respx.mock
+async def test_archive_story_sends_archived_true(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("SHORTCUT_API_TOKEN", "x")
+    monkeypatch.setenv("SHORTCUT_MODE", "readwrite")
+    _mock_member()
+    route = respx.put(f"{BASE}/stories/10").mock(return_value=httpx.Response(200, json={"id": 10, "archived": True}))
+    server = create_server()
+    async with Client(server) as client:
+        result = await client.call_tool("shortcut_archive_story", {"story_id": 10})
+    assert not result.is_error
+    body = json.loads(route.calls.last.request.content)
+    assert body == {"archived": True}
+
+
+@pytest.mark.asyncio
+@respx.mock
+async def test_unarchive_story_sends_archived_false(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("SHORTCUT_API_TOKEN", "x")
+    monkeypatch.setenv("SHORTCUT_MODE", "readwrite")
+    _mock_member()
+    route = respx.put(f"{BASE}/stories/10").mock(return_value=httpx.Response(200, json={"id": 10, "archived": False}))
+    server = create_server()
+    async with Client(server) as client:
+        result = await client.call_tool("shortcut_unarchive_story", {"story_id": 10})
+    assert not result.is_error
+    body = json.loads(route.calls.last.request.content)
+    assert body == {"archived": False}
+
+
+@pytest.mark.asyncio
+@respx.mock
+async def test_add_story_labels_merges_and_dedupes(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("SHORTCUT_API_TOKEN", "x")
+    monkeypatch.setenv("SHORTCUT_MODE", "readwrite")
+    _mock_member()
+    respx.get(f"{BASE}/stories/5").mock(
+        return_value=httpx.Response(200, json={"id": 5, "labels": [{"name": "a"}], "owner_ids": ["u1"]})
+    )
+    put_route = respx.put(f"{BASE}/stories/5").mock(return_value=httpx.Response(200, json={"id": 5}))
+    server = create_server()
+    async with Client(server) as client:
+        result = await client.call_tool("shortcut_add_story_labels", {"story_id": 5, "labels": ["b"]})
+    assert not result.is_error
+    body = json.loads(put_route.calls.last.request.content)
+    assert body["labels"] == [{"name": "a"}, {"name": "b"}]
+
+
+@pytest.mark.asyncio
+@respx.mock
+async def test_add_story_labels_dedupes_existing(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("SHORTCUT_API_TOKEN", "x")
+    monkeypatch.setenv("SHORTCUT_MODE", "readwrite")
+    _mock_member()
+    respx.get(f"{BASE}/stories/5").mock(
+        return_value=httpx.Response(200, json={"id": 5, "labels": [{"name": "a"}, {"name": "b"}], "owner_ids": []})
+    )
+    put_route = respx.put(f"{BASE}/stories/5").mock(return_value=httpx.Response(200, json={"id": 5}))
+    server = create_server()
+    async with Client(server) as client:
+        await client.call_tool("shortcut_add_story_labels", {"story_id": 5, "labels": ["a", "c"]})
+    body = json.loads(put_route.calls.last.request.content)
+    assert body["labels"] == [{"name": "a"}, {"name": "b"}, {"name": "c"}]
+
+
+@pytest.mark.asyncio
+@respx.mock
+async def test_add_story_owners_merges_and_dedupes(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("SHORTCUT_API_TOKEN", "x")
+    monkeypatch.setenv("SHORTCUT_MODE", "readwrite")
+    _mock_member()
+    respx.get(f"{BASE}/stories/5").mock(
+        return_value=httpx.Response(200, json={"id": 5, "labels": [], "owner_ids": ["u1"]})
+    )
+    put_route = respx.put(f"{BASE}/stories/5").mock(return_value=httpx.Response(200, json={"id": 5}))
+    server = create_server()
+    async with Client(server) as client:
+        result = await client.call_tool("shortcut_add_story_owners", {"story_id": 5, "owner_ids": ["u2", "u1"]})
+    assert not result.is_error
+    body = json.loads(put_route.calls.last.request.content)
+    assert body["owner_ids"] == ["u1", "u2"]
+
+
+@pytest.mark.asyncio
+@respx.mock
+async def test_bulk_create_stories_posts_stories_key(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("SHORTCUT_API_TOKEN", "x")
+    monkeypatch.setenv("SHORTCUT_MODE", "readwrite")
+    _mock_member()
+    route = respx.post(f"{BASE}/stories/bulk").mock(return_value=httpx.Response(201, json=[{"id": 1}, {"id": 2}]))
+    server = create_server()
+    stories = [{"name": "S1", "workflow_state_id": 500}, {"name": "S2", "workflow_state_id": 500}]
+    async with Client(server) as client:
+        result = await client.call_tool("shortcut_bulk_create_stories", {"stories": stories})
+    assert not result.is_error
+    body = json.loads(route.calls.last.request.content)
+    assert body == {"stories": stories}
+
+
+@pytest.mark.asyncio
+@respx.mock
+async def test_bulk_update_stories_includes_only_provided_fields(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("SHORTCUT_API_TOKEN", "x")
+    monkeypatch.setenv("SHORTCUT_MODE", "readwrite")
+    _mock_member()
+    route = respx.put(f"{BASE}/stories/bulk").mock(return_value=httpx.Response(200, json=[{"id": 1}]))
+    server = create_server()
+    async with Client(server) as client:
+        result = await client.call_tool(
+            "shortcut_bulk_update_stories",
+            {"story_ids": [1, 2], "workflow_state_id": 600},
+        )
+    assert not result.is_error
+    body = json.loads(route.calls.last.request.content)
+    assert body["story_ids"] == [1, 2]
+    assert body["workflow_state_id"] == 600
+    assert "archived" not in body
+    assert "epic_id" not in body
+
+
+@pytest.mark.asyncio
+@respx.mock
+async def test_create_story_from_template_includes_template_id(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("SHORTCUT_API_TOKEN", "x")
+    monkeypatch.setenv("SHORTCUT_MODE", "readwrite")
+    _mock_member()
+    route = respx.post(f"{BASE}/stories/from-template").mock(
+        return_value=httpx.Response(201, json={"id": 99, "name": "From template"})
+    )
+    server = create_server()
+    async with Client(server) as client:
+        result = await client.call_tool(
+            "shortcut_create_story_from_template",
+            {"template_id": "tmpl-abc", "name": "Override name"},
+        )
+    assert not result.is_error
+    assert result.data["id"] == 99
+    body = json.loads(route.calls.last.request.content)
+    assert body["story_template_id"] == "tmpl-abc"
+    assert body["name"] == "Override name"
+
+
+@pytest.mark.asyncio
+@respx.mock
+async def test_create_story_denied_in_readonly(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("SHORTCUT_API_TOKEN", "x")
+    # SHORTCUT_MODE defaults to readonly — no setenv needed
+    _mock_member()
+    server = create_server()
+    async with Client(server) as client:
+        result = await client.call_tool(
+            "shortcut_create_story",
+            {"name": "S", "workflow_state_id": 500},
+            raise_on_error=False,
+        )
+    assert result.is_error

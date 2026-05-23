@@ -187,6 +187,32 @@ async def test_all_profile_exposes_full_read_surface(monkeypatch: pytest.MonkeyP
 
 @pytest.mark.asyncio
 @respx.mock
+async def test_create_story_hidden_in_readonly_visible_in_readwrite(monkeypatch: pytest.MonkeyPatch) -> None:
+    from fastmcp import Client
+
+    monkeypatch.setenv("SHORTCUT_API_TOKEN", "x")
+    # Default mode is readonly — create_story must not appear in the tool list.
+    respx.get("https://api.app.shortcut.com/api/v3/member").mock(
+        return_value=httpx.Response(200, json={"id": "u1", "name": "tester"})
+    )
+    readonly_server = create_server()
+    async with Client(readonly_server) as client:
+        readonly_names = {t.name for t in await client.list_tools()}
+    assert "shortcut_create_story" not in readonly_names
+
+    # With SHORTCUT_MODE=readwrite it must appear.
+    monkeypatch.setenv("SHORTCUT_MODE", "readwrite")
+    respx.get("https://api.app.shortcut.com/api/v3/member").mock(
+        return_value=httpx.Response(200, json={"id": "u1", "name": "tester"})
+    )
+    readwrite_server = create_server()
+    async with Client(readwrite_server) as client:
+        readwrite_names = {t.name for t in await client.list_tools()}
+    assert "shortcut_create_story" in readwrite_names
+
+
+@pytest.mark.asyncio
+@respx.mock
 async def test_core_profile_is_smaller_than_all(monkeypatch: pytest.MonkeyPatch) -> None:
     from fastmcp import Client
 
