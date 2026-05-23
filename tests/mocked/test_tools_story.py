@@ -59,3 +59,20 @@ async def test_get_story_propagates_404(monkeypatch: pytest.MonkeyPatch) -> None
     async with Client(server) as client:
         result = await client.call_tool("shortcut_get_story", {"story_id": 9999}, raise_on_error=False)
     assert result.is_error
+
+
+@pytest.mark.asyncio
+@respx.mock
+async def test_list_story_history_returns_items(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("SHORTCUT_API_TOKEN", "x")
+    base = "https://api.app.shortcut.com/api/v3"
+    respx.get(f"{base}/member").mock(return_value=httpx.Response(200, json={"id": "u"}))
+    respx.get(f"{base}/stories/7/history").mock(
+        return_value=httpx.Response(200, json=[{"id": "h1"}, {"id": "h2"}])
+    )
+    server = create_server()
+    async with Client(server) as client:
+        result = await client.call_tool("shortcut_list_story_history", {"story_id": 7})
+    assert not result.is_error
+    assert result.data["items"][0]["id"] == "h1"
+    assert result.data["truncated"] is False
