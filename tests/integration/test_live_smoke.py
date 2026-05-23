@@ -15,6 +15,7 @@ Deselect from normal runs:
 
 from __future__ import annotations
 
+import contextlib
 import os
 
 import pytest
@@ -53,10 +54,8 @@ async def test_live_read_surface(live_token: str) -> None:
 
         env_id = os.environ.get("SHORTCUT_SMOKE_STORY_ID")
         if env_id:
-            try:
+            with contextlib.suppress(ValueError):
                 smoke_story_id = int(env_id)
-            except ValueError:
-                pass
 
         if smoke_story_id is None:
             search = await client.get("/search/stories", params={"query": "label:tracer-bullet", "page_size": 5})

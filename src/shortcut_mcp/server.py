@@ -3,9 +3,12 @@
 from __future__ import annotations
 
 import logging
-from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from dataclasses import dataclass, field
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from collections.abc import AsyncIterator
 
 import httpx
 from fastmcp import FastMCP

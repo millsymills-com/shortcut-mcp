@@ -2,9 +2,11 @@
 
 from __future__ import annotations
 
-from types import TracebackType
-from typing import Any
+from typing import TYPE_CHECKING, Any
 from urllib.parse import quote
+
+if TYPE_CHECKING:
+    from types import TracebackType
 
 import httpx
 from tenacity import (

@@ -18,7 +18,6 @@ from shortcut_mcp.clients.shortcut import ShortcutClient
 from shortcut_mcp.errors import (
     ShortcutAuthError,
     ShortcutClientError,
-    ShortcutConnectionError,
     ShortcutRateLimitedError,
     ShortcutServerError,
     ShortcutTimeoutError,
