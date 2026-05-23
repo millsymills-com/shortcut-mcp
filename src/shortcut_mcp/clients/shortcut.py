@@ -1,39 +1,76 @@
-"""Async httpx client for the Shortcut REST API.
-
-Retry + error-mapping layer is implemented in Task 11; this module
-provides the core: URL validation, path encoding, and generic verbs.
-"""
+"""Async httpx client for the Shortcut REST API."""
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from types import TracebackType
+from typing import Any
 from urllib.parse import quote
 
 import httpx
+from tenacity import (
+    AsyncRetrying,
+    retry_if_exception_type,
+    stop_after_attempt,
+    wait_exponential,
+)
 
-if TYPE_CHECKING:
-    from types import TracebackType
+from shortcut_mcp.errors import (
+    ShortcutAuthError,
+    ShortcutClientError,
+    ShortcutConnectionError,
+    ShortcutError,
+    ShortcutRateLimitedError,
+    ShortcutServerError,
+    ShortcutTimeoutError,
+)
 
 DEFAULT_BASE_URL = "https://api.app.shortcut.com/api/v3"
+IDEMPOTENT_METHODS = frozenset({"GET", "HEAD"})
+RETRYABLE_EXCEPTIONS = (ShortcutTimeoutError, ShortcutConnectionError)
 
 
 def _seg(value: str) -> str:
-    """Percent-encode a path segment.
-
-    Use for any caller-controlled fragment that becomes part of the URL
-    path (story IDs from URLs, label names with slashes, etc.). The empty
-    `safe=""` arg means *every* reserved character is escaped, so a
-    segment cannot accidentally traverse path boundaries.
-    """
+    """Percent-encode a path segment with no reserved characters allowed."""
     return quote(value, safe="")
 
 
 def _validate_path(path: str) -> None:
-    """Reject paths that could redirect the auth header to a different host."""
     if "://" in path:
         raise ValueError(f"path must be relative, not absolute: {path!r}")
     if not path.startswith("/"):
         raise ValueError(f"path must have a leading slash: {path!r}")
+
+
+def _safe_body(response: httpx.Response) -> Any:
+    try:
+        return response.json()
+    except ValueError:
+        return response.text
+
+
+def _parse_retry_after(response: httpx.Response) -> float | None:
+    raw = response.headers.get("Retry-After")
+    if raw is None:
+        return None
+    try:
+        return float(raw)
+    except ValueError:
+        return None
+
+
+def _map_status_to_error(response: httpx.Response) -> ShortcutError:
+    body = _safe_body(response)
+    if response.status_code == 401:
+        return ShortcutAuthError(status_code=401, body=body)
+    if response.status_code == 429:
+        return ShortcutRateLimitedError(
+            status_code=429, body=body, retry_after=_parse_retry_after(response)
+        )
+    if 400 <= response.status_code < 500:
+        return ShortcutClientError(status_code=response.status_code, body=body)
+    if response.status_code >= 500:
+        return ShortcutServerError(status_code=response.status_code, body=body)
+    return ShortcutError(status_code=response.status_code, body=body)
 
 
 class ShortcutClient:
@@ -43,7 +80,9 @@ class ShortcutClient:
         token: str,
         base_url: str = DEFAULT_BASE_URL,
         timeout: float = 30.0,
+        max_retries: int = 3,
     ) -> None:
+        self._max_retries = max_retries
         self._client = httpx.AsyncClient(
             base_url=base_url,
             headers={
@@ -89,10 +128,39 @@ class ShortcutClient:
         json: dict[str, Any] | None = None,
     ) -> Any:
         _validate_path(path)
-        response = await self._client.request(method, path, params=params, json=json)
-        # Error-mapping + retry come in Task 11. Core: raise raw on error,
-        # return None for 204, JSON otherwise.
+
+        if method in IDEMPOTENT_METHODS:
+            retryer = AsyncRetrying(
+                retry=retry_if_exception_type(RETRYABLE_EXCEPTIONS),
+                stop=stop_after_attempt(self._max_retries),
+                wait=wait_exponential(multiplier=0.2, max=2.0),
+                reraise=True,
+            )
+            async for attempt in retryer:
+                with attempt:
+                    return await self._issue(method, path, params=params, json=json)
+            return None  # unreachable; satisfies type checker
+        return await self._issue(method, path, params=params, json=json)
+
+    async def _issue(
+        self,
+        method: str,
+        path: str,
+        *,
+        params: dict[str, Any] | None,
+        json: dict[str, Any] | None,
+    ) -> Any:
+        try:
+            response = await self._client.request(method, path, params=params, json=json)
+        except httpx.TimeoutException as exc:
+            raise ShortcutTimeoutError(status_code=0, body=str(exc)) from exc
+        except httpx.ConnectError as exc:
+            raise ShortcutConnectionError(status_code=0, body=str(exc)) from exc
+        except httpx.HTTPError as exc:
+            raise ShortcutConnectionError(status_code=0, body=str(exc)) from exc
+
+        if response.status_code >= 400:
+            raise _map_status_to_error(response)
         if response.status_code == 204 or not response.content:
             return None
-        response.raise_for_status()
         return response.json()
