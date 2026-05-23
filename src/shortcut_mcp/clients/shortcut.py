@@ -142,6 +142,14 @@ class ShortcutClient:
             return None  # unreachable; satisfies type checker
         return await self._issue(method, path, params=params, json=json)
 
+    async def validate_connection(self) -> None:
+        """Probe the API with a cheap GET to surface auth/connection issues at startup.
+
+        Calls GET /member (the authenticated user's profile — minimal payload).
+        Any ShortcutError propagates so the lifespan can classify it.
+        """
+        await self.get("/member")
+
     async def _issue(
         self,
         method: str,
