@@ -5,7 +5,6 @@ from __future__ import annotations
 import os
 
 import pytest
-from pydantic import SecretStr
 
 from shortcut_mcp.config import ShortcutConfig
 
