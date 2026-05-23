@@ -9,6 +9,8 @@ from shortcut_mcp.tools._common import (
     read_tags,
     require_destructive,
     require_writes,
+    shape_member_summary,
+    shape_story_summary,
     shaped_list,
 )
 
@@ -53,3 +55,35 @@ def test_shaped_list_truncates_and_reports():
     assert out["total"] == 99
     assert len(out["items"]) == 3
     assert out["items"][0] == {"id": 0, "name": "s0"}
+
+
+def test_shape_story_summary_picks_key_fields():
+    raw = {
+        "id": 1,
+        "name": "S",
+        "story_type": "feature",
+        "workflow_state_id": 5,
+        "epic_id": 9,
+        "archived": False,
+        "description": "x" * 9999,
+    }
+    out = shape_story_summary(raw)
+    assert out == {
+        "id": 1,
+        "name": "S",
+        "story_type": "feature",
+        "workflow_state_id": 5,
+        "epic_id": 9,
+        "archived": False,
+    }
+
+
+def test_shape_member_summary_flattens_profile():
+    raw = {"id": "m1", "disabled": False, "profile": {"name": "Ada", "mention_name": "ada", "email_address": "a@b.c"}}
+    out = shape_member_summary(raw)
+    assert out == {"id": "m1", "disabled": False, "name": "Ada", "mention_name": "ada", "email_address": "a@b.c"}
+
+
+def test_shapers_tolerate_missing_optional_fields():
+    assert shape_story_summary({"id": 2})["id"] == 2  # no KeyError
+    assert shape_member_summary({"id": "m2"})["id"] == "m2"

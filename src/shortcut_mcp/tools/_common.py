@@ -51,9 +51,7 @@ def require_writes(ctx: Context) -> None:
 
 def require_destructive(ctx: Context) -> None:
     if not server_context(ctx).config.destructive_enabled:
-        raise ToolError(
-            "mode_denied: set SHORTCUT_MODE=readwrite and SHORTCUT_ALLOW_DESTRUCTIVE=true"
-        )
+        raise ToolError("mode_denied: set SHORTCUT_MODE=readwrite and SHORTCUT_ALLOW_DESTRUCTIVE=true")
 
 
 def shaped_list(
@@ -72,3 +70,89 @@ def shaped_list(
     if total is not None:
         out["total"] = total
     return out
+
+
+def _pick(raw: dict[str, Any], keys: tuple[str, ...]) -> dict[str, Any]:
+    """Extract a subset of keys from a dict, omitting missing ones."""
+    return {k: raw[k] for k in keys if k in raw}
+
+
+def shape_story_summary(raw: dict[str, Any]) -> dict[str, Any]:
+    """Pick key fields from a story for list display."""
+    return _pick(
+        raw,
+        (
+            "id",
+            "name",
+            "story_type",
+            "workflow_state_id",
+            "epic_id",
+            "iteration_id",
+            "owner_ids",
+            "app_url",
+            "archived",
+        ),
+    )
+
+
+def shape_epic_summary(raw: dict[str, Any]) -> dict[str, Any]:
+    """Pick key fields from an epic for list display."""
+    return _pick(raw, ("id", "name", "state", "epic_state_id", "milestone_id", "objective_ids", "app_url", "archived"))
+
+
+def shape_iteration_summary(raw: dict[str, Any]) -> dict[str, Any]:
+    """Pick key fields from an iteration for list display."""
+    return _pick(raw, ("id", "name", "status", "start_date", "end_date", "app_url"))
+
+
+def shape_objective_summary(raw: dict[str, Any]) -> dict[str, Any]:
+    """Pick key fields from an objective for list display."""
+    return _pick(raw, ("id", "name", "state", "archived", "app_url"))
+
+
+def shape_member_summary(raw: dict[str, Any]) -> dict[str, Any]:
+    """Flatten profile nested fields and pick key fields from a member."""
+    profile = raw.get("profile", {})
+    out = _pick(raw, ("id", "role", "disabled"))
+    out.update({k: profile[k] for k in ("name", "mention_name", "email_address") if k in profile})
+    return out
+
+
+def shape_group_summary(raw: dict[str, Any]) -> dict[str, Any]:
+    """Pick key fields from a group for list display."""
+    return _pick(raw, ("id", "name", "mention_name", "archived", "member_ids"))
+
+
+def shape_workflow_summary(raw: dict[str, Any]) -> dict[str, Any]:
+    """Pick key fields from a workflow for list display."""
+    return _pick(raw, ("id", "name", "default_state_id", "states"))
+
+
+def shape_label_summary(raw: dict[str, Any]) -> dict[str, Any]:
+    """Pick key fields from a label for list display."""
+    return _pick(raw, ("id", "name", "color", "archived"))
+
+
+def shape_project_summary(raw: dict[str, Any]) -> dict[str, Any]:
+    """Pick key fields from a project for list display."""
+    return _pick(raw, ("id", "name", "archived", "team_id"))
+
+
+def shape_file_summary(raw: dict[str, Any]) -> dict[str, Any]:
+    """Pick key fields from a file for list display."""
+    return _pick(raw, ("id", "name", "content_type", "size", "url"))
+
+
+def shape_linked_file_summary(raw: dict[str, Any]) -> dict[str, Any]:
+    """Pick key fields from a linked file for list display."""
+    return _pick(raw, ("id", "name", "type", "url", "story_ids"))
+
+
+def shape_comment_summary(raw: dict[str, Any]) -> dict[str, Any]:
+    """Pick key fields from a comment for list display."""
+    return _pick(raw, ("id", "author_id", "created_at", "text"))
+
+
+def shape_task_summary(raw: dict[str, Any]) -> dict[str, Any]:
+    """Pick key fields from a task for list display."""
+    return _pick(raw, ("id", "description", "complete", "story_id"))
