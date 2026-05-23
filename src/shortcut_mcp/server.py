@@ -80,6 +80,8 @@ def _register_all_tools(server: FastMCP) -> None:
     from shortcut_mcp.tools.epic import register as register_epic_tools
     from shortcut_mcp.tools.epic_comment import register as register_epic_comment_tools
     from shortcut_mcp.tools.epic_workflow import register as register_epic_workflow_tools
+    from shortcut_mcp.tools.iteration import register as register_iteration_tools
+    from shortcut_mcp.tools.objective import register as register_objective_tools
     from shortcut_mcp.tools.search import register as register_search_tools
     from shortcut_mcp.tools.story import register as register_story_tools
 
@@ -88,6 +90,8 @@ def _register_all_tools(server: FastMCP) -> None:
     register_epic_tools(server)
     register_epic_comment_tools(server)
     register_epic_workflow_tools(server)
+    register_iteration_tools(server)
+    register_objective_tools(server)
 
 
 def create_server(config: ShortcutConfig | None = None) -> FastMCP:
