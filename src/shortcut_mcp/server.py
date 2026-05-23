@@ -77,9 +77,11 @@ def _build_lifespan(config: ShortcutConfig):  # type: ignore[no-untyped-def]
 
 def _register_all_tools(server: FastMCP) -> None:
     """Register every v0.1+ tool. Imported lazily to avoid circular deps."""
+    from shortcut_mcp.tools.search import register as register_search_tools
     from shortcut_mcp.tools.story import register as register_story_tools
 
     register_story_tools(server)
+    register_search_tools(server)
 
 
 def create_server(config: ShortcutConfig | None = None) -> FastMCP:

@@ -26,8 +26,6 @@ def register(server: FastMCP) -> None:
         tags=read_tags("story"),
         annotations={"readOnlyHint": True, "openWorldHint": True},
     )
-    async def shortcut_list_story_history(
-        ctx: Context, story_id: int, limit: int = 50
-    ) -> dict[str, Any]:
+    async def shortcut_list_story_history(ctx: Context, story_id: int, limit: int = 50) -> dict[str, Any]:
         rows = await get_client(ctx).get(f"/stories/{_seg(str(story_id))}/history")
         return shaped_list(rows, lambda r: r, limit=limit)

@@ -67,9 +67,7 @@ async def test_list_story_history_returns_items(monkeypatch: pytest.MonkeyPatch)
     monkeypatch.setenv("SHORTCUT_API_TOKEN", "x")
     base = "https://api.app.shortcut.com/api/v3"
     respx.get(f"{base}/member").mock(return_value=httpx.Response(200, json={"id": "u"}))
-    respx.get(f"{base}/stories/7/history").mock(
-        return_value=httpx.Response(200, json=[{"id": "h1"}, {"id": "h2"}])
-    )
+    respx.get(f"{base}/stories/7/history").mock(return_value=httpx.Response(200, json=[{"id": "h1"}, {"id": "h2"}]))
     server = create_server()
     async with Client(server) as client:
         result = await client.call_tool("shortcut_list_story_history", {"story_id": 7})
