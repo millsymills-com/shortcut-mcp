@@ -41,6 +41,18 @@ async def test_get_epic_returns_full_object(monkeypatch):
 
 @pytest.mark.asyncio
 @respx.mock
+async def test_list_epics_raises_on_empty_body(monkeypatch):
+    monkeypatch.setenv("SHORTCUT_API_TOKEN", "x")
+    respx.get(f"{BASE}/member").mock(return_value=httpx.Response(200, json={"id": "u"}))
+    respx.get(f"{BASE}/epics").mock(return_value=httpx.Response(204))
+    server = create_server()
+    async with Client(server) as client:
+        result = await client.call_tool("shortcut_list_epics", {}, raise_on_error=False)
+    assert result.is_error
+
+
+@pytest.mark.asyncio
+@respx.mock
 async def test_list_epic_stories_shapes_rows(monkeypatch):
     monkeypatch.setenv("SHORTCUT_API_TOKEN", "x")
     respx.get(f"{BASE}/member").mock(return_value=httpx.Response(200, json={"id": "u"}))

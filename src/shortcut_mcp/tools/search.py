@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 
 from fastmcp import Context, FastMCP
+from fastmcp.exceptions import ToolError
 
 from shortcut_mcp.tools._common import (
     get_client,
@@ -85,6 +86,8 @@ def register(server: FastMCP) -> None:
     )
     async def shortcut_search(ctx: Context, query: str, limit: int = 25) -> dict[str, Any]:
         raw = await get_client(ctx).get("/search", params={"query": query, "page_size": min(limit, 25)})
+        if not isinstance(raw, dict):
+            raise ToolError(f"shortcut_search: /search returned {type(raw).__name__}, expected an object")
         stories = (raw.get("stories") or {}).get("data", [])
         epics = (raw.get("epics") or {}).get("data", [])
         return {
@@ -116,4 +119,6 @@ def register(server: FastMCP) -> None:
         if epic_id is not None:
             body["epic_id"] = epic_id
         rows = await get_client(ctx).post("/stories/search", json=body)
-        return shaped_list(rows or [], shape_story_summary, limit=limit)
+        if rows is None:
+            raise ToolError("shortcut_query_stories: POST /stories/search returned an empty body")
+        return shaped_list(rows, shape_story_summary, limit=limit)

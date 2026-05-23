@@ -63,6 +63,24 @@ async def test_paginate_respects_max_pages():
 
 
 @pytest.mark.asyncio
+@respx.mock
+async def test_paginate_rejects_non_dict_page():
+    base = "https://api.app.shortcut.com/api/v3"
+    respx.get(f"{base}/search/stories").mock(return_value=httpx.Response(200, json=[1, 2, 3]))
+    from shortcut_mcp.errors import ShortcutError
+
+    client = ShortcutClient(token="x")
+    with pytest.raises(ShortcutError, match="expected a paginated object"):
+        await client.paginate("/search/stories", params={"query": "x"})
+    await client.close()
+
+
+def test_split_next_rejects_double_slash():
+    with pytest.raises(ValueError, match="scheme-relative"):
+        _split_next("/api/v3//evil.com/x")
+
+
+@pytest.mark.asyncio
 @settings(max_examples=25, suppress_health_check=[HealthCheck.function_scoped_fixture])
 @given(page_count=st.integers(min_value=1, max_value=20), cap=st.integers(min_value=1, max_value=10))
 async def test_paginate_never_exceeds_max_pages(page_count: int, cap: int):

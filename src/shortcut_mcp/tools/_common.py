@@ -40,7 +40,8 @@ def server_context(ctx: Context) -> ServerContext:
 
 def get_client(ctx: Context) -> ShortcutClient:
     client = server_context(ctx).client
-    assert client is not None, "shortcut tools should be disabled when client is None"
+    if client is None:
+        raise ToolError("Shortcut client unavailable — startup validation failed or SHORTCUT_API_TOKEN is unset.")
     return client
 
 
@@ -62,7 +63,11 @@ def shaped_list(
     total: int | None = None,
 ) -> dict[str, Any]:
     """Trim a list response to `limit` summary rows with truncation metadata."""
-    truncated = len(rows) > limit
+    if not isinstance(rows, list):
+        raise ToolError(
+            f"expected a list from the Shortcut API, got {type(rows).__name__}; the response was empty or malformed"
+        )
+    truncated = len(rows) > limit or (total is not None and total > min(len(rows), limit))
     out: dict[str, Any] = {
         "items": [shaper(r) for r in rows[:limit]],
         "truncated": truncated,

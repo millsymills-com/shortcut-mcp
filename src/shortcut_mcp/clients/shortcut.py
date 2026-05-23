@@ -42,6 +42,8 @@ def _split_next(nxt: str) -> tuple[str, dict[str, str]]:
     path = parts.path
     if path.startswith(_API_PREFIX):
         path = path[len(_API_PREFIX) :]
+    if path.startswith("//"):
+        raise ValueError(f"next cursor path must not be scheme-relative: {path!r}")
     if not path.startswith("/"):
         raise ValueError(f"next cursor path must have a leading slash: {path!r}")
     return path, dict(parse_qsl(parts.query))
@@ -145,6 +147,11 @@ class ShortcutClient:
         next_path, next_params = path, dict(params or {})
         while True:
             page = await self.get(next_path, params=next_params)
+            if not isinstance(page, dict):
+                raise ShortcutError(
+                    status_code=0,
+                    body=f"paginate({path!r}): expected a paginated object, got {type(page).__name__}",
+                )
             items.extend(page.get("data", []))
             page_total = page.get("total")
             if page_total is not None:

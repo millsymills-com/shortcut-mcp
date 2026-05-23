@@ -87,3 +87,27 @@ def test_unknown_tool_name_rejected(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setenv("SHORTCUT_TOOLS", "story, bogus")
     with pytest.raises(ValidationError, match="bogus"):
         ShortcutConfig()
+
+
+def test_planning_profile_adds_group_and_project(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("SHORTCUT_API_TOKEN", "x")
+    monkeypatch.setenv("SHORTCUT_PROFILE", "planning")
+    cfg = ShortcutConfig()
+    assert cfg.shortcut_profile is ToolProfile.PLANNING
+    modules = cfg.enabled_modules
+    assert "group" in modules
+    assert "project" in modules
+    assert "file" not in modules
+    assert "linked_file" not in modules
+
+
+def test_files_profile_adds_file_and_linked_file(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("SHORTCUT_API_TOKEN", "x")
+    monkeypatch.setenv("SHORTCUT_PROFILE", "files")
+    cfg = ShortcutConfig()
+    assert cfg.shortcut_profile is ToolProfile.FILES
+    modules = cfg.enabled_modules
+    assert "file" in modules
+    assert "linked_file" in modules
+    assert "group" not in modules
+    assert "project" not in modules

@@ -8,14 +8,15 @@ from dataclasses import dataclass, field
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from collections.abc import AsyncIterator
+    from collections.abc import AsyncIterator, Callable
+    from contextlib import AbstractAsyncContextManager
 
 import httpx
 from fastmcp import FastMCP
 
 from shortcut_mcp.clients.shortcut import ShortcutClient
 from shortcut_mcp.config import ALL_MODULES, ShortcutConfig
-from shortcut_mcp.errors import ShortcutError, _classify_startup_error
+from shortcut_mcp.errors import ConfigError, ShortcutError, _classify_startup_error
 
 logger = logging.getLogger(__name__)
 
@@ -28,7 +29,9 @@ class ServerContext:
     client: ShortcutClient | None = field(default=None)
 
 
-def _build_lifespan(config: ShortcutConfig):  # type: ignore[no-untyped-def]
+def _build_lifespan(
+    config: ShortcutConfig,
+) -> Callable[[FastMCP], AbstractAsyncContextManager[ServerContext]]:
     @asynccontextmanager
     async def lifespan(server: FastMCP) -> AsyncIterator[ServerContext]:
         context = ServerContext(config=config)
@@ -39,7 +42,8 @@ def _build_lifespan(config: ShortcutConfig):  # type: ignore[no-untyped-def]
             yield context
             return
 
-        assert config.shortcut_api_token is not None
+        if config.shortcut_api_token is None:  # invariant: authenticated implies token present
+            raise ConfigError("authenticated but SHORTCUT_API_TOKEN is None — internal invariant violated")
         client = ShortcutClient(
             token=config.shortcut_api_token.get_secret_value(),
             base_url=config.shortcut_api_base_url,

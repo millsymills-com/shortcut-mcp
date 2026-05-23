@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import json
+
 import httpx
 import pytest
 import respx
@@ -90,6 +92,52 @@ async def test_search_objectives_routes_to_endpoint(monkeypatch):
         result = await client.call_tool("shortcut_search_objectives", {"query": "x"})
     assert not result.is_error
     assert result.data["items"] == [{"id": 8, "name": "Q3", "state": "active"}]
+
+
+@pytest.mark.asyncio
+@respx.mock
+async def test_query_stories_raises_on_empty_body(monkeypatch):
+    monkeypatch.setenv("SHORTCUT_API_TOKEN", "x")
+    respx.get(f"{BASE}/member").mock(return_value=httpx.Response(200, json={"id": "u"}))
+    respx.post(f"{BASE}/stories/search").mock(return_value=httpx.Response(204))
+    server = create_server()
+    async with Client(server) as client:
+        result = await client.call_tool("shortcut_query_stories", {}, raise_on_error=False)
+    assert result.is_error
+
+
+@pytest.mark.asyncio
+@respx.mock
+async def test_query_stories_sends_filter_body(monkeypatch):
+    monkeypatch.setenv("SHORTCUT_API_TOKEN", "x")
+    respx.get(f"{BASE}/member").mock(return_value=httpx.Response(200, json={"id": "u"}))
+    route = respx.post(f"{BASE}/stories/search").mock(return_value=httpx.Response(200, json=[]))
+    server = create_server()
+    async with Client(server) as client:
+        result = await client.call_tool(
+            "shortcut_query_stories", {"archived": False, "epic_id": 7}, raise_on_error=False
+        )
+    assert not result.is_error
+    body = json.loads(route.calls.last.request.content)
+    assert body == {"archived": False, "epic_id": 7}
+
+
+@pytest.mark.asyncio
+@respx.mock
+async def test_search_stories_truncates_at_limit(monkeypatch):
+    monkeypatch.setenv("SHORTCUT_API_TOKEN", "x")
+    respx.get(f"{BASE}/member").mock(return_value=httpx.Response(200, json={"id": "u"}))
+    rows = [{"id": i, "name": f"S{i}"} for i in range(5)]
+    respx.get(f"{BASE}/search/stories").mock(
+        return_value=httpx.Response(200, json={"data": rows, "next": None, "total": 5})
+    )
+    server = create_server()
+    async with Client(server) as client:
+        result = await client.call_tool("shortcut_search_stories", {"query": "x", "limit": 2})
+    assert not result.is_error
+    assert result.data["truncated"] is True
+    assert len(result.data["items"]) == 2
+    assert result.data["total"] == 5
 
 
 @pytest.mark.asyncio

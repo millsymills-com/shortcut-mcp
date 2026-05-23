@@ -92,3 +92,8 @@ def test_shape_member_summary_flattens_profile():
 def test_shapers_tolerate_missing_optional_fields():
     assert shape_story_summary({"id": 2})["id"] == 2  # no KeyError
     assert shape_member_summary({"id": "m2"})["id"] == "m2"
+
+
+def test_shaped_list_rejects_none():
+    with pytest.raises(ToolError, match="expected a list"):
+        shaped_list(None, lambda r: r, limit=10)  # type: ignore[arg-type]  # ty: ignore[invalid-argument-type]
