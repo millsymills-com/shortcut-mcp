@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from pathlib import Path
 from typing import TYPE_CHECKING, Any
 from urllib.parse import parse_qsl, quote, urlsplit
 
@@ -9,6 +10,7 @@ if TYPE_CHECKING:
     from types import TracebackType
 
 import httpx
+from httpx._multipart import MultipartStream
 from tenacity import (
     AsyncRetrying,
     retry_if_exception_type,
@@ -171,8 +173,42 @@ class ShortcutClient:
     async def put(self, path: str, *, json: dict[str, Any]) -> Any:
         return await self._request("PUT", path, json=json)
 
-    async def delete(self, path: str) -> Any:
-        return await self._request("DELETE", path)
+    async def delete(self, path: str, *, json: dict[str, Any] | None = None) -> Any:
+        return await self._request("DELETE", path, json=json)
+
+    async def upload(self, path: str, *, file_path: str, max_bytes: int = 50 * 1024 * 1024) -> Any:
+        """Upload a local file as multipart/form-data (Shortcut POST /files)."""
+        p = Path(file_path)
+        if not p.is_file():
+            raise ShortcutError(status_code=0, body=f"upload: not a file: {file_path!r}")
+        size = p.stat().st_size
+        if size > max_bytes:
+            raise ShortcutError(
+                status_code=0,
+                body=f"upload: file too large ({size} > {max_bytes} bytes)",
+            )
+        _validate_path(path)
+        files = {"file0": (p.name, p.read_bytes(), "application/octet-stream")}
+        req = self._client.build_request("POST", path, files=files)
+        # The client-level Content-Type: application/json default overrides the
+        # multipart boundary httpx sets on the stream; restore it from the stream
+        # (whose content_type carries the exact boundary used to encode the body).
+        if not isinstance(req.stream, MultipartStream):
+            raise ShortcutError(status_code=0, body="upload: failed to build a multipart request")
+        req.headers["content-type"] = req.stream.content_type
+        try:
+            resp = await self._client.send(req)
+        except httpx.TimeoutException as exc:
+            raise ShortcutTimeoutError(status_code=0, body=str(exc)) from exc
+        except httpx.ConnectError as exc:
+            raise ShortcutConnectionError(status_code=0, body=str(exc)) from exc
+        except httpx.HTTPError as exc:
+            raise ShortcutConnectionError(status_code=0, body=str(exc)) from exc
+        if resp.status_code >= 400:
+            raise _map_status_to_error(resp)
+        if resp.status_code == 204 or not resp.content:
+            return None
+        return resp.json()
 
     async def _request(
         self,
