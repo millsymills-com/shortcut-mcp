@@ -20,41 +20,45 @@ class ToolProfile(enum.StrEnum):
     ALL = "all"
 
 
-ALL_MODULES: frozenset[str] = frozenset({
-    "story",
-    "story_comment",
-    "story_task",
-    "story_link",
-    "epic",
-    "epic_comment",
-    "epic_workflow",
-    "iteration",
-    "objective",
-    "member",
-    "group",
-    "workflow",
-    "label",
-    "project",
-    "file",
-    "linked_file",
-    "search",
-})
+ALL_MODULES: frozenset[str] = frozenset(
+    {
+        "story",
+        "story_comment",
+        "story_task",
+        "story_link",
+        "epic",
+        "epic_comment",
+        "epic_workflow",
+        "iteration",
+        "objective",
+        "member",
+        "group",
+        "workflow",
+        "label",
+        "project",
+        "file",
+        "linked_file",
+        "search",
+    }
+)
 
-_CORE_MODULES: frozenset[str] = frozenset({
-    "story",
-    "story_comment",
-    "story_task",
-    "story_link",
-    "epic",
-    "epic_comment",
-    "epic_workflow",
-    "iteration",
-    "objective",
-    "member",
-    "workflow",
-    "label",
-    "search",
-})
+_CORE_MODULES: frozenset[str] = frozenset(
+    {
+        "story",
+        "story_comment",
+        "story_task",
+        "story_link",
+        "epic",
+        "epic_comment",
+        "epic_workflow",
+        "iteration",
+        "objective",
+        "member",
+        "workflow",
+        "label",
+        "search",
+    }
+)
 
 PROFILE_MODULES: dict[ToolProfile, frozenset[str]] = {
     ToolProfile.CORE: _CORE_MODULES,
