@@ -4,13 +4,64 @@ from __future__ import annotations
 
 import enum
 
-from pydantic import Field, SecretStr
+from pydantic import Field, SecretStr, field_validator
 from pydantic_settings import BaseSettings
 
 
 class ShortcutMode(enum.StrEnum):
     READONLY = "readonly"
     READWRITE = "readwrite"
+
+
+class ToolProfile(enum.StrEnum):
+    CORE = "core"
+    PLANNING = "planning"
+    FILES = "files"
+    ALL = "all"
+
+
+ALL_MODULES: frozenset[str] = frozenset({
+    "story",
+    "story_comment",
+    "story_task",
+    "story_link",
+    "epic",
+    "epic_comment",
+    "epic_workflow",
+    "iteration",
+    "objective",
+    "member",
+    "group",
+    "workflow",
+    "label",
+    "project",
+    "file",
+    "linked_file",
+    "search",
+})
+
+_CORE_MODULES: frozenset[str] = frozenset({
+    "story",
+    "story_comment",
+    "story_task",
+    "story_link",
+    "epic",
+    "epic_comment",
+    "epic_workflow",
+    "iteration",
+    "objective",
+    "member",
+    "workflow",
+    "label",
+    "search",
+})
+
+PROFILE_MODULES: dict[ToolProfile, frozenset[str]] = {
+    ToolProfile.CORE: _CORE_MODULES,
+    ToolProfile.PLANNING: _CORE_MODULES | {"group", "project"},
+    ToolProfile.FILES: _CORE_MODULES | {"file", "linked_file"},
+    ToolProfile.ALL: ALL_MODULES,
+}
 
 
 class ShortcutConfig(BaseSettings):
@@ -32,6 +83,18 @@ class ShortcutConfig(BaseSettings):
     shortcut_request_timeout: int = Field(default=30, gt=0)
     shortcut_max_retries: int = Field(default=3, ge=1)
 
+    shortcut_profile: ToolProfile = ToolProfile.CORE
+    shortcut_tools: str = ""
+
+    @field_validator("shortcut_tools")
+    @classmethod
+    def _validate_tools(cls, raw: str) -> str:
+        names = {n.strip() for n in raw.split(",") if n.strip()}
+        unknown = names - ALL_MODULES
+        if unknown:
+            raise ValueError(f"unknown SHORTCUT_TOOLS module(s): {sorted(unknown)}")
+        return raw
+
     @property
     def authenticated(self) -> bool:
         return self.shortcut_api_token is not None and bool(self.shortcut_api_token.get_secret_value())
@@ -43,3 +106,8 @@ class ShortcutConfig(BaseSettings):
     @property
     def destructive_enabled(self) -> bool:
         return self.writes_enabled and self.shortcut_allow_destructive
+
+    @property
+    def enabled_modules(self) -> frozenset[str]:
+        names = frozenset(n.strip() for n in self.shortcut_tools.split(",") if n.strip())
+        return names if names else PROFILE_MODULES[self.shortcut_profile]
