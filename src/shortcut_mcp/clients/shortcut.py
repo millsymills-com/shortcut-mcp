@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
-from urllib.parse import quote
+from urllib.parse import parse_qsl, quote, urlsplit
 
 if TYPE_CHECKING:
     from types import TracebackType
@@ -29,6 +29,22 @@ from shortcut_mcp.errors import (
 DEFAULT_BASE_URL = "https://api.app.shortcut.com/api/v3"
 IDEMPOTENT_METHODS = frozenset({"GET", "HEAD"})
 RETRYABLE_EXCEPTIONS = (ShortcutTimeoutError, ShortcutConnectionError)
+
+
+_API_PREFIX = "/api/v3"
+
+
+def _split_next(nxt: str) -> tuple[str, dict[str, str]]:
+    """Parse a Shortcut `next` cursor (path + query) into a client-relative (path, params)."""
+    parts = urlsplit(nxt)
+    if parts.netloc:
+        raise ValueError(f"next cursor must be relative, not absolute: {nxt!r}")
+    path = parts.path
+    if path.startswith(_API_PREFIX):
+        path = path[len(_API_PREFIX) :]
+    if not path.startswith("/"):
+        raise ValueError(f"next cursor path must have a leading slash: {path!r}")
+    return path, dict(parse_qsl(parts.query))
 
 
 def _seg(value: str) -> str:
@@ -65,9 +81,7 @@ def _map_status_to_error(response: httpx.Response) -> ShortcutError:
     if response.status_code == 401:
         return ShortcutAuthError(status_code=401, body=body)
     if response.status_code == 429:
-        return ShortcutRateLimitedError(
-            status_code=429, body=body, retry_after=_parse_retry_after(response)
-        )
+        return ShortcutRateLimitedError(status_code=429, body=body, retry_after=_parse_retry_after(response))
     if 400 <= response.status_code < 500:
         return ShortcutClientError(status_code=response.status_code, body=body)
     if response.status_code >= 500:
@@ -111,6 +125,38 @@ class ShortcutClient:
 
     async def get(self, path: str, *, params: dict[str, Any] | None = None) -> Any:
         return await self._request("GET", path, params=params)
+
+    async def paginate(
+        self,
+        path: str,
+        *,
+        params: dict[str, Any] | None = None,
+        max_pages: int = 5,
+        limit: int | None = None,
+    ) -> dict[str, Any]:
+        """Follow the `{data, next, total}` cursor up to max_pages / limit.
+
+        Used by /search/* and /epics/paginated. The `next` cursor is parsed into
+        a relative (path, params) so the query never lands in the path.
+        """
+        items: list[Any] = []
+        total: int | None = None
+        pages = 0
+        next_path, next_params = path, dict(params or {})
+        while True:
+            page = await self.get(next_path, params=next_params)
+            items.extend(page.get("data", []))
+            page_total = page.get("total")
+            if page_total is not None:
+                total = page_total
+            pages += 1
+            nxt = page.get("next")
+            if not nxt or pages >= max_pages or (limit is not None and len(items) >= limit):
+                break
+            next_path, next_params = _split_next(nxt)
+        if limit is not None:
+            items = items[:limit]
+        return {"data": items, "total": total, "pages": pages}
 
     async def post(self, path: str, *, json: dict[str, Any]) -> Any:
         return await self._request("POST", path, json=json)
