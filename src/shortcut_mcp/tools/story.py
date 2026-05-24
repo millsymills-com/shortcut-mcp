@@ -7,10 +7,19 @@ from typing import Any
 from fastmcp import Context, FastMCP
 
 from shortcut_mcp.clients.shortcut import _seg
-from shortcut_mcp.tools._common import get_client, read_tags, require_writes, shaped_list, write_tags
+from shortcut_mcp.tools._common import (
+    destructive_tags,
+    get_client,
+    read_tags,
+    require_destructive,
+    require_writes,
+    shaped_list,
+    write_tags,
+)
 
 _MODULE = "story"
 _WRITE_ANN: dict[str, Any] = {"readOnlyHint": False, "destructiveHint": False}
+_DESTRUCTIVE_ANN: dict[str, Any] = {"readOnlyHint": False, "destructiveHint": True, "idempotentHint": True}
 
 
 def register(server: FastMCP) -> None:
@@ -245,3 +254,31 @@ def register(server: FastMCP) -> None:
         if labels is not None:
             body["labels"] = [{"name": n} for n in labels]
         return await get_client(ctx).post("/stories/from-template", json=body)
+
+    @server.tool(
+        name="shortcut_delete_story",
+        description=(
+            "Permanently delete a Shortcut story. Irreversible. "
+            "Requires SHORTCUT_MODE=readwrite and SHORTCUT_ALLOW_DESTRUCTIVE=true."
+        ),
+        tags=destructive_tags(_MODULE),
+        annotations=_DESTRUCTIVE_ANN,
+    )
+    async def shortcut_delete_story(ctx: Context, story_id: int) -> dict[str, Any]:
+        require_destructive(ctx)
+        await get_client(ctx).delete(f"/stories/{_seg(str(story_id))}")
+        return {"id": story_id, "deleted": True}
+
+    @server.tool(
+        name="shortcut_bulk_delete_stories",
+        description=(
+            "Permanently delete multiple stories in one request (DELETE /stories/bulk). "
+            "Irreversible. Requires SHORTCUT_MODE=readwrite and SHORTCUT_ALLOW_DESTRUCTIVE=true."
+        ),
+        tags=destructive_tags(_MODULE),
+        annotations=_DESTRUCTIVE_ANN,
+    )
+    async def shortcut_bulk_delete_stories(ctx: Context, story_ids: list[int]) -> dict[str, Any]:
+        require_destructive(ctx)
+        await get_client(ctx).delete("/stories/bulk", json={"story_ids": story_ids})
+        return {"story_ids": story_ids, "deleted": True}
