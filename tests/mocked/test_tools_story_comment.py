@@ -115,3 +115,19 @@ async def test_remove_story_comment_reaction_sends_delete_with_body(monkeypatch:
     assert not result.is_error
     body = json.loads(route.calls.last.request.content)
     assert body == {"emoji": "x"}
+
+
+@pytest.mark.asyncio
+@respx.mock
+async def test_delete_story_comment_confirms(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("SHORTCUT_API_TOKEN", "x")
+    monkeypatch.setenv("SHORTCUT_MODE", "readwrite")
+    monkeypatch.setenv("SHORTCUT_ALLOW_DESTRUCTIVE", "true")
+    respx.get(f"{BASE}/member").mock(return_value=httpx.Response(200, json={"id": "u"}))
+    route = respx.delete(f"{BASE}/stories/5/comments/9").mock(return_value=httpx.Response(204))
+    server = create_server()
+    async with Client(server) as client:
+        result = await client.call_tool("shortcut_delete_story_comment", {"story_id": 5, "comment_id": 9})
+    assert not result.is_error
+    assert result.data == {"id": 9, "deleted": True}
+    assert route.called
