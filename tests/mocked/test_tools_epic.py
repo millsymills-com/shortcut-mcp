@@ -148,3 +148,19 @@ async def test_unarchive_epic_puts_archived_false(monkeypatch: pytest.MonkeyPatc
     assert not result.is_error
     body = json.loads(route.calls.last.request.content)
     assert body == {"archived": False}
+
+
+@pytest.mark.asyncio
+@respx.mock
+async def test_delete_epic_confirms(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("SHORTCUT_API_TOKEN", "x")
+    monkeypatch.setenv("SHORTCUT_MODE", "readwrite")
+    monkeypatch.setenv("SHORTCUT_ALLOW_DESTRUCTIVE", "true")
+    respx.get(f"{BASE}/member").mock(return_value=httpx.Response(200, json={"id": "u"}))
+    route = respx.delete(f"{BASE}/epics/12").mock(return_value=httpx.Response(204))
+    server = create_server()
+    async with Client(server) as client:
+        result = await client.call_tool("shortcut_delete_epic", {"epic_id": 12})
+    assert not result.is_error
+    assert result.data == {"id": 12, "deleted": True}
+    assert route.called
