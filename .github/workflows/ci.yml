@@ -61,8 +61,8 @@ jobs:
           enable-cache: true
       - run: uv sync --extra dev --frozen
       - name: Workflow audit (zizmor)
-        # Offline: skips audits that need a GitHub token / network, matching the
-        # local pre-commit run and keeping the job hermetic.
+        # Offline: skips audits that need a GitHub token / network, keeping the
+        # audit hermetic. Current workflows pass with no findings.
         run: uvx zizmor@1.24.1 --offline .github/workflows/
       - name: Static analysis (bandit)
         run: uvx bandit -c pyproject.toml -r src
