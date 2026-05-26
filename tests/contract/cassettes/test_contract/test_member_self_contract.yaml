@@ -1,0 +1,60 @@
+interactions:
+- request:
+    body: ''
+    headers:
+      Accept:
+      - application/json
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json
+      Host:
+      - api.app.shortcut.com
+      Shortcut-Token:
+      - DUMMY
+      User-Agent:
+      - python-httpx/0.28.1
+    method: GET
+    uri: https://api.app.shortcut.com/api/v3/member
+  response:
+    body:
+      string: '{"id": "6a1042c0-f182-409f-90fb-98a30cc66b62", "is_owner": true, "mention_name":
+        "mills6169", "name": "mills", "role": "admin", "workspace2": {"id": "6a1042c0-a06e-4711-80a9-0178a339396b",
+        "created_at": "2026-05-22T11:49:20Z", "default_workflow_id": 500000005, "estimate_scale":
+        [0, 1, 2, 4, 8], "korey_enabled": true, "name": "millsymills", "url_slug":
+        "millsymills", "utc_offset": "-05:00"}, "organization2": {"id": "6a1042c0-958a-4fe0-90fa-07c3b7a37651"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '425'
+      Content-Type:
+      - application/json;charset=utf-8
+      Date:
+      - Tue, 26 May 2026 20:25:19 GMT
+      access-control-allow-credentials:
+      - 'true'
+      access-control-expose-headers:
+      - Vary, Server-Timing, Database-Time, Request-Key
+      cache-control:
+      - no-store
+      database-time:
+      - '1305515675'
+      pragma:
+      - no-cache
+      request-key:
+      - 59ad53dee281
+      server-timing:
+      - respWOses;dur=2
+      strict-transport-security:
+      - max-age=31536000; includeSubDomains
+      vary:
+      - Accept, Tenant-Workspace2, Tenant-Organization2, origin, shortcut-token
+      x-content-type-options:
+      - nosniff
+    status:
+      code: 200
+      message: OK
+version: 1

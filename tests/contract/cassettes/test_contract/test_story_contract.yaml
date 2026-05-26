@@ -1,0 +1,181 @@
+interactions:
+- request:
+    body: ''
+    headers:
+      Accept:
+      - application/json
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json
+      Host:
+      - api.app.shortcut.com
+      Shortcut-Token:
+      - DUMMY
+      User-Agent:
+      - python-httpx/0.28.1
+    method: GET
+    uri: https://api.app.shortcut.com/api/v3/search/stories?query=is%3Astory&page_size=1
+  response:
+    body:
+      string: '{"next": "/api/v3/search/stories?query=is%3Astory&detail=full&page_size=1&next=1cfab66ed50b0717810be9f9f23f2b1a5f457815~0",
+        "data": [{"app_url": "https://app.shortcut.com/millsymills/story/104", "description":
+        "", "archived": false, "started": true, "story_links": [], "entity_type":
+        "story", "labels": [{"app_url": "https://app.shortcut.com/millsymills/label/48",
+        "description": "", "archived": false, "entity_type": "label", "color": null,
+        "name": "area:ci", "global_id": "v2:l:6a1042c0-a06e-4711-80a9-0178a339396b:48",
+        "updated_at": "2026-05-23T06:07:12Z", "external_id": null, "id": 48, "created_at":
+        "2026-05-23T06:07:12Z"}, {"app_url": "https://app.shortcut.com/millsymills/label/73",
+        "description": "", "archived": false, "entity_type": "label", "color": null,
+        "name": "type:release", "global_id": "v2:l:6a1042c0-a06e-4711-80a9-0178a339396b:73",
+        "updated_at": "2026-05-23T06:07:15Z", "external_id": null, "id": 73, "created_at":
+        "2026-05-23T06:07:15Z"}], "mention_ids": [], "member_mention_ids": [], "story_type":
+        "feature", "custom_fields": [], "linked_files": [], "workflow_id": 500000005,
+        "completed_at_override": null, "started_at": "2026-05-26T20:06:36Z", "completed_at":
+        null, "name": "Single-source versioning + Keep-a-Changelog + semver releases",
+        "global_id": "v2:s:6a1042c0-a06e-4711-80a9-0178a339396b:104", "completed":
+        false, "comments": [], "blocker": false, "branches": [], "epic_id": 101, "story_template_id":
+        null, "external_links": [], "previous_iteration_ids": [], "requested_by_id":
+        "6a1042c0-f182-409f-90fb-98a30cc66b62", "iteration_id": null, "sub_task_story_ids":
+        [], "tasks": [], "formatted_vcs_branch_name": null, "label_ids": [73, 48],
+        "started_at_override": null, "group_id": null, "workflow_state_id": 500000008,
+        "updated_at": "2026-05-26T20:06:36Z", "pull_requests": [{"entity_type": "pull-request",
+        "closed": false, "merged": false, "num_added": 43, "branch_id": 500000026,
+        "overlapping_stories": [], "number": 22, "branch_name": "chore/versioning-changelog",
+        "target_branch_name": "main", "num_commits": null, "title": "docs: align version
+        with v0.4, document token security and rate limits", "updated_at": "2026-05-26T20:06:36Z",
+        "has_overlapping_stories": false, "draft": false, "id": 500000027, "url":
+        "https://github.com/millsymills-com/shortcut-mcp/pull/22", "num_removed":
+        4, "review_status": "review-required", "num_modified": null, "target_branch_id":
+        500000019, "repository_id": 500000018, "created_at": "2026-05-26T20:06:36Z"}],
+        "group_mention_ids": [], "follower_ids": ["6a1042c0-f182-409f-90fb-98a30cc66b62"],
+        "owner_ids": ["6a1042c0-f182-409f-90fb-98a30cc66b62"], "external_id": null,
+        "id": 104, "parent_story_id": null, "estimate": null, "commits": [], "files":
+        [], "position": 32151022592, "blocked": false, "project_id": null, "deadline":
+        null, "stats": {"num_related_documents": 0}, "created_at": "2026-05-23T10:05:12Z",
+        "moved_at": "2026-05-26T20:06:36Z"}], "total": 66}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json;charset=utf-8
+      Date:
+      - Tue, 26 May 2026 20:25:20 GMT
+      access-control-allow-credentials:
+      - 'true'
+      access-control-expose-headers:
+      - Vary, Server-Timing, Database-Time, Request-Key
+      cache-control:
+      - no-store
+      content-length:
+      - '2753'
+      database-time:
+      - '1305515693'
+      pragma:
+      - no-cache
+      request-key:
+      - 80ff70b3ec90
+      server-timing:
+      - respWOses;dur=40
+      strict-transport-security:
+      - max-age=31536000; includeSubDomains
+      vary:
+      - Accept, Tenant-Workspace2, Tenant-Organization2, origin, shortcut-token, Accept-Encoding
+      x-content-type-options:
+      - nosniff
+    status:
+      code: 200
+      message: OK
+- request:
+    body: ''
+    headers:
+      Accept:
+      - application/json
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json
+      Host:
+      - api.app.shortcut.com
+      Shortcut-Token:
+      - DUMMY
+      User-Agent:
+      - python-httpx/0.28.1
+    method: GET
+    uri: https://api.app.shortcut.com/api/v3/stories/104
+  response:
+    body:
+      string: '{"app_url": "https://app.shortcut.com/millsymills/story/104", "description":
+        "", "archived": false, "started": true, "story_links": [], "entity_type":
+        "story", "labels": [{"app_url": "https://app.shortcut.com/millsymills/label/48",
+        "description": "", "archived": false, "entity_type": "label", "color": null,
+        "name": "area:ci", "global_id": "v2:l:6a1042c0-a06e-4711-80a9-0178a339396b:48",
+        "updated_at": "2026-05-23T06:07:12Z", "external_id": null, "id": 48, "created_at":
+        "2026-05-23T06:07:12Z"}, {"app_url": "https://app.shortcut.com/millsymills/label/73",
+        "description": "", "archived": false, "entity_type": "label", "color": null,
+        "name": "type:release", "global_id": "v2:l:6a1042c0-a06e-4711-80a9-0178a339396b:73",
+        "updated_at": "2026-05-23T06:07:15Z", "external_id": null, "id": 73, "created_at":
+        "2026-05-23T06:07:15Z"}], "mention_ids": [], "member_mention_ids": [], "story_type":
+        "feature", "custom_fields": [], "linked_files": [], "workflow_id": 500000005,
+        "completed_at_override": null, "started_at": "2026-05-26T20:06:36Z", "completed_at":
+        null, "name": "Single-source versioning + Keep-a-Changelog + semver releases",
+        "global_id": "v2:s:6a1042c0-a06e-4711-80a9-0178a339396b:104", "completed":
+        false, "comments": [], "blocker": false, "branches": [], "epic_id": 101, "story_template_id":
+        null, "external_links": [], "previous_iteration_ids": [], "requested_by_id":
+        "6a1042c0-f182-409f-90fb-98a30cc66b62", "iteration_id": null, "sub_task_story_ids":
+        [], "tasks": [], "formatted_vcs_branch_name": null, "label_ids": [73, 48],
+        "started_at_override": null, "group_id": null, "workflow_state_id": 500000008,
+        "updated_at": "2026-05-26T20:06:36Z", "pull_requests": [{"entity_type": "pull-request",
+        "closed": false, "merged": false, "num_added": 43, "branch_id": 500000026,
+        "overlapping_stories": [], "number": 22, "branch_name": "chore/versioning-changelog",
+        "target_branch_name": "main", "num_commits": null, "title": "docs: align version
+        with v0.4, document token security and rate limits", "updated_at": "2026-05-26T20:06:36Z",
+        "has_overlapping_stories": false, "draft": false, "id": 500000027, "url":
+        "https://github.com/millsymills-com/shortcut-mcp/pull/22", "num_removed":
+        4, "review_status": "review-required", "num_modified": null, "target_branch_id":
+        500000019, "repository_id": 500000018, "created_at": "2026-05-26T20:06:36Z"}],
+        "group_mention_ids": [], "follower_ids": ["6a1042c0-f182-409f-90fb-98a30cc66b62"],
+        "owner_ids": ["6a1042c0-f182-409f-90fb-98a30cc66b62"], "external_id": null,
+        "id": 104, "parent_story_id": null, "estimate": null, "commits": [], "files":
+        [], "position": 32151022592, "blocked": false, "project_id": null, "deadline":
+        null, "stats": {"num_related_documents": 0}, "created_at": "2026-05-23T10:05:12Z",
+        "moved_at": "2026-05-26T20:06:36Z"}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json;charset=utf-8
+      Date:
+      - Tue, 26 May 2026 20:25:20 GMT
+      access-control-allow-credentials:
+      - 'true'
+      access-control-expose-headers:
+      - ETag, Vary, Server-Timing, Database-Time, Request-Key
+      cache-control:
+      - no-cache
+      content-length:
+      - '2606'
+      database-time:
+      - '1305515695'
+      etag:
+      - '"v1-53cd5697eb07f3cd-1779825996291"'
+      last-modified:
+      - Tue, 26 May 2026 20:06:36 GMT
+      request-key:
+      - 9835ae9a414d
+      server-timing:
+      - respWOses;dur=94
+      strict-transport-security:
+      - max-age=31536000; includeSubDomains
+      vary:
+      - Accept, Tenant-Workspace2, Tenant-Organization2, origin, shortcut-token, Accept-Encoding
+      x-content-type-options:
+      - nosniff
+    status:
+      code: 200
+      message: OK
+version: 1

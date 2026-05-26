@@ -1,0 +1,80 @@
+interactions:
+- request:
+    body: ''
+    headers:
+      Accept:
+      - application/json
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json
+      Host:
+      - api.app.shortcut.com
+      Shortcut-Token:
+      - DUMMY
+      User-Agent:
+      - python-httpx/0.28.1
+    method: GET
+    uri: https://api.app.shortcut.com/api/v3/workflows
+  response:
+    body:
+      string: '[{"description": "Our default workflow, designed for product and engineering
+        teams. Add to or edit these States to customize your team''s workflow.", "entity_type":
+        "workflow", "project_ids": [], "states": [{"description": "", "entity_type":
+        "workflow-state", "verb": null, "name": "Backlog", "global_id": "v2:wfs:6a1042c0-a06e-4711-80a9-0178a339396b:500000006",
+        "num_stories": 0, "type": "backlog", "updated_at": "2026-05-22T11:49:20Z",
+        "id": 500000006, "num_story_templates": 0, "position": 1, "created_at": "2026-05-22T11:49:20Z"},
+        {"description": "", "entity_type": "workflow-state", "verb": null, "name":
+        "To Do", "global_id": "v2:wfs:6a1042c0-a06e-4711-80a9-0178a339396b:500000007",
+        "num_stories": 41, "type": "unstarted", "updated_at": "2026-05-22T11:49:20Z",
+        "id": 500000007, "num_story_templates": 0, "position": 2, "created_at": "2026-05-22T11:49:20Z"},
+        {"description": "", "entity_type": "workflow-state", "verb": "start", "name":
+        "In Progress", "global_id": "v2:wfs:6a1042c0-a06e-4711-80a9-0178a339396b:500000008",
+        "num_stories": 6, "type": "started", "updated_at": "2026-05-22T11:49:20Z",
+        "id": 500000008, "num_story_templates": 0, "position": 3, "created_at": "2026-05-22T11:49:20Z"},
+        {"description": "", "entity_type": "workflow-state", "verb": null, "name":
+        "In Review", "global_id": "v2:wfs:6a1042c0-a06e-4711-80a9-0178a339396b:500000009",
+        "num_stories": 0, "type": "started", "updated_at": "2026-05-22T11:49:20Z",
+        "id": 500000009, "num_story_templates": 0, "position": 4, "created_at": "2026-05-22T11:49:20Z"},
+        {"description": "", "entity_type": "workflow-state", "verb": "finish", "name":
+        "Done", "global_id": "v2:wfs:6a1042c0-a06e-4711-80a9-0178a339396b:500000010",
+        "num_stories": 19, "type": "done", "updated_at": "2026-05-22T11:49:20Z", "id":
+        500000010, "num_story_templates": 0, "position": 5, "created_at": "2026-05-22T11:49:20Z"}],
+        "name": "Standard", "updated_at": "2026-05-22T11:49:20Z", "auto_assign_owner":
+        true, "id": 500000005, "team_id": 500000005, "created_at": "2026-05-22T11:49:20Z",
+        "default_state_id": 500000007}]'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json;charset=utf-8
+      Date:
+      - Tue, 26 May 2026 20:25:18 GMT
+      access-control-allow-credentials:
+      - 'true'
+      access-control-expose-headers:
+      - Vary, Server-Timing, Database-Time, Request-Key
+      cache-control:
+      - no-store
+      content-length:
+      - '1909'
+      database-time:
+      - '1305515655'
+      pragma:
+      - no-cache
+      request-key:
+      - a61bc0e73b23
+      server-timing:
+      - respWOses;dur=17
+      strict-transport-security:
+      - max-age=31536000; includeSubDomains
+      vary:
+      - Accept, Tenant-Workspace2, Tenant-Organization2, origin, shortcut-token, Accept-Encoding
+      x-content-type-options:
+      - nosniff
+    status:
+      code: 200
+      message: OK
+version: 1

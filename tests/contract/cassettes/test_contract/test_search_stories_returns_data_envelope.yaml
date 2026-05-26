@@ -1,0 +1,235 @@
+interactions:
+- request:
+    body: ''
+    headers:
+      Accept:
+      - application/json
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json
+      Host:
+      - api.app.shortcut.com
+      Shortcut-Token:
+      - DUMMY
+      User-Agent:
+      - python-httpx/0.28.1
+    method: GET
+    uri: https://api.app.shortcut.com/api/v3/search/stories?query=is%3Astory&page_size=5
+  response:
+    body:
+      string: '{"next": "/api/v3/search/stories?query=is%3Astory&detail=full&page_size=5&next=996c30603e86b07d1cb72e7c74030f555011451a~4",
+        "data": [{"app_url": "https://app.shortcut.com/millsymills/story/104", "description":
+        "", "archived": false, "started": true, "story_links": [], "entity_type":
+        "story", "labels": [{"app_url": "https://app.shortcut.com/millsymills/label/48",
+        "description": "", "archived": false, "entity_type": "label", "color": null,
+        "name": "area:ci", "global_id": "v2:l:6a1042c0-a06e-4711-80a9-0178a339396b:48",
+        "updated_at": "2026-05-23T06:07:12Z", "external_id": null, "id": 48, "created_at":
+        "2026-05-23T06:07:12Z"}, {"app_url": "https://app.shortcut.com/millsymills/label/73",
+        "description": "", "archived": false, "entity_type": "label", "color": null,
+        "name": "type:release", "global_id": "v2:l:6a1042c0-a06e-4711-80a9-0178a339396b:73",
+        "updated_at": "2026-05-23T06:07:15Z", "external_id": null, "id": 73, "created_at":
+        "2026-05-23T06:07:15Z"}], "mention_ids": [], "member_mention_ids": [], "story_type":
+        "feature", "custom_fields": [], "linked_files": [], "workflow_id": 500000005,
+        "completed_at_override": null, "started_at": "2026-05-26T20:06:36Z", "completed_at":
+        null, "name": "Single-source versioning + Keep-a-Changelog + semver releases",
+        "global_id": "v2:s:6a1042c0-a06e-4711-80a9-0178a339396b:104", "completed":
+        false, "comments": [], "blocker": false, "branches": [], "epic_id": 101, "story_template_id":
+        null, "external_links": [], "previous_iteration_ids": [], "requested_by_id":
+        "6a1042c0-f182-409f-90fb-98a30cc66b62", "iteration_id": null, "sub_task_story_ids":
+        [], "tasks": [], "formatted_vcs_branch_name": null, "label_ids": [73, 48],
+        "started_at_override": null, "group_id": null, "workflow_state_id": 500000008,
+        "updated_at": "2026-05-26T20:06:36Z", "pull_requests": [{"entity_type": "pull-request",
+        "closed": false, "merged": false, "num_added": 43, "branch_id": 500000026,
+        "overlapping_stories": [], "number": 22, "branch_name": "chore/versioning-changelog",
+        "target_branch_name": "main", "num_commits": null, "title": "docs: align version
+        with v0.4, document token security and rate limits", "updated_at": "2026-05-26T20:06:36Z",
+        "has_overlapping_stories": false, "draft": false, "id": 500000027, "url":
+        "https://github.com/millsymills-com/shortcut-mcp/pull/22", "num_removed":
+        4, "review_status": "review-required", "num_modified": null, "target_branch_id":
+        500000019, "repository_id": 500000018, "created_at": "2026-05-26T20:06:36Z"}],
+        "group_mention_ids": [], "follower_ids": ["6a1042c0-f182-409f-90fb-98a30cc66b62"],
+        "owner_ids": ["6a1042c0-f182-409f-90fb-98a30cc66b62"], "external_id": null,
+        "id": 104, "parent_story_id": null, "estimate": null, "commits": [], "files":
+        [], "position": 32151022592, "blocked": false, "project_id": null, "deadline":
+        null, "stats": {"num_related_documents": 0}, "created_at": "2026-05-23T10:05:12Z",
+        "moved_at": "2026-05-26T20:06:36Z"}, {"app_url": "https://app.shortcut.com/millsymills/story/102",
+        "description": "", "archived": false, "started": true, "story_links": [],
+        "entity_type": "story", "labels": [{"app_url": "https://app.shortcut.com/millsymills/label/71",
+        "description": "", "archived": false, "entity_type": "label", "color": null,
+        "name": "area:docs", "global_id": "v2:l:6a1042c0-a06e-4711-80a9-0178a339396b:71",
+        "updated_at": "2026-05-23T06:07:15Z", "external_id": null, "id": 71, "created_at":
+        "2026-05-23T06:07:15Z"}, {"app_url": "https://app.shortcut.com/millsymills/label/49",
+        "description": "", "archived": false, "entity_type": "label", "color": null,
+        "name": "type:scaffold", "global_id": "v2:l:6a1042c0-a06e-4711-80a9-0178a339396b:49",
+        "updated_at": "2026-05-23T06:07:12Z", "external_id": null, "id": 49, "created_at":
+        "2026-05-23T06:07:12Z"}], "mention_ids": [], "member_mention_ids": [], "story_type":
+        "feature", "custom_fields": [], "linked_files": [], "workflow_id": 500000005,
+        "completed_at_override": null, "started_at": "2026-05-26T20:06:36Z", "completed_at":
+        null, "name": "README tool catalog + token-security + rate-limit docs", "global_id":
+        "v2:s:6a1042c0-a06e-4711-80a9-0178a339396b:102", "completed": false, "comments":
+        [], "blocker": false, "branches": [], "epic_id": 101, "story_template_id":
+        null, "external_links": [], "previous_iteration_ids": [], "requested_by_id":
+        "6a1042c0-f182-409f-90fb-98a30cc66b62", "iteration_id": null, "sub_task_story_ids":
+        [], "tasks": [], "formatted_vcs_branch_name": null, "label_ids": [71, 49],
+        "started_at_override": null, "group_id": null, "workflow_state_id": 500000008,
+        "updated_at": "2026-05-26T20:06:36Z", "pull_requests": [{"entity_type": "pull-request",
+        "closed": false, "merged": false, "num_added": 43, "branch_id": 500000026,
+        "overlapping_stories": [], "number": 22, "branch_name": "chore/versioning-changelog",
+        "target_branch_name": "main", "num_commits": null, "title": "docs: align version
+        with v0.4, document token security and rate limits", "updated_at": "2026-05-26T20:06:36Z",
+        "has_overlapping_stories": false, "draft": false, "id": 500000027, "url":
+        "https://github.com/millsymills-com/shortcut-mcp/pull/22", "num_removed":
+        4, "review_status": "review-required", "num_modified": null, "target_branch_id":
+        500000019, "repository_id": 500000018, "created_at": "2026-05-26T20:06:36Z"}],
+        "group_mention_ids": [], "follower_ids": ["6a1042c0-f182-409f-90fb-98a30cc66b62"],
+        "owner_ids": ["6a1042c0-f182-409f-90fb-98a30cc66b62"], "external_id": null,
+        "id": 102, "parent_story_id": null, "estimate": null, "commits": [], "files":
+        [], "position": 32151088128, "blocked": false, "project_id": null, "deadline":
+        null, "stats": {"num_related_documents": 0}, "created_at": "2026-05-23T10:05:12Z",
+        "moved_at": "2026-05-26T20:06:36Z"}, {"app_url": "https://app.shortcut.com/millsymills/story/106",
+        "description": "", "archived": false, "started": true, "story_links": [],
+        "entity_type": "story", "labels": [{"app_url": "https://app.shortcut.com/millsymills/label/71",
+        "description": "", "archived": false, "entity_type": "label", "color": null,
+        "name": "area:docs", "global_id": "v2:l:6a1042c0-a06e-4711-80a9-0178a339396b:71",
+        "updated_at": "2026-05-23T06:07:15Z", "external_id": null, "id": 71, "created_at":
+        "2026-05-23T06:07:15Z"}, {"app_url": "https://app.shortcut.com/millsymills/label/73",
+        "description": "", "archived": false, "entity_type": "label", "color": null,
+        "name": "type:release", "global_id": "v2:l:6a1042c0-a06e-4711-80a9-0178a339396b:73",
+        "updated_at": "2026-05-23T06:07:15Z", "external_id": null, "id": 73, "created_at":
+        "2026-05-23T06:07:15Z"}], "mention_ids": [], "member_mention_ids": [], "story_type":
+        "feature", "custom_fields": [], "linked_files": [], "workflow_id": 500000005,
+        "completed_at_override": null, "started_at": "2026-05-26T19:57:45Z", "completed_at":
+        null, "name": "Make the repo public", "global_id": "v2:s:6a1042c0-a06e-4711-80a9-0178a339396b:106",
+        "completed": false, "comments": [], "blocker": false, "branches": [], "epic_id":
+        101, "story_template_id": null, "external_links": [], "previous_iteration_ids":
+        [], "requested_by_id": "6a1042c0-f182-409f-90fb-98a30cc66b62", "iteration_id":
+        null, "sub_task_story_ids": [], "tasks": [], "formatted_vcs_branch_name":
+        null, "label_ids": [73, 71], "started_at_override": null, "group_id": null,
+        "workflow_state_id": 500000008, "updated_at": "2026-05-26T20:00:57Z", "pull_requests":
+        [{"entity_type": "pull-request", "closed": false, "merged": false, "num_added":
+        248, "branch_id": 500000022, "overlapping_stories": [], "number": 20, "branch_name":
+        "feat/ci-supply-chain", "target_branch_name": "main", "num_commits": null,
+        "title": "ci: CI, supply-chain audit, and release-install workflows", "updated_at":
+        "2026-05-26T19:58:42Z", "has_overlapping_stories": false, "draft": false,
+        "id": 500000023, "url": "https://github.com/millsymills-com/shortcut-mcp/pull/20",
+        "num_removed": 0, "review_status": "review-required", "num_modified": null,
+        "build_status": "in-progress", "target_branch_id": 500000019, "repository_id":
+        500000018, "created_at": "2026-05-26T19:57:45Z"}, {"entity_type": "pull-request",
+        "closed": false, "merged": false, "num_added": 208, "branch_id": 500000024,
+        "overlapping_stories": [], "number": 21, "branch_name": "chore/community-health",
+        "target_branch_name": "main", "num_commits": null, "title": "docs: community
+        health files and contribution guides", "updated_at": "2026-05-26T20:00:57Z",
+        "has_overlapping_stories": false, "draft": false, "id": 500000025, "url":
+        "https://github.com/millsymills-com/shortcut-mcp/pull/21", "num_removed":
+        0, "review_status": "review-required", "num_modified": null, "target_branch_id":
+        500000019, "repository_id": 500000018, "created_at": "2026-05-26T20:00:57Z"}],
+        "group_mention_ids": [], "follower_ids": ["6a1042c0-f182-409f-90fb-98a30cc66b62"],
+        "owner_ids": ["6a1042c0-f182-409f-90fb-98a30cc66b62"], "external_id": null,
+        "id": 106, "parent_story_id": null, "estimate": null, "commits": [], "files":
+        [], "position": 32147614720, "blocked": false, "project_id": null, "deadline":
+        null, "stats": {"num_related_documents": 0}, "created_at": "2026-05-23T10:05:12Z",
+        "moved_at": "2026-05-26T19:57:45Z"}, {"app_url": "https://app.shortcut.com/millsymills/story/103",
+        "description": "", "archived": false, "started": true, "story_links": [],
+        "entity_type": "story", "labels": [{"app_url": "https://app.shortcut.com/millsymills/label/71",
+        "description": "", "archived": false, "entity_type": "label", "color": null,
+        "name": "area:docs", "global_id": "v2:l:6a1042c0-a06e-4711-80a9-0178a339396b:71",
+        "updated_at": "2026-05-23T06:07:15Z", "external_id": null, "id": 71, "created_at":
+        "2026-05-23T06:07:15Z"}, {"app_url": "https://app.shortcut.com/millsymills/label/49",
+        "description": "", "archived": false, "entity_type": "label", "color": null,
+        "name": "type:scaffold", "global_id": "v2:l:6a1042c0-a06e-4711-80a9-0178a339396b:49",
+        "updated_at": "2026-05-23T06:07:12Z", "external_id": null, "id": 49, "created_at":
+        "2026-05-23T06:07:12Z"}], "mention_ids": [], "member_mention_ids": [], "story_type":
+        "feature", "custom_fields": [], "linked_files": [], "workflow_id": 500000005,
+        "completed_at_override": null, "started_at": "2026-05-26T20:00:57Z", "completed_at":
+        null, "name": "CONTRIBUTING / CODE_OF_CONDUCT / SECURITY + issue/PR templates
+        + CODEOWNERS", "global_id": "v2:s:6a1042c0-a06e-4711-80a9-0178a339396b:103",
+        "completed": false, "comments": [], "blocker": false, "branches": [], "epic_id":
+        101, "story_template_id": null, "external_links": [], "previous_iteration_ids":
+        [], "requested_by_id": "6a1042c0-f182-409f-90fb-98a30cc66b62", "iteration_id":
+        null, "sub_task_story_ids": [], "tasks": [], "formatted_vcs_branch_name":
+        null, "label_ids": [71, 49], "started_at_override": null, "group_id": null,
+        "workflow_state_id": 500000008, "updated_at": "2026-05-26T20:00:57Z", "pull_requests":
+        [{"entity_type": "pull-request", "closed": false, "merged": false, "num_added":
+        208, "branch_id": 500000024, "overlapping_stories": [], "number": 21, "branch_name":
+        "chore/community-health", "target_branch_name": "main", "num_commits": null,
+        "title": "docs: community health files and contribution guides", "updated_at":
+        "2026-05-26T20:00:57Z", "has_overlapping_stories": false, "draft": false,
+        "id": 500000025, "url": "https://github.com/millsymills-com/shortcut-mcp/pull/21",
+        "num_removed": 0, "review_status": "review-required", "num_modified": null,
+        "target_branch_id": 500000019, "repository_id": 500000018, "created_at": "2026-05-26T20:00:57Z"}],
+        "group_mention_ids": [], "follower_ids": ["6a1042c0-f182-409f-90fb-98a30cc66b62"],
+        "owner_ids": ["6a1042c0-f182-409f-90fb-98a30cc66b62"], "external_id": null,
+        "id": 103, "parent_story_id": null, "estimate": null, "commits": [], "files":
+        [], "position": 32150957056, "blocked": false, "project_id": null, "deadline":
+        null, "stats": {"num_related_documents": 0}, "created_at": "2026-05-23T10:05:12Z",
+        "moved_at": "2026-05-26T20:00:57Z"}, {"app_url": "https://app.shortcut.com/millsymills/story/98",
+        "description": "", "archived": false, "started": true, "story_links": [],
+        "entity_type": "story", "labels": [{"app_url": "https://app.shortcut.com/millsymills/label/48",
+        "description": "", "archived": false, "entity_type": "label", "color": null,
+        "name": "area:ci", "global_id": "v2:l:6a1042c0-a06e-4711-80a9-0178a339396b:48",
+        "updated_at": "2026-05-23T06:07:12Z", "external_id": null, "id": 48, "created_at":
+        "2026-05-23T06:07:12Z"}, {"app_url": "https://app.shortcut.com/millsymills/label/49",
+        "description": "", "archived": false, "entity_type": "label", "color": null,
+        "name": "type:scaffold", "global_id": "v2:l:6a1042c0-a06e-4711-80a9-0178a339396b:49",
+        "updated_at": "2026-05-23T06:07:12Z", "external_id": null, "id": 49, "created_at":
+        "2026-05-23T06:07:12Z"}], "mention_ids": [], "member_mention_ids": [], "story_type":
+        "feature", "custom_fields": [], "linked_files": [], "workflow_id": 500000005,
+        "completed_at_override": null, "started_at": "2026-05-26T19:57:45Z", "completed_at":
+        null, "name": "Release-install smoke + dependabot + SHA-pinned actions + zizmor",
+        "global_id": "v2:s:6a1042c0-a06e-4711-80a9-0178a339396b:98", "completed":
+        false, "comments": [], "blocker": false, "branches": [], "epic_id": 96, "story_template_id":
+        null, "external_links": [], "previous_iteration_ids": [], "requested_by_id":
+        "6a1042c0-f182-409f-90fb-98a30cc66b62", "iteration_id": null, "sub_task_story_ids":
+        [], "tasks": [], "formatted_vcs_branch_name": null, "label_ids": [49, 48],
+        "started_at_override": null, "group_id": null, "workflow_state_id": 500000008,
+        "updated_at": "2026-05-26T19:57:45Z", "pull_requests": [{"entity_type": "pull-request",
+        "closed": false, "merged": false, "num_added": 248, "branch_id": 500000022,
+        "overlapping_stories": [], "number": 20, "branch_name": "feat/ci-supply-chain",
+        "target_branch_name": "main", "num_commits": null, "title": "ci: CI, supply-chain
+        audit, and release-install workflows", "updated_at": "2026-05-26T19:58:42Z",
+        "has_overlapping_stories": false, "draft": false, "id": 500000023, "url":
+        "https://github.com/millsymills-com/shortcut-mcp/pull/20", "num_removed":
+        0, "review_status": "review-required", "num_modified": null, "build_status":
+        "in-progress", "target_branch_id": 500000019, "repository_id": 500000018,
+        "created_at": "2026-05-26T19:57:45Z"}], "group_mention_ids": [], "follower_ids":
+        ["6a1042c0-f182-409f-90fb-98a30cc66b62"], "owner_ids": ["6a1042c0-f182-409f-90fb-98a30cc66b62"],
+        "external_id": null, "id": 98, "parent_story_id": null, "estimate": null,
+        "commits": [], "files": [], "position": 32147549184, "blocked": false, "project_id":
+        null, "deadline": null, "stats": {"num_related_documents": 0}, "created_at":
+        "2026-05-23T10:05:11Z", "moved_at": "2026-05-26T19:57:45Z"}], "total": 66}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json;charset=utf-8
+      Date:
+      - Tue, 26 May 2026 20:25:19 GMT
+      access-control-allow-credentials:
+      - 'true'
+      access-control-expose-headers:
+      - Vary, Server-Timing, Database-Time, Request-Key
+      cache-control:
+      - no-store
+      content-length:
+      - '13773'
+      database-time:
+      - '1305515678'
+      pragma:
+      - no-cache
+      request-key:
+      - 266823964bbb
+      server-timing:
+      - respWOses;dur=129
+      strict-transport-security:
+      - max-age=31536000; includeSubDomains
+      vary:
+      - Accept, Tenant-Workspace2, Tenant-Organization2, origin, shortcut-token, Accept-Encoding
+      x-content-type-options:
+      - nosniff
+    status:
+      code: 200
+      message: OK
+version: 1

@@ -1,0 +1,40 @@
+name: Bug report
+description: Report a problem with shortcut-mcp
+labels: ["bug"]
+body:
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: What did you do, and what went wrong?
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+      description: Include the tool/command invoked. Do not paste your API token.
+    validations:
+      required: true
+  - type: dropdown
+    id: mode
+    attributes:
+      label: SHORTCUT_MODE
+      options:
+        - readonly
+        - readwrite
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: Output of the installed package version.
+    validations:
+      required: true
