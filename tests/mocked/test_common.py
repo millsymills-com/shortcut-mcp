@@ -111,6 +111,11 @@ def test_shaped_list_drops_rows_with_no_recognized_fields():
     assert out["total"] == 3  # total reflects the API count, not the post-filter length
 
 
+def test_shaped_list_empty_page_is_not_truncated():
+    out = shaped_list([], shape_story_summary, limit=10)
+    assert out == {"items": [], "truncated": False}
+
+
 def test_shaped_list_rejects_none():
     with pytest.raises(ToolError, match="expected a list"):
         shaped_list(None, lambda r: r, limit=10)  # type: ignore[arg-type]  # ty: ignore[invalid-argument-type]
