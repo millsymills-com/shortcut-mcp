@@ -31,7 +31,33 @@ shortcut-mcp
 | `SHORTCUT_TOOLS` | _(unset)_ | Comma-separated module allowlist; overrides `SHORTCUT_PROFILE` |
 | `SHORTCUT_API_BASE_URL` | `https://api.app.shortcut.com/api/v3` | API base URL |
 | `SHORTCUT_REQUEST_TIMEOUT` | `30` | Per-request timeout in seconds |
-| `SHORTCUT_MAX_RETRIES` | `3` | Maximum retry attempts |
+| `SHORTCUT_MAX_RETRIES` | `3` | Total request attempts (initial + retries), not extra retries |
+
+## Token security
+
+`SHORTCUT_API_TOKEN` grants full access to your workspace under your account.
+Treat it like a password:
+
+- Read it from the environment only. The server never logs it, and you should
+  never commit it or paste it into issues, PRs, or test fixtures.
+- A token's permissions match the user who created it. Prefer a service account
+  with the least access the integration needs.
+- Run with the default `SHORTCUT_MODE=readonly` unless you need writes; keep
+  `SHORTCUT_ALLOW_DESTRUCTIVE=false` unless delete tools are required.
+- For write/destructive testing, use a separate, disposable workspace token
+  (`SHORTCUT_TEST_WORKSPACE_TOKEN`) — never the workspace you care about.
+
+## Rate limits & retries
+
+Shortcut rate-limits the API and returns HTTP 429. The client **does not retry
+429s**: it raises `ShortcutRateLimitedError`, carrying the upstream
+`Retry-After` value (seconds) when present, so the caller decides whether to
+back off. Server errors (5xx) raise `ShortcutServerError` and are likewise
+surfaced, not retried.
+
+Only transport-level failures (timeouts, connection errors) are retried, up to
+`SHORTCUT_MAX_RETRIES` total attempts with exponential backoff. Lower the value
+to fail faster, or raise it for flaky networks.
 
 ## Tool profiles & gating
 
