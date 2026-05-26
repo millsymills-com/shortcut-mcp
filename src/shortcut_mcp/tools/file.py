@@ -12,6 +12,7 @@ from shortcut_mcp.tools._common import (
     get_client,
     read_tags,
     require_destructive,
+    require_update_fields,
     require_writes,
     shape_file_summary,
     shaped_list,
@@ -46,7 +47,11 @@ def register(server: FastMCP) -> None:
 
     @server.tool(
         name="shortcut_upload_file",
-        description=("Upload a local file (server reads the given filesystem path). Requires SHORTCUT_MODE=readwrite."),
+        description=(
+            "Upload a local file to Shortcut. The server reads ANY filesystem path "
+            "readable by its process and uploads the bytes — do not expose this server "
+            "to untrusted prompts when sensitive files are on disk. Requires SHORTCUT_MODE=readwrite."
+        ),
         tags=write_tags(_MODULE),
         annotations={**_WRITE_ANN, "idempotentHint": False},
     )
@@ -72,6 +77,7 @@ def register(server: FastMCP) -> None:
             body["name"] = name
         if description is not None:
             body["description"] = description
+        require_update_fields(body)
         client = get_client(ctx)
         result = await client.put(f"/files/{_seg(str(file_id))}", json=body)
         return result if result is not None else {"id": file_id}

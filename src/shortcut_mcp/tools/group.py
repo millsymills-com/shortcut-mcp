@@ -10,6 +10,7 @@ from shortcut_mcp.clients.shortcut import _seg
 from shortcut_mcp.tools._common import (
     get_client,
     read_tags,
+    require_update_fields,
     require_writes,
     shape_group_summary,
     shape_story_summary,
@@ -100,6 +101,7 @@ def register(server: FastMCP) -> None:
             body["member_ids"] = member_ids
         if archived is not None:
             body["archived"] = archived
+        require_update_fields(body)
         client = get_client(ctx)
         result = await client.put(f"/groups/{_seg(group_id)}", json=body)
         return result if result is not None else {"id": group_id}

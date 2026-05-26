@@ -12,6 +12,7 @@ from shortcut_mcp.tools._common import (
     get_client,
     read_tags,
     require_destructive,
+    require_update_fields,
     require_writes,
     shape_epic_summary,
     shape_label_summary,
@@ -110,6 +111,7 @@ def register(server: FastMCP) -> None:
             body["description"] = description
         if archived is not None:
             body["archived"] = archived
+        require_update_fields(body)
         client = get_client(ctx)
         result = await client.put(f"/labels/{_seg(str(label_id))}", json=body)
         return result if result is not None else {"id": label_id}

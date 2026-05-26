@@ -55,6 +55,16 @@ def require_destructive(ctx: Context) -> None:
         raise ToolError("mode_denied: set SHORTCUT_MODE=readwrite and SHORTCUT_ALLOW_DESTRUCTIVE=true")
 
 
+def require_update_fields(body: dict[str, Any]) -> None:
+    """Reject an update with no fields to change.
+
+    Every ``update_*`` tool builds its PUT body from optional args; an empty body
+    would PUT ``{}`` — a silent no-op the caller almost never intends. Fail fast.
+    """
+    if not body:
+        raise ToolError("update requires at least one field to change")
+
+
 def shaped_list(
     rows: list[dict[str, Any]],
     shaper: Callable[[dict[str, Any]], dict[str, Any]],

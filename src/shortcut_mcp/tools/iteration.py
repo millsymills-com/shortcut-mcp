@@ -12,6 +12,7 @@ from shortcut_mcp.tools._common import (
     get_client,
     read_tags,
     require_destructive,
+    require_update_fields,
     require_writes,
     shape_iteration_summary,
     shape_story_summary,
@@ -101,6 +102,7 @@ def register(server: FastMCP) -> None:
             body["end_date"] = end_date
         if description is not None:
             body["description"] = description
+        require_update_fields(body)
         client = get_client(ctx)
         result = await client.put(f"/iterations/{_seg(str(iteration_id))}", json=body)
         return result if result is not None else {"id": iteration_id}

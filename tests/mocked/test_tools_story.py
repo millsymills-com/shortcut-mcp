@@ -354,3 +354,17 @@ async def test_delete_story_hidden_without_destructive_flag(monkeypatch: pytest.
     async with Client(server) as client:
         names = {t.name for t in await client.list_tools()}
     assert "shortcut_delete_story" not in names
+
+
+@pytest.mark.asyncio
+@respx.mock
+async def test_update_story_with_no_fields_fails_fast(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("SHORTCUT_API_TOKEN", "x")
+    monkeypatch.setenv("SHORTCUT_MODE", "readwrite")
+    respx.get(f"{BASE}/member").mock(return_value=httpx.Response(200, json={"id": "u"}))
+    put_route = respx.put(f"{BASE}/stories/5").mock(return_value=httpx.Response(200, json={"id": 5}))
+    server = create_server()
+    async with Client(server) as client:
+        result = await client.call_tool("shortcut_update_story", {"story_id": 5}, raise_on_error=False)
+    assert result.is_error
+    assert not put_route.called  # guard raises before any HTTP call

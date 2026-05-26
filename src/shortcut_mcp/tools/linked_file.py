@@ -12,6 +12,7 @@ from shortcut_mcp.tools._common import (
     get_client,
     read_tags,
     require_destructive,
+    require_update_fields,
     require_writes,
     shape_linked_file_summary,
     shaped_list,
@@ -90,6 +91,7 @@ def register(server: FastMCP) -> None:
             body["type"] = type
         if description is not None:
             body["description"] = description
+        require_update_fields(body)
         client = get_client(ctx)
         result = await client.put(f"/linked-files/{_seg(str(linked_file_id))}", json=body)
         return result if result is not None else {"id": linked_file_id}
