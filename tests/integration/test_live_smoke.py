@@ -5,6 +5,8 @@ Covers the real Shortcut workspace:
 - GET /workflows returns a list with id + name
 - GET /epics returns a list with id + name
 - GET /stories/{id} returns the tracer-bullet story (id 60, or via search fallback)
+- shortcut_list_epics MCP tool returns a shaped_list envelope
+- shortcut_search_stories MCP tool returns a shaped_list envelope
 
 Run with:
     SHORTCUT_API_TOKEN=<token> uv run pytest tests/integration/test_live_smoke.py -m live -v
@@ -15,12 +17,15 @@ Deselect from normal runs:
 
 from __future__ import annotations
 
+import contextlib
 import os
 
 import pytest
+from fastmcp import Client
 
 from shortcut_mcp.clients.shortcut import ShortcutClient
 from shortcut_mcp.config import ShortcutConfig
+from shortcut_mcp.server import create_server
 
 
 @pytest.mark.live
@@ -53,10 +58,8 @@ async def test_live_read_surface(live_token: str) -> None:
 
         env_id = os.environ.get("SHORTCUT_SMOKE_STORY_ID")
         if env_id:
-            try:
+            with contextlib.suppress(ValueError):
                 smoke_story_id = int(env_id)
-            except ValueError:
-                pass
 
         if smoke_story_id is None:
             search = await client.get("/search/stories", params={"query": "label:tracer-bullet", "page_size": 5})
@@ -69,3 +72,18 @@ async def test_live_read_surface(live_token: str) -> None:
 
         story = await client.get(f"/stories/{smoke_story_id}")
         assert story["id"] == smoke_story_id, f"expected story id {smoke_story_id}, got {story['id']}"
+
+    # -- MCP tool layer: shortcut_list_epics --
+    # Verify the tool returns a shaped_list envelope; epics may legitimately be empty.
+    server = create_server()
+    async with Client(server) as mcp:
+        result = await mcp.call_tool("shortcut_list_epics", {}, raise_on_error=False)
+        assert not result.is_error, f"shortcut_list_epics returned an error: {result.data}"
+        assert "items" in result.data, f"shortcut_list_epics missing 'items' key: {result.data}"
+        assert "truncated" in result.data, f"shortcut_list_epics missing 'truncated' key: {result.data}"
+
+        # -- MCP tool layer: shortcut_search_stories --
+        # Broad query; search index may lag so we only check envelope shape, not count.
+        result = await mcp.call_tool("shortcut_search_stories", {"query": "is:story", "limit": 5}, raise_on_error=False)
+        assert not result.is_error, f"shortcut_search_stories returned an error: {result.data}"
+        assert "items" in result.data, f"shortcut_search_stories missing 'items' key: {result.data}"

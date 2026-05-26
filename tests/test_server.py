@@ -91,3 +91,118 @@ def test_lifespan_disables_all_when_token_missing(monkeypatch: pytest.MonkeyPatc
     server = create_server()
     # Built without auth: registration completes but shortcut tag disabled.
     assert "shortcut" in _disabled_tags(server)
+
+
+@pytest.mark.asyncio
+@respx.mock
+async def test_allowlist_excluding_story_hides_get_story(monkeypatch: pytest.MonkeyPatch) -> None:
+    from fastmcp import Client
+
+    monkeypatch.setenv("SHORTCUT_API_TOKEN", "x")
+    monkeypatch.setenv("SHORTCUT_TOOLS", "search")  # story not in allowlist
+    respx.get("https://api.app.shortcut.com/api/v3/member").mock(
+        return_value=httpx.Response(200, json={"id": "u1", "name": "tester"})
+    )
+    server = create_server()
+    async with Client(server) as client:
+        names = {t.name for t in await client.list_tools()}
+    assert "shortcut_get_story" not in names
+
+
+@pytest.mark.asyncio
+@respx.mock
+async def test_default_profile_includes_story(monkeypatch: pytest.MonkeyPatch) -> None:
+    from fastmcp import Client
+
+    monkeypatch.setenv("SHORTCUT_API_TOKEN", "x")
+    respx.get("https://api.app.shortcut.com/api/v3/member").mock(
+        return_value=httpx.Response(200, json={"id": "u1", "name": "tester"})
+    )
+    server = create_server()
+    async with Client(server) as client:
+        names = {t.name for t in await client.list_tools()}
+    assert "shortcut_get_story" in names  # core profile includes story
+
+
+@pytest.mark.asyncio
+@respx.mock
+async def test_all_profile_exposes_full_read_surface(monkeypatch: pytest.MonkeyPatch) -> None:
+    from fastmcp import Client
+
+    monkeypatch.setenv("SHORTCUT_API_TOKEN", "x")
+    monkeypatch.setenv("SHORTCUT_PROFILE", "all")
+    respx.get("https://api.app.shortcut.com/api/v3/member").mock(
+        return_value=httpx.Response(200, json={"id": "u1", "name": "tester"})
+    )
+    expected = {
+        "shortcut_get_current_member",
+        "shortcut_get_epic",
+        "shortcut_get_epic_comment",
+        "shortcut_get_epic_workflow",
+        "shortcut_get_file",
+        "shortcut_get_group",
+        "shortcut_get_iteration",
+        "shortcut_get_label",
+        "shortcut_get_linked_file",
+        "shortcut_get_member",
+        "shortcut_get_objective",
+        "shortcut_get_project",
+        "shortcut_get_story",
+        "shortcut_get_story_comment",
+        "shortcut_get_story_link",
+        "shortcut_get_story_task",
+        "shortcut_get_workflow",
+        "shortcut_list_epic_comments",
+        "shortcut_list_epic_stories",
+        "shortcut_list_epics",
+        "shortcut_list_files",
+        "shortcut_list_group_stories",
+        "shortcut_list_groups",
+        "shortcut_list_iteration_stories",
+        "shortcut_list_iterations",
+        "shortcut_list_label_epics",
+        "shortcut_list_label_stories",
+        "shortcut_list_labels",
+        "shortcut_list_linked_files",
+        "shortcut_list_members",
+        "shortcut_list_objective_epics",
+        "shortcut_list_objectives",
+        "shortcut_list_project_stories",
+        "shortcut_list_projects",
+        "shortcut_list_story_comments",
+        "shortcut_list_story_history",
+        "shortcut_list_workflows",
+        "shortcut_query_stories",
+        "shortcut_search",
+        "shortcut_search_epics",
+        "shortcut_search_iterations",
+        "shortcut_search_objectives",
+        "shortcut_search_stories",
+    }
+    server = create_server()
+    async with Client(server) as client:
+        names = {t.name for t in await client.list_tools()}
+    assert names == expected
+
+
+@pytest.mark.asyncio
+@respx.mock
+async def test_core_profile_is_smaller_than_all(monkeypatch: pytest.MonkeyPatch) -> None:
+    from fastmcp import Client
+
+    monkeypatch.setenv("SHORTCUT_API_TOKEN", "x")
+    respx.get("https://api.app.shortcut.com/api/v3/member").mock(
+        return_value=httpx.Response(200, json={"id": "u1", "name": "tester"})
+    )
+    core_server = create_server()
+    async with Client(core_server) as c:
+        core_names = {t.name for t in await c.list_tools()}
+
+    monkeypatch.setenv("SHORTCUT_PROFILE", "all")
+    all_server = create_server()
+    async with Client(all_server) as c:
+        all_names = {t.name for t in await c.list_tools()}
+
+    assert core_names < all_names  # strict subset
+    assert "shortcut_list_projects" in all_names
+    assert "shortcut_list_projects" not in core_names

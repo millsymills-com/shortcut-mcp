@@ -18,7 +18,6 @@ from shortcut_mcp.clients.shortcut import ShortcutClient
 from shortcut_mcp.errors import (
     ShortcutAuthError,
     ShortcutClientError,
-    ShortcutConnectionError,
     ShortcutRateLimitedError,
     ShortcutServerError,
     ShortcutTimeoutError,
@@ -55,9 +54,7 @@ async def test_get_timeout_exhausts_retries_then_raises() -> None:
 @pytest.mark.asyncio
 @respx.mock
 async def test_post_timeout_does_not_retry() -> None:
-    route = respx.post("https://api.app.shortcut.com/api/v3/stories").mock(
-        side_effect=httpx.TimeoutException("once")
-    )
+    route = respx.post("https://api.app.shortcut.com/api/v3/stories").mock(side_effect=httpx.TimeoutException("once"))
     async with ShortcutClient(token="x", max_retries=3) as client:
         with pytest.raises(ShortcutTimeoutError):
             await client.post("/stories", json={"name": "x"})

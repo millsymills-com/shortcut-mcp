@@ -5,7 +5,7 @@ from __future__ import annotations
 import pytest
 from pydantic import SecretStr, ValidationError
 
-from shortcut_mcp.config import ShortcutConfig, ShortcutMode
+from shortcut_mcp.config import ALL_MODULES, ShortcutConfig, ShortcutMode, ToolProfile
 
 
 def test_loads_token_from_env(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -57,3 +57,57 @@ def test_config_is_frozen(monkeypatch: pytest.MonkeyPatch) -> None:
     config = ShortcutConfig()
     with pytest.raises(ValidationError):
         config.shortcut_mode = ShortcutMode.READWRITE  # type: ignore[misc]
+
+
+def test_default_profile_is_core(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("SHORTCUT_API_TOKEN", "x")
+    cfg = ShortcutConfig()
+    assert cfg.shortcut_profile is ToolProfile.CORE
+    assert "story" in cfg.enabled_modules
+    assert "project" not in cfg.enabled_modules  # planning-only
+
+
+def test_profile_all_enables_every_module(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("SHORTCUT_API_TOKEN", "x")
+    monkeypatch.setenv("SHORTCUT_PROFILE", "all")
+    cfg = ShortcutConfig()
+    assert cfg.enabled_modules == ALL_MODULES
+
+
+def test_explicit_tools_override_profile(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("SHORTCUT_API_TOKEN", "x")
+    monkeypatch.setenv("SHORTCUT_PROFILE", "all")
+    monkeypatch.setenv("SHORTCUT_TOOLS", "story, epic")
+    cfg = ShortcutConfig()
+    assert cfg.enabled_modules == {"story", "epic"}
+
+
+def test_unknown_tool_name_rejected(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("SHORTCUT_API_TOKEN", "x")
+    monkeypatch.setenv("SHORTCUT_TOOLS", "story, bogus")
+    with pytest.raises(ValidationError, match="bogus"):
+        ShortcutConfig()
+
+
+def test_planning_profile_adds_group_and_project(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("SHORTCUT_API_TOKEN", "x")
+    monkeypatch.setenv("SHORTCUT_PROFILE", "planning")
+    cfg = ShortcutConfig()
+    assert cfg.shortcut_profile is ToolProfile.PLANNING
+    modules = cfg.enabled_modules
+    assert "group" in modules
+    assert "project" in modules
+    assert "file" not in modules
+    assert "linked_file" not in modules
+
+
+def test_files_profile_adds_file_and_linked_file(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("SHORTCUT_API_TOKEN", "x")
+    monkeypatch.setenv("SHORTCUT_PROFILE", "files")
+    cfg = ShortcutConfig()
+    assert cfg.shortcut_profile is ToolProfile.FILES
+    modules = cfg.enabled_modules
+    assert "file" in modules
+    assert "linked_file" in modules
+    assert "group" not in modules
+    assert "project" not in modules

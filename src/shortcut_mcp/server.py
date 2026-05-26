@@ -3,16 +3,20 @@
 from __future__ import annotations
 
 import logging
-from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from dataclasses import dataclass, field
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from collections.abc import AsyncIterator, Callable
+    from contextlib import AbstractAsyncContextManager
 
 import httpx
 from fastmcp import FastMCP
 
 from shortcut_mcp.clients.shortcut import ShortcutClient
-from shortcut_mcp.config import ShortcutConfig
-from shortcut_mcp.errors import ShortcutError, _classify_startup_error
+from shortcut_mcp.config import ALL_MODULES, ShortcutConfig
+from shortcut_mcp.errors import ConfigError, ShortcutError, _classify_startup_error
 
 logger = logging.getLogger(__name__)
 
@@ -25,7 +29,9 @@ class ServerContext:
     client: ShortcutClient | None = field(default=None)
 
 
-def _build_lifespan(config: ShortcutConfig):  # type: ignore[no-untyped-def]
+def _build_lifespan(
+    config: ShortcutConfig,
+) -> Callable[[FastMCP], AbstractAsyncContextManager[ServerContext]]:
     @asynccontextmanager
     async def lifespan(server: FastMCP) -> AsyncIterator[ServerContext]:
         context = ServerContext(config=config)
@@ -36,7 +42,8 @@ def _build_lifespan(config: ShortcutConfig):  # type: ignore[no-untyped-def]
             yield context
             return
 
-        assert config.shortcut_api_token is not None
+        if config.shortcut_api_token is None:  # invariant: authenticated implies token present
+            raise ConfigError("authenticated but SHORTCUT_API_TOKEN is None — internal invariant violated")
         client = ShortcutClient(
             token=config.shortcut_api_token.get_secret_value(),
             base_url=config.shortcut_api_base_url,
@@ -73,10 +80,47 @@ def _build_lifespan(config: ShortcutConfig):  # type: ignore[no-untyped-def]
 
 
 def _register_all_tools(server: FastMCP) -> None:
-    """Register every v0.1+ tool. Imported lazily to avoid circular deps."""
-    from shortcut_mcp.tools.story import register as register_story_tools
+    """Register every read module. Imported lazily to avoid circular deps."""
+    from shortcut_mcp.tools import (
+        epic,
+        epic_comment,
+        epic_workflow,
+        file,
+        group,
+        iteration,
+        label,
+        linked_file,
+        member,
+        objective,
+        project,
+        search,
+        story,
+        story_comment,
+        story_link,
+        story_task,
+        workflow,
+    )
 
-    register_story_tools(server)
+    for module in (
+        story,
+        story_comment,
+        story_task,
+        story_link,
+        epic,
+        epic_comment,
+        epic_workflow,
+        iteration,
+        objective,
+        member,
+        group,
+        workflow,
+        label,
+        project,
+        file,
+        linked_file,
+        search,
+    ):
+        module.register(server)
 
 
 def create_server(config: ShortcutConfig | None = None) -> FastMCP:
@@ -88,9 +132,9 @@ def create_server(config: ShortcutConfig | None = None) -> FastMCP:
         name="shortcut-mcp",
         instructions=(
             "Shortcut MCP server — read workflows, epics, iterations, labels, "
-            "members, and stories from a Shortcut workspace. Read-only in v0.1; "
-            "writes and destructive ops are gated behind SHORTCUT_MODE and "
-            "SHORTCUT_ALLOW_DESTRUCTIVE."
+            "members, and stories from a Shortcut workspace. Read-only in v0.2 "
+            "(full read surface); writes and destructive ops are gated behind "
+            "SHORTCUT_MODE and SHORTCUT_ALLOW_DESTRUCTIVE."
         ),
         lifespan=_build_lifespan(config),
     )
@@ -103,5 +147,10 @@ def create_server(config: ShortcutConfig | None = None) -> FastMCP:
         server.disable(tags={"destructive"})
     if not config.authenticated:
         server.disable(tags={"shortcut"})
+
+    enabled = config.enabled_modules
+    for module_name in ALL_MODULES:
+        if module_name not in enabled:
+            server.disable(tags={f"mod:{module_name}"})
 
     return server
