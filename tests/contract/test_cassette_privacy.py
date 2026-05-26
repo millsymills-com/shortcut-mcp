@@ -26,9 +26,11 @@ _PII_FIELD_RES = {
     "mention_name": (re.compile(rb'"mention_name":\s*"([^"]*)"'), REDACTED_MENTION_NAME),
     "gravatar_hash": (re.compile(rb'"gravatar_hash":\s*"([^"]*)"'), REDACTED_GRAVATAR_HASH),
 }
-# The gravatar_hash MD5 is reversible (rainbow tables) and the same value rides
+# The gravatar hash is reversible (rainbow tables) and the same value rides
 # inside avatar URLs (e.g. display_icon), bypassing the key-based field guards.
-_GRAVATAR_URL_RE = re.compile(rb"gravatar\.com/avatar/([0-9a-fA-F]{32})")
+# `{32,}` captures the full hex run so a partially-scrubbed SHA-256 (sentinel
+# prefix + real trailing half) is still flagged rather than masked by the prefix.
+_GRAVATAR_URL_RE = re.compile(rb"gravatar\.com/avatar/([0-9a-fA-F]{32,})")
 
 
 def _unredacted_gravatar_hashes(raw: bytes) -> set[str]:
@@ -72,6 +74,14 @@ def test_unredacted_gravatar_hashes_flags_real_md5() -> None:
 def test_unredacted_gravatar_hashes_ignores_sentinel() -> None:
     raw = f'{{"display_icon": "https://www.gravatar.com/avatar/{REDACTED_GRAVATAR_HASH}"}}'.encode()
     assert _unredacted_gravatar_hashes(raw) == set()
+
+
+def test_unredacted_gravatar_hashes_flags_partial_sha256_leak() -> None:
+    # A fixed-32 scrubber would leave sentinel + real trailing half; capturing the
+    # full hex run keeps the sentinel prefix from masking the leaked remnant.
+    tail = "00112233445566778899aabbccddeeff"
+    raw = f'{{"display_icon": "https://www.gravatar.com/avatar/{REDACTED_GRAVATAR_HASH}{tail}"}}'.encode()
+    assert _unredacted_gravatar_hashes(raw) == {f"{REDACTED_GRAVATAR_HASH}{tail}"}
 
 
 @pytest.mark.contract

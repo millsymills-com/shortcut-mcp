@@ -14,6 +14,7 @@ from tests.contract.conftest import (
 )
 
 _REAL_MD5 = "d41d8cd98f00b204e9800998ecf8427e"
+_REAL_SHA256 = "a1b2c3d4e5f6071829304a5b6c7d8e9f00112233445566778899aabbccddeeff"
 
 
 def test_scrub_rewrites_gravatar_avatar_url_preserving_query() -> None:
@@ -28,6 +29,15 @@ def test_scrub_rewrites_gravatar_md5_regardless_of_carrying_key() -> None:
     # The reversible MD5 must die in any string field, not just gravatar_hash.
     out = _scrub_pii({"icon": {"url": f"https://www.gravatar.com/avatar/{_REAL_MD5}"}})
     assert _REAL_MD5 not in out["icon"]["url"]
+
+
+def test_scrub_consumes_full_sha256_hash_no_trailing_remnant() -> None:
+    # A fixed-32 match would leave the hash's second half in the URL; the whole
+    # hex run must be redacted so no reversible fragment survives.
+    out = _scrub_pii({"display_icon": f"https://www.gravatar.com/avatar/{_REAL_SHA256}?s=40"})
+    assert _REAL_SHA256 not in out["display_icon"]
+    assert _REAL_SHA256[32:] not in out["display_icon"]
+    assert out["display_icon"] == f"https://www.gravatar.com/avatar/{REDACTED_GRAVATAR_HASH}?s=40"
 
 
 def test_scrub_still_redacts_known_keys_and_emails() -> None:
