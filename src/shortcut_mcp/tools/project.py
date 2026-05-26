@@ -11,6 +11,7 @@ from shortcut_mcp.tools._common import (
     LimitParam,
     destructive_tags,
     get_client,
+    get_object,
     read_tags,
     require_destructive,
     require_update_fields,
@@ -45,7 +46,7 @@ def register(server: FastMCP) -> None:
         annotations=_READ_ANN,
     )
     async def shortcut_get_project(ctx: Context, project_id: int) -> dict[str, Any]:
-        return await get_client(ctx).get(f"/projects/{_seg(str(project_id))}")
+        return await get_object(ctx, f"/projects/{_seg(str(project_id))}")
 
     @server.tool(
         name="shortcut_list_project_stories",

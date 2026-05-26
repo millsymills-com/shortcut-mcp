@@ -11,6 +11,7 @@ from shortcut_mcp.tools._common import (
     LimitParam,
     destructive_tags,
     get_client,
+    get_object,
     read_tags,
     require_destructive,
     require_update_fields,
@@ -46,7 +47,7 @@ def register(server: FastMCP) -> None:
         annotations=_READ_ANN,
     )
     async def shortcut_get_label(ctx: Context, label_id: int) -> dict[str, Any]:
-        return await get_client(ctx).get(f"/labels/{_seg(str(label_id))}")
+        return await get_object(ctx, f"/labels/{_seg(str(label_id))}")
 
     @server.tool(
         name="shortcut_list_label_stories",

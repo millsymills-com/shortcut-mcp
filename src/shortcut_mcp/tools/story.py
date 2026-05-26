@@ -11,6 +11,7 @@ from shortcut_mcp.tools._common import (
     LimitParam,
     destructive_tags,
     get_client,
+    get_object,
     read_tags,
     require_destructive,
     require_update_fields,
@@ -32,7 +33,7 @@ def register(server: FastMCP) -> None:
         annotations={"readOnlyHint": True, "openWorldHint": True},
     )
     async def shortcut_get_story(ctx: Context, story_id: int) -> dict[str, Any]:
-        return await get_client(ctx).get(f"/stories/{_seg(str(story_id))}")
+        return await get_object(ctx, f"/stories/{_seg(str(story_id))}")
 
     @server.tool(
         name="shortcut_list_story_history",

@@ -7,7 +7,14 @@ from typing import Any
 from fastmcp import Context, FastMCP
 
 from shortcut_mcp.clients.shortcut import _seg
-from shortcut_mcp.tools._common import LimitParam, get_client, read_tags, shape_workflow_summary, shaped_list
+from shortcut_mcp.tools._common import (
+    LimitParam,
+    get_client,
+    get_object,
+    read_tags,
+    shape_workflow_summary,
+    shaped_list,
+)
 
 _MODULE = "workflow"
 _READ_ANN = {"readOnlyHint": True, "openWorldHint": True}
@@ -31,4 +38,4 @@ def register(server: FastMCP) -> None:
         annotations=_READ_ANN,
     )
     async def shortcut_get_workflow(ctx: Context, workflow_id: int) -> dict[str, Any]:
-        return await get_client(ctx).get(f"/workflows/{_seg(str(workflow_id))}")
+        return await get_object(ctx, f"/workflows/{_seg(str(workflow_id))}")
