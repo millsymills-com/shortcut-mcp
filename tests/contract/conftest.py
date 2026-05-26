@@ -24,8 +24,9 @@ REDACTED_EMAIL = "redacted@example.com"
 REDACTED_MENTION_NAME = "redacted"
 REDACTED_GRAVATAR_HASH = "0" * 32
 
-# Member-identity fields scrubbed by key. Low collision risk — these keys appear
-# only on member/profile objects, unlike `name` (workspaces, labels, epics, ...).
+# Member-identity fields scrubbed by key, avoiding a broad `name` redaction that
+# would clobber workspace/label/epic names. `mention_name` also appears on groups;
+# scrubbing it there is a harmless fixture-only side effect.
 _PII_KEYS = {
     "mention_name": REDACTED_MENTION_NAME,
     "gravatar_hash": REDACTED_GRAVATAR_HASH,
