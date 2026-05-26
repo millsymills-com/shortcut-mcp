@@ -8,8 +8,10 @@ from fastmcp import Context, FastMCP
 
 from shortcut_mcp.clients.shortcut import _seg
 from shortcut_mcp.tools._common import (
+    destructive_tags,
     get_client,
     read_tags,
+    require_destructive,
     require_writes,
     shape_linked_file_summary,
     shaped_list,
@@ -19,6 +21,7 @@ from shortcut_mcp.tools._common import (
 _MODULE = "linked_file"
 _READ_ANN = {"readOnlyHint": True, "openWorldHint": True}
 _WRITE_ANN: dict[str, Any] = {"readOnlyHint": False, "destructiveHint": False}
+_DESTRUCTIVE_ANN: dict[str, Any] = {"readOnlyHint": False, "destructiveHint": True, "idempotentHint": True}
 
 
 def register(server: FastMCP) -> None:
@@ -90,3 +93,17 @@ def register(server: FastMCP) -> None:
         client = get_client(ctx)
         result = await client.put(f"/linked-files/{_seg(str(linked_file_id))}", json=body)
         return result if result is not None else {"id": linked_file_id}
+
+    @server.tool(
+        name="shortcut_delete_linked_file",
+        description=(
+            "Permanently delete a linked file. Irreversible. "
+            "Requires SHORTCUT_MODE=readwrite and SHORTCUT_ALLOW_DESTRUCTIVE=true."
+        ),
+        tags=destructive_tags(_MODULE),
+        annotations=_DESTRUCTIVE_ANN,
+    )
+    async def shortcut_delete_linked_file(ctx: Context, linked_file_id: int) -> dict[str, Any]:
+        require_destructive(ctx)
+        await get_client(ctx).delete(f"/linked-files/{_seg(str(linked_file_id))}")
+        return {"id": linked_file_id, "deleted": True}
