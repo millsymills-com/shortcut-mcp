@@ -309,3 +309,48 @@ async def test_create_story_denied_in_readonly(monkeypatch: pytest.MonkeyPatch) 
             raise_on_error=False,
         )
     assert result.is_error
+
+
+@pytest.mark.asyncio
+@respx.mock
+async def test_delete_story_calls_delete_and_confirms(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("SHORTCUT_API_TOKEN", "x")
+    monkeypatch.setenv("SHORTCUT_MODE", "readwrite")
+    monkeypatch.setenv("SHORTCUT_ALLOW_DESTRUCTIVE", "true")
+    respx.get(f"{BASE}/member").mock(return_value=httpx.Response(200, json={"id": "u"}))
+    route = respx.delete(f"{BASE}/stories/7").mock(return_value=httpx.Response(204))
+    server = create_server()
+    async with Client(server) as client:
+        result = await client.call_tool("shortcut_delete_story", {"story_id": 7})
+    assert not result.is_error
+    assert result.data == {"id": 7, "deleted": True}
+    assert route.called
+
+
+@pytest.mark.asyncio
+@respx.mock
+async def test_bulk_delete_stories_sends_ids_body(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("SHORTCUT_API_TOKEN", "x")
+    monkeypatch.setenv("SHORTCUT_MODE", "readwrite")
+    monkeypatch.setenv("SHORTCUT_ALLOW_DESTRUCTIVE", "true")
+    respx.get(f"{BASE}/member").mock(return_value=httpx.Response(200, json={"id": "u"}))
+    route = respx.delete(f"{BASE}/stories/bulk").mock(return_value=httpx.Response(204))
+    server = create_server()
+    async with Client(server) as client:
+        result = await client.call_tool("shortcut_bulk_delete_stories", {"story_ids": [1, 2, 3]})
+    assert not result.is_error
+    assert result.data == {"story_ids": [1, 2, 3], "deleted": True}
+    body = json.loads(route.calls.last.request.content)
+    assert body == {"story_ids": [1, 2, 3]}
+
+
+@pytest.mark.asyncio
+@respx.mock
+async def test_delete_story_hidden_without_destructive_flag(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("SHORTCUT_API_TOKEN", "x")
+    monkeypatch.setenv("SHORTCUT_MODE", "readwrite")  # writes on, destructive OFF
+    respx.get(f"{BASE}/member").mock(return_value=httpx.Response(200, json={"id": "u"}))
+    server = create_server()
+    async with Client(server) as client:
+        names = {t.name for t in await client.list_tools()}
+    assert "shortcut_delete_story" not in names

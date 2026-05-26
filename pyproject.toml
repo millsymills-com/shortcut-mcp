@@ -71,5 +71,6 @@ markers = [
     "live: requires SHORTCUT_API_TOKEN",
     "smoke: minimal live read",
     "slow: slow tests",
+    "live_write: opt-in live write/destructive tests against an isolated workspace",
 ]
 addopts = ["-ra", "--strict-markers", "--strict-config"]

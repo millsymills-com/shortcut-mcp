@@ -53,6 +53,16 @@ def test_server_in_readwrite_keeps_writes(monkeypatch: pytest.MonkeyPatch) -> No
     assert "destructive" in disabled  # allow-destructive still false
 
 
+def test_server_with_destructive_enabled_keeps_destructive(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("SHORTCUT_API_TOKEN", "x")
+    monkeypatch.setenv("SHORTCUT_MODE", "readwrite")
+    monkeypatch.setenv("SHORTCUT_ALLOW_DESTRUCTIVE", "true")
+    server = create_server()
+    disabled = _disabled_tags(server)
+    assert "write" not in disabled
+    assert "destructive" not in disabled
+
+
 @pytest.mark.asyncio
 @respx.mock
 async def test_lifespan_disables_all_tools_on_auth_failure(
@@ -325,12 +335,8 @@ async def test_readwrite_exposes_write_surface(monkeypatch: pytest.MonkeyPatch) 
 
 @pytest.mark.asyncio
 @respx.mock
-async def test_writes_still_absent_without_destructive(monkeypatch: pytest.MonkeyPatch) -> None:
-    """No delete_* tools exist yet (v0.4 scope) — guard against accidental scope creep.
-
-    archive_story / archive_epic are valid v0.3 write tools and must not be flagged.
-    Only names that START WITH shortcut_delete are out of scope.
-    """
+async def test_deletes_hidden_without_destructive_flag(monkeypatch: pytest.MonkeyPatch) -> None:
+    """readwrite + profile=all but ALLOW_DESTRUCTIVE unset: writes visible, all deletes hidden."""
     from fastmcp import Client
 
     monkeypatch.setenv("SHORTCUT_API_TOKEN", "x")
@@ -343,5 +349,44 @@ async def test_writes_still_absent_without_destructive(monkeypatch: pytest.Monke
     async with server._lifespan(server), Client(server) as client:
         names = {t.name for t in await client.list_tools()}
 
-    delete_tools = {n for n in names if n.startswith("shortcut_delete")}
-    assert not delete_tools, f"Unexpected v0.4 delete tools found: {delete_tools}"
+    delete_tools = {n for n in names if "delete" in n}
+    assert not delete_tools, f"Unexpected delete tools visible without ALLOW_DESTRUCTIVE: {delete_tools}"
+    assert len(names) == 81, f"Expected 81 tools (43 read + 38 write, no destructive), got {len(names)}"
+
+
+@pytest.mark.asyncio
+@respx.mock
+async def test_destructive_exposes_delete_surface(monkeypatch: pytest.MonkeyPatch) -> None:
+    """readwrite + ALLOW_DESTRUCTIVE=true + profile=all exposes all 13 deletes (94 total)."""
+    from fastmcp import Client
+
+    monkeypatch.setenv("SHORTCUT_API_TOKEN", "x")
+    monkeypatch.setenv("SHORTCUT_MODE", "readwrite")
+    monkeypatch.setenv("SHORTCUT_ALLOW_DESTRUCTIVE", "true")
+    monkeypatch.setenv("SHORTCUT_PROFILE", "all")
+    respx.get("https://api.app.shortcut.com/api/v3/member").mock(
+        return_value=httpx.Response(200, json={"id": "u1", "name": "tester"})
+    )
+    server = create_server()
+    async with server._lifespan(server), Client(server) as client:
+        names = {t.name for t in await client.list_tools()}
+
+    expected_deletes = {
+        "shortcut_delete_story",
+        "shortcut_bulk_delete_stories",
+        "shortcut_delete_story_comment",
+        "shortcut_delete_story_task",
+        "shortcut_delete_story_link",
+        "shortcut_delete_epic",
+        "shortcut_delete_epic_comment",
+        "shortcut_delete_iteration",
+        "shortcut_delete_objective",
+        "shortcut_delete_label",
+        "shortcut_delete_project",
+        "shortcut_delete_file",
+        "shortcut_delete_linked_file",
+    }
+    assert expected_deletes <= names, f"Missing delete tools: {expected_deletes - names}"
+    assert "shortcut_delete_group" not in names, "groups have no DELETE endpoint"
+    assert {n for n in names if "delete" in n} == expected_deletes
+    assert len(names) == 94, f"Expected 94 tools (43 read + 38 write + 13 destructive), got {len(names)}"

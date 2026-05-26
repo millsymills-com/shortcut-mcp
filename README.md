@@ -1,9 +1,10 @@
 # shortcut-mcp
 
-Python FastMCP server for the Shortcut REST API. v0.3 ships a complete read
-surface plus a write tier: **43 read tools + 38 write tools across 17 resource
-modules** (81 tools total). Write tools require `SHORTCUT_MODE=readwrite`.
-Destructive tools (delete/purge) are planned for v0.4 and not yet present.
+Python FastMCP server for the Shortcut REST API. v0.4 ships a complete read
+surface, a write tier, and a destructive tier: **43 read + 38 write + 13
+destructive tools across 17 resource modules** (94 tools total). Write tools
+require `SHORTCUT_MODE=readwrite`; destructive (delete) tools additionally
+require `SHORTCUT_ALLOW_DESTRUCTIVE=true`.
 
 ## Installation
 
@@ -25,7 +26,7 @@ shortcut-mcp
 |---|---|---|
 | `SHORTCUT_API_TOKEN` | _(required)_ | Shortcut API token |
 | `SHORTCUT_MODE` | `readonly` | `readonly` or `readwrite` |
-| `SHORTCUT_ALLOW_DESTRUCTIVE` | `false` | Enable destructive tools (v0.4+, not yet shipped) |
+| `SHORTCUT_ALLOW_DESTRUCTIVE` | `false` | With `readwrite`, expose the 13 destructive delete tools |
 | `SHORTCUT_PROFILE` | `core` | Named tool bundle — see [Tool profiles](#tool-profiles--gating) |
 | `SHORTCUT_TOOLS` | _(unset)_ | Comma-separated module allowlist; overrides `SHORTCUT_PROFILE` |
 | `SHORTCUT_API_BASE_URL` | `https://api.app.shortcut.com/api/v3` | API base URL |
@@ -41,7 +42,7 @@ shortcut-mcp
 | `core` (default) | story, story_comment, story_task, story_link, epic, epic_comment, epic_workflow, iteration, objective, member, workflow, label, search |
 | `planning` | core + group, project |
 | `files` | core + file, linked_file |
-| `all` | all 17 modules (43 read + 38 write tools when in readwrite mode) |
+| `all` | all 17 modules (43 read + 38 write + 13 destructive tools at the matching gates) |
 
 `SHORTCUT_TOOLS` accepts a comma-separated list of module names and **overrides**
 the profile entirely. Unknown module names are rejected at startup.
@@ -60,11 +61,14 @@ SHORTCUT_PROFILE=planning shortcut-mcp
 |---|---|---|
 | `readonly` (default) | _(ignored)_ | 43 read tools only |
 | `readwrite` | `false` | 43 read + 38 write tools (81 total) |
-| `readwrite` | `true` | Read + write + destructive tools (v0.4+, not yet shipped) |
+| `readwrite` | `true` | 43 read + 38 write + 13 destructive tools (94 total) |
 
 Write tools are hidden entirely in readonly mode — they do not appear in
 `list_tools()` output and cannot be called. Setting `SHORTCUT_MODE=readwrite`
-is required to expose them.
+is required to expose them. Destructive tools require **both**
+`SHORTCUT_MODE=readwrite` and `SHORTCUT_ALLOW_DESTRUCTIVE=true`; with either gate
+unset they stay hidden. Each delete handler also calls a runtime guard that
+raises `mode_denied` if reached without both gates.
 
 ## Tool catalog
 
@@ -257,3 +261,45 @@ Two behaviors to be aware of:
 
 - `shortcut_create_linked_file` — Create a linked file (external URL reference).
 - `shortcut_update_linked_file` — Update a linked file's metadata.
+
+### Destructive tools (13)
+
+Require **both** `SHORTCUT_MODE=readwrite` and `SHORTCUT_ALLOW_DESTRUCTIVE=true`.
+Hidden unless both are set. Every delete is **irreversible** and returns a
+structured confirmation (`{"id": <id>, "deleted": true}`).
+
+- `shortcut_delete_story` — Delete a story.
+- `shortcut_bulk_delete_stories` — Delete multiple stories in one request.
+- `shortcut_delete_story_comment` — Delete a comment on a story.
+- `shortcut_delete_story_task` — Delete a task on a story.
+- `shortcut_delete_story_link` — Delete a story link.
+- `shortcut_delete_epic` — Delete an epic.
+- `shortcut_delete_epic_comment` — Delete a comment on an epic.
+- `shortcut_delete_iteration` — Delete an iteration.
+- `shortcut_delete_objective` — Delete an objective.
+- `shortcut_delete_label` — Delete a label.
+- `shortcut_delete_project` — Delete a project (the API returns `422` if the
+  project still has stories — move or delete them first).
+- `shortcut_delete_file` — Delete an uploaded file.
+- `shortcut_delete_linked_file` — Delete a linked file.
+
+There is **no `delete_group`** — the Shortcut API exposes no `DELETE /groups/{id}`
+endpoint.
+
+## Testing destructive tools against a live workspace
+
+The default test suite is fully mocked and never touches the network. The
+destructive delete path also has an opt-in live test that runs only against an
+**isolated, disposable workspace** — never the workspace behind your everyday
+`SHORTCUT_API_TOKEN`. It creates its own story, deletes it, and confirms it is
+gone. It skips unless **both** of these are set:
+
+| Variable | Purpose |
+|---|---|
+| `SHORTCUT_LIVE_WRITE_TESTS=true` | Opt-in flag; absent → the test skips |
+| `SHORTCUT_TEST_WORKSPACE_TOKEN` | Token for the isolated workspace (deliberately not `SHORTCUT_API_TOKEN`) |
+
+```bash
+SHORTCUT_LIVE_WRITE_TESTS=true SHORTCUT_TEST_WORKSPACE_TOKEN=<token> \
+    uv run pytest tests/integration/test_live_destructive.py -m live_write -v
+```

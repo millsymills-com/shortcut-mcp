@@ -8,8 +8,10 @@ from fastmcp import Context, FastMCP
 
 from shortcut_mcp.clients.shortcut import _seg
 from shortcut_mcp.tools._common import (
+    destructive_tags,
     get_client,
     read_tags,
+    require_destructive,
     require_writes,
     shape_project_summary,
     shape_story_summary,
@@ -20,6 +22,7 @@ from shortcut_mcp.tools._common import (
 _MODULE = "project"
 _READ_ANN = {"readOnlyHint": True, "openWorldHint": True}
 _WRITE_ANN: dict[str, Any] = {"readOnlyHint": False, "destructiveHint": False}
+_DESTRUCTIVE_ANN: dict[str, Any] = {"readOnlyHint": False, "destructiveHint": True, "idempotentHint": True}
 
 
 def register(server: FastMCP) -> None:
@@ -102,3 +105,18 @@ def register(server: FastMCP) -> None:
         client = get_client(ctx)
         result = await client.put(f"/projects/{_seg(str(project_id))}", json=body)
         return result if result is not None else {"id": project_id}
+
+    @server.tool(
+        name="shortcut_delete_project",
+        description=(
+            "Permanently delete a project. Irreversible. The Shortcut API rejects this "
+            "with a 422 if the project still has stories — move or delete them first. "
+            "Requires SHORTCUT_MODE=readwrite and SHORTCUT_ALLOW_DESTRUCTIVE=true."
+        ),
+        tags=destructive_tags(_MODULE),
+        annotations=_DESTRUCTIVE_ANN,
+    )
+    async def shortcut_delete_project(ctx: Context, project_id: int) -> dict[str, Any]:
+        require_destructive(ctx)
+        await get_client(ctx).delete(f"/projects/{_seg(str(project_id))}")
+        return {"id": project_id, "deleted": True}

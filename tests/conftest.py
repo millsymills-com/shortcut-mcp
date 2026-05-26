@@ -24,3 +24,19 @@ def live_token() -> str:
     if not token:
         pytest.skip("SHORTCUT_API_TOKEN not set; skipping live test")
     return token
+
+
+@pytest.fixture
+def live_write_token() -> str:
+    """Isolated write/destructive workspace token. Skips unless explicitly opted in.
+
+    Requires BOTH SHORTCUT_LIVE_WRITE_TESTS=true AND a token in
+    SHORTCUT_TEST_WORKSPACE_TOKEN (deliberately NOT SHORTCUT_API_TOKEN, so the
+    nightly read token can never be used to mutate or delete data).
+    """
+    if os.environ.get("SHORTCUT_LIVE_WRITE_TESTS", "").lower() != "true":
+        pytest.skip("SHORTCUT_LIVE_WRITE_TESTS != true; skipping live write/destructive test")
+    token = os.environ.get("SHORTCUT_TEST_WORKSPACE_TOKEN")
+    if not token:
+        pytest.skip("SHORTCUT_TEST_WORKSPACE_TOKEN not set; skipping live write/destructive test")
+    return token

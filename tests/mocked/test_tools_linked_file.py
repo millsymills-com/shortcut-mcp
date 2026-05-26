@@ -89,3 +89,20 @@ async def test_update_linked_file_sends_partial_body(monkeypatch: pytest.MonkeyP
     assert result.data["id"] == 3
     body = json.loads(route.calls.last.request.content)
     assert body == {"name": "x"}
+
+
+@pytest.mark.asyncio
+@respx.mock
+async def test_delete_linked_file_confirms(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("SHORTCUT_API_TOKEN", "x")
+    monkeypatch.setenv("SHORTCUT_MODE", "readwrite")
+    monkeypatch.setenv("SHORTCUT_ALLOW_DESTRUCTIVE", "true")
+    monkeypatch.setenv("SHORTCUT_PROFILE", "all")
+    respx.get(f"{BASE}/member").mock(return_value=httpx.Response(200, json={"id": "u"}))
+    route = respx.delete(f"{BASE}/linked-files/41").mock(return_value=httpx.Response(204))
+    server = create_server()
+    async with Client(server) as client:
+        result = await client.call_tool("shortcut_delete_linked_file", {"linked_file_id": 41})
+    assert not result.is_error
+    assert result.data == {"id": 41, "deleted": True}
+    assert route.called

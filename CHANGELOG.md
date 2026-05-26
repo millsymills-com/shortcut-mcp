@@ -9,6 +9,17 @@ This project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- **v0.4 destructive tier — 13 delete tools**, gated by `SHORTCUT_MODE=readwrite`
+  **and** `SHORTCUT_ALLOW_DESTRUCTIVE=true` (hidden unless both are set):
+  `delete_story`, `bulk_delete_stories`, `delete_story_comment`, `delete_story_task`,
+  `delete_story_link`, `delete_epic`, `delete_epic_comment`, `delete_iteration`,
+  `delete_objective`, `delete_label`, `delete_project`, `delete_file`, `delete_linked_file`.
+  No `delete_group` (no API endpoint).
+- **`require_destructive` runtime guard live** on every delete handler (defense-in-depth
+  beyond the tag-visibility gate).
+- **Opt-in live destructive test harness** (`SHORTCUT_LIVE_WRITE_TESTS` +
+  `SHORTCUT_TEST_WORKSPACE_TOKEN`) using disposable fixtures in an isolated workspace;
+  never runs on the default suite or the nightly read cron.
 - **v0.3 write tier — 38 write tools across all resource modules**, gated by
   `SHORTCUT_MODE=readwrite` (hidden entirely in readonly mode):
   - `story`: create, update, archive, unarchive, add labels, add owners,

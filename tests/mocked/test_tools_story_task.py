@@ -64,3 +64,19 @@ async def test_update_story_task_omits_none_fields(monkeypatch: pytest.MonkeyPat
     body = json.loads(route.calls.last.request.content)
     assert body == {"complete": True}
     assert "description" not in body
+
+
+@pytest.mark.asyncio
+@respx.mock
+async def test_delete_story_task_confirms(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("SHORTCUT_API_TOKEN", "x")
+    monkeypatch.setenv("SHORTCUT_MODE", "readwrite")
+    monkeypatch.setenv("SHORTCUT_ALLOW_DESTRUCTIVE", "true")
+    respx.get(f"{BASE}/member").mock(return_value=httpx.Response(200, json={"id": "u"}))
+    route = respx.delete(f"{BASE}/stories/5/tasks/3").mock(return_value=httpx.Response(204))
+    server = create_server()
+    async with Client(server) as client:
+        result = await client.call_tool("shortcut_delete_story_task", {"story_id": 5, "task_id": 3})
+    assert not result.is_error
+    assert result.data == {"id": 3, "deleted": True}
+    assert route.called

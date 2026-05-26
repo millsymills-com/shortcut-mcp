@@ -120,3 +120,33 @@ async def test_update_label_tolerates_empty_response(monkeypatch: pytest.MonkeyP
         result = await client.call_tool("shortcut_update_label", {"label_id": 1, "archived": True})
     assert not result.is_error
     assert result.data == {"id": 1}
+
+
+@pytest.mark.asyncio
+@respx.mock
+async def test_delete_label_confirms(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("SHORTCUT_API_TOKEN", "x")
+    monkeypatch.setenv("SHORTCUT_MODE", "readwrite")
+    monkeypatch.setenv("SHORTCUT_ALLOW_DESTRUCTIVE", "true")
+    respx.get(f"{BASE}/member").mock(return_value=httpx.Response(200, json={"id": "u"}))
+    route = respx.delete(f"{BASE}/labels/15").mock(return_value=httpx.Response(204))
+    server = create_server()
+    async with Client(server) as client:
+        result = await client.call_tool("shortcut_delete_label", {"label_id": 15})
+    assert not result.is_error
+    assert result.data == {"id": 15, "deleted": True}
+    assert route.called
+
+
+@pytest.mark.asyncio
+@respx.mock
+async def test_delete_label_surfaces_client_error(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("SHORTCUT_API_TOKEN", "x")
+    monkeypatch.setenv("SHORTCUT_MODE", "readwrite")
+    monkeypatch.setenv("SHORTCUT_ALLOW_DESTRUCTIVE", "true")
+    respx.get(f"{BASE}/member").mock(return_value=httpx.Response(200, json={"id": "u"}))
+    respx.delete(f"{BASE}/labels/15").mock(return_value=httpx.Response(404, json={"message": "Not Found"}))
+    server = create_server()
+    async with Client(server) as client:
+        result = await client.call_tool("shortcut_delete_label", {"label_id": 15}, raise_on_error=False)
+    assert result.is_error
