@@ -36,6 +36,12 @@ _PII_KEYS = {
 # also surface in descriptions, comment text and mention fields.
 _EMAIL_RE = re.compile(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}")
 
+# The same reversible hash redacted from `gravatar_hash` also rides inside avatar
+# URLs (e.g. `display_icon`), so rewrite it wherever it appears in a string. The
+# run is `{32,}` not `{32}`: Gravatar now emits SHA-256 (64 hex) as well as MD5,
+# and a fixed-32 match would leave the hash's trailing half in the cassette.
+_GRAVATAR_URL_RE = re.compile(r"(gravatar\.com/avatar/)[0-9a-fA-F]{32,}")
+
 
 def _scrub_pii(value: Any) -> Any:
     if isinstance(value, dict):
@@ -46,6 +52,7 @@ def _scrub_pii(value: Any) -> Any:
     if isinstance(value, list):
         return [_scrub_pii(item) for item in value]
     if isinstance(value, str):
+        value = _GRAVATAR_URL_RE.sub(rf"\g<1>{REDACTED_GRAVATAR_HASH}", value)
         return _EMAIL_RE.sub(REDACTED_EMAIL, value)
     return value
 
