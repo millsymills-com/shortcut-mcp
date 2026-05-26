@@ -48,7 +48,7 @@ jobs:
         with:
           enable-cache: true
       - run: uv sync --extra dev --frozen
-      - run: uv run pytest -m "not live and not live_write" --cov=shortcut_mcp --cov-fail-under=85
+      - run: uv run pytest -m "not live and not live_write" --cov=shortcut_mcp --cov-fail-under=90
 
   security:
     runs-on: ubuntu-latest
@@ -60,6 +60,10 @@ jobs:
         with:
           enable-cache: true
       - run: uv sync --extra dev --frozen
+      - name: Workflow audit (zizmor)
+        # Offline: skips audits that need a GitHub token / network, keeping the
+        # audit hermetic. Current workflows pass with no findings.
+        run: uvx zizmor@1.24.1 --offline .github/workflows/
       - name: Static analysis (bandit)
         run: uvx bandit -c pyproject.toml -r src
       - name: Dependency audit (pip-audit)

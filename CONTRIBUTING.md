@@ -23,7 +23,7 @@ uv run pytest -m "not live and not live_write"   # mocked + property tests
 ```
 
 The mocked suite uses `respx` and needs no credentials. Coverage must stay at or
-above 85%.
+above 90%.
 
 ### Live tests
 
