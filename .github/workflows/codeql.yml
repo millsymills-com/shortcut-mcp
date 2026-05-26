@@ -1,0 +1,31 @@
+name: CodeQL
+
+# Code scanning requires GitHub Advanced Security (private repos) or a public
+# repo. This workflow is inert until the repo variable ENABLE_CODEQL is "true";
+# flip it after enabling GHAS or making the repo public (Shortcut sc-106).
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: "0 6 * * 1"
+
+permissions:
+  contents: read
+
+jobs:
+  analyze:
+    if: vars.ENABLE_CODEQL == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+      - uses: github/codeql-action/init@03e4368ac7daa2bd82b3e85262f3bf87ee112f57 # v3.36.0
+        with:
+          languages: python
+          build-mode: none
+      - uses: github/codeql-action/analyze@03e4368ac7daa2bd82b3e85262f3bf87ee112f57 # v3.36.0

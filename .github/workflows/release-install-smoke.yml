@@ -1,0 +1,28 @@
+name: Release install smoke
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  install-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
+      - name: Build wheel
+        run: uv build
+      - name: Install built wheel into a clean 3.13 environment
+        run: |
+          uv venv --python 3.13 /tmp/smoke
+          uv pip install --python /tmp/smoke/bin/python dist/*.whl
+      - name: Verify import, version, and console script
+        run: |
+          /tmp/smoke/bin/python -c "import shortcut_mcp; assert shortcut_mcp.__version__ != '0.0.0+unknown', shortcut_mcp.__version__; print(shortcut_mcp.__version__)"
+          test -x /tmp/smoke/bin/shortcut-mcp
