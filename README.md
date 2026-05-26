@@ -178,8 +178,10 @@ Require `SHORTCUT_MODE=readwrite`. Hidden entirely in readonly mode.
 
 Two behaviors to be aware of:
 
-- **`shortcut_upload_file(path)`** reads a local filesystem path on the server
-  side. The MCP server process must have read access to the file at that path.
+- **`shortcut_upload_file(path)`** reads **any** filesystem path readable by the
+  server process and uploads its bytes to Shortcut. Treat the path as a trust
+  boundary: do not expose this server to untrusted prompts when sensitive files
+  (keys, credentials) are on disk. Uploads are capped at 50 MB.
 - **`shortcut_update_story`** REPLACES `labels` and `owner_ids` arrays — it
   does not append. Use `shortcut_add_story_labels` / `shortcut_add_story_owners`
   to add entries without clobbering the existing values.

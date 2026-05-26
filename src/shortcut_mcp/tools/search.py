@@ -88,16 +88,23 @@ def register(server: FastMCP) -> None:
         raw = await get_client(ctx).get("/search", params={"query": query, "page_size": min(limit, 25)})
         if not isinstance(raw, dict):
             raise ToolError(f"shortcut_search: /search returned {type(raw).__name__}, expected an object")
-        stories = (raw.get("stories") or {}).get("data", [])
-        epics = (raw.get("epics") or {}).get("data", [])
+        stories = raw.get("stories") or {}
+        epics = raw.get("epics") or {}
+        # Thread each entity's `total` so truncation is reported correctly when the
+        # API caps the page (page_size<=25) but more results exist (limit>25).
         return {
-            "stories": shaped_list(stories, shape_story_summary, limit=limit),
-            "epics": shaped_list(epics, shape_epic_summary, limit=limit),
+            "stories": shaped_list(
+                stories.get("data", []), shape_story_summary, limit=limit, total=stories.get("total")
+            ),
+            "epics": shaped_list(epics.get("data", []), shape_epic_summary, limit=limit, total=epics.get("total")),
         }
 
     @server.tool(
         name="shortcut_query_stories",
-        description="Search stories by structured filter (POST query). Read-only despite POST.",
+        description=(
+            "Search stories by a structured filter. Supported filters: archived, "
+            "owner_ids, workflow_state_id, epic_id (POST query; read-only despite POST)."
+        ),
         tags=read_tags(_MODULE),
         annotations=_READ_ANN,
     )

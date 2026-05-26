@@ -157,3 +157,26 @@ async def test_global_search_returns_stories_and_epics_shape(monkeypatch):
     assert not result.is_error
     assert result.data["stories"]["items"] == [{"id": 1, "name": "S"}]
     assert result.data["epics"]["items"] == [{"id": 2, "name": "E"}]
+
+
+@pytest.mark.asyncio
+@respx.mock
+async def test_global_search_reports_truncation_when_total_exceeds_page(monkeypatch):
+    """limit>25 caps the page at 25 rows; total must drive truncated=True (issue #14)."""
+    monkeypatch.setenv("SHORTCUT_API_TOKEN", "x")
+    respx.get(f"{BASE}/member").mock(return_value=httpx.Response(200, json={"id": "u"}))
+    page = [{"id": i, "name": f"S{i}"} for i in range(25)]
+    respx.get(f"{BASE}/search").mock(
+        return_value=httpx.Response(
+            200,
+            json={"stories": {"data": page, "total": 100}, "epics": {"data": [], "total": 0}},
+        )
+    )
+    server = create_server()
+    async with Client(server) as client:
+        result = await client.call_tool("shortcut_search", {"query": "x", "limit": 50})
+    assert not result.is_error
+    assert result.data["stories"]["truncated"] is True
+    assert result.data["stories"]["total"] == 100
+    assert len(result.data["stories"]["items"]) == 25
+    assert result.data["epics"]["truncated"] is False

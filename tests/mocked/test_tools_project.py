@@ -112,3 +112,19 @@ async def test_delete_project_confirms(monkeypatch: pytest.MonkeyPatch) -> None:
     assert not result.is_error
     assert result.data == {"id": 21, "deleted": True}
     assert route.called
+
+
+@pytest.mark.asyncio
+@respx.mock
+async def test_delete_project_surfaces_422_when_not_empty(monkeypatch: pytest.MonkeyPatch) -> None:
+    """The API rejects deleting a project that still has stories with 422 (issue #17)."""
+    monkeypatch.setenv("SHORTCUT_API_TOKEN", "x")
+    monkeypatch.setenv("SHORTCUT_MODE", "readwrite")
+    monkeypatch.setenv("SHORTCUT_ALLOW_DESTRUCTIVE", "true")
+    monkeypatch.setenv("SHORTCUT_PROFILE", "all")
+    respx.get(f"{BASE}/member").mock(return_value=httpx.Response(200, json={"id": "u"}))
+    respx.delete(f"{BASE}/projects/21").mock(return_value=httpx.Response(422, json={"message": "Project has stories"}))
+    server = create_server()
+    async with Client(server) as client:
+        result = await client.call_tool("shortcut_delete_project", {"project_id": 21}, raise_on_error=False)
+    assert result.is_error

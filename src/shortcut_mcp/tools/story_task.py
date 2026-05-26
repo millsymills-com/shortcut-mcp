@@ -12,6 +12,7 @@ from shortcut_mcp.tools._common import (
     get_client,
     read_tags,
     require_destructive,
+    require_update_fields,
     require_writes,
     write_tags,
 )
@@ -64,6 +65,7 @@ def register(server: FastMCP) -> None:
             body["description"] = description
         if complete is not None:
             body["complete"] = complete
+        require_update_fields(body)
         client = get_client(ctx)
         result = await client.put(
             f"/stories/{_seg(str(story_id))}/tasks/{_seg(str(task_id))}",

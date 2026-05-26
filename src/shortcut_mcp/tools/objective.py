@@ -12,6 +12,7 @@ from shortcut_mcp.tools._common import (
     get_client,
     read_tags,
     require_destructive,
+    require_update_fields,
     require_writes,
     shape_epic_summary,
     shape_objective_summary,
@@ -96,6 +97,7 @@ def register(server: FastMCP) -> None:
             body["description"] = description
         if state is not None:
             body["state"] = state
+        require_update_fields(body)
         client = get_client(ctx)
         result = await client.put(f"/objectives/{_seg(str(objective_id))}", json=body)
         return result if result is not None else {"id": objective_id}

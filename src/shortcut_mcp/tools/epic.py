@@ -12,6 +12,7 @@ from shortcut_mcp.tools._common import (
     get_client,
     read_tags,
     require_destructive,
+    require_update_fields,
     require_writes,
     shape_epic_summary,
     shape_story_summary,
@@ -114,6 +115,7 @@ def register(server: FastMCP) -> None:
             body["owner_ids"] = owner_ids
         if deadline is not None:
             body["deadline"] = deadline
+        require_update_fields(body)
         client = get_client(ctx)
         result = await client.put(f"/epics/{_seg(str(epic_id))}", json=body)
         return result if result is not None else {"id": epic_id}

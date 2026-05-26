@@ -8,6 +8,7 @@ from shortcut_mcp.server import ServerContext
 from shortcut_mcp.tools._common import (
     read_tags,
     require_destructive,
+    require_update_fields,
     require_writes,
     shape_member_summary,
     shape_story_summary,
@@ -51,6 +52,15 @@ def test_require_destructive_blocks_without_flag(monkeypatch):
 def test_require_destructive_allows_when_enabled(monkeypatch):
     ctx = _StubCtx(_cfg(monkeypatch, SHORTCUT_MODE="readwrite", SHORTCUT_ALLOW_DESTRUCTIVE="true"))
     require_destructive(ctx)  # type: ignore[arg-type]  # ty: ignore[invalid-argument-type]
+
+
+def test_require_update_fields_blocks_empty_body():
+    with pytest.raises(ToolError, match="at least one field"):
+        require_update_fields({})
+
+
+def test_require_update_fields_allows_nonempty_body():
+    require_update_fields({"name": "x"})  # no raise
 
 
 def test_shaped_list_truncates_and_reports():

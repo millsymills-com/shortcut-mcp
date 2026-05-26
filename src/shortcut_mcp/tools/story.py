@@ -12,6 +12,7 @@ from shortcut_mcp.tools._common import (
     get_client,
     read_tags,
     require_destructive,
+    require_update_fields,
     require_writes,
     shaped_list,
     write_tags,
@@ -118,6 +119,7 @@ def register(server: FastMCP) -> None:
             body["owner_ids"] = owner_ids
         if labels is not None:
             body["labels"] = [{"name": n} for n in labels]
+        require_update_fields(body)
         client = get_client(ctx)
         result = await client.put(f"/stories/{_seg(str(story_id))}", json=body)
         return result if result is not None else {"id": story_id}

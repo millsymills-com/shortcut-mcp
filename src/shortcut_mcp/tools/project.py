@@ -12,6 +12,7 @@ from shortcut_mcp.tools._common import (
     get_client,
     read_tags,
     require_destructive,
+    require_update_fields,
     require_writes,
     shape_project_summary,
     shape_story_summary,
@@ -102,6 +103,7 @@ def register(server: FastMCP) -> None:
             body["color"] = color
         if archived is not None:
             body["archived"] = archived
+        require_update_fields(body)
         client = get_client(ctx)
         result = await client.put(f"/projects/{_seg(str(project_id))}", json=body)
         return result if result is not None else {"id": project_id}
