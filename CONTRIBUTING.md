@@ -9,6 +9,7 @@ Requires Python 3.13 and [uv](https://docs.astral.sh/uv/).
 
 ```bash
 uv sync --extra dev
+pre-commit install   # ruff, ty, and hygiene hooks on every commit
 ```
 
 ## Checks
