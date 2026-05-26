@@ -67,12 +67,13 @@ async def test_get_with_params_passes_query_string() -> None:
 async def test_protocol_errors_not_classified_as_connection(exc_cls: type[httpx.HTTPError]) -> None:
     from shortcut_mcp.errors import ShortcutConnectionError, ShortcutError
 
-    respx.get("https://api.app.shortcut.com/api/v3/stories/1").mock(side_effect=exc_cls("boom"))
-    async with ShortcutClient(token="x", max_retries=1) as client:
+    route = respx.get("https://api.app.shortcut.com/api/v3/stories/1").mock(side_effect=exc_cls("boom"))
+    async with ShortcutClient(token="x", max_retries=3) as client:
         with pytest.raises(ShortcutError) as excinfo:
             await client.get("/stories/1")
     assert not isinstance(excinfo.value, ShortcutConnectionError)  # "check network/DNS" would mislead here
     assert exc_cls.__name__ in str(excinfo.value)
+    assert route.call_count == 1  # not retried: a ShortcutConnectionError would have retried 3x on GET
 
 
 @pytest.mark.asyncio
