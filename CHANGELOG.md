@@ -7,6 +7,18 @@ This project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Changed
+
+- Transport errors `RemoteProtocolError` ("server disconnected"), `DecodingError`
+  and `TooManyRedirects` are now classified as non-retryable protocol failures
+  rather than connection errors, so a GET no longer retries them.
+
+### Security
+
+- Contract cassettes additionally redact member `gravatar_hash` (an MD5 of the
+  real email) and `mention_name`; the privacy guard test fails on any future
+  recording that leaks them.
+
 ## [0.4.0] - 2026-05-26
 
 ### Added

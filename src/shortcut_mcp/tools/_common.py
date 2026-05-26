@@ -55,11 +55,14 @@ async def get_object(ctx: Context, path: str) -> dict[str, Any]:
     A missing resource is a 404 (which raises upstream), so an empty body here
     means a 204/no-content response the single-object tools can't represent —
     surface it as a clear ToolError instead of returning a null that violates
-    the tool's ``dict`` output contract.
+    the tool's ``dict`` output contract. A non-dict JSON value (array/scalar)
+    would likewise violate that contract and is rejected for the same reason.
     """
     result = await get_client(ctx).get(path)
     if result is None:
         raise ToolError(f"GET {path} returned an empty body; expected a single object")
+    if not isinstance(result, dict):
+        raise ToolError(f"GET {path} returned a {type(result).__name__}, expected a single object")
     return result
 
 

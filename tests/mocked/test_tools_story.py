@@ -80,6 +80,19 @@ async def test_get_story_raises_on_empty_body(monkeypatch: pytest.MonkeyPatch) -
 
 @pytest.mark.asyncio
 @respx.mock
+async def test_get_story_raises_on_non_dict_body(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("SHORTCUT_API_TOKEN", "x")
+    _mock_member()
+    respx.get(f"{BASE}/stories/1234").mock(return_value=httpx.Response(200, json=[{"id": 1234}]))
+    server = create_server()
+    async with Client(server) as client:
+        result = await client.call_tool("shortcut_get_story", {"story_id": 1234}, raise_on_error=False)
+    assert result.is_error
+    assert "expected a single object" in result.content[0].text.lower()
+
+
+@pytest.mark.asyncio
+@respx.mock
 async def test_list_story_history_returns_items(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setenv("SHORTCUT_API_TOKEN", "x")
     _mock_member()
