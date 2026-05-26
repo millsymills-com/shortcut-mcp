@@ -33,6 +33,7 @@ dev = [
     "pytest>=9.0.0",
     "pytest-asyncio>=1.3.0",
     "pytest-cov>=7.1.0",
+    "pytest-recording>=0.13.4",
     "respx>=0.23.0",
     "hypothesis>=6.150.0",
     "ruff>=0.15.0",
@@ -73,6 +74,7 @@ markers = [
     "smoke: minimal live read",
     "slow: slow tests",
     "live_write: opt-in live write/destructive tests against an isolated workspace",
+    "contract: VCR-replayed API contract tests (offline; re-record with --record-mode=once)",
 ]
 addopts = ["-ra", "--strict-markers", "--strict-config"]
 

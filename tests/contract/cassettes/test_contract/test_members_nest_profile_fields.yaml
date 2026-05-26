@@ -1,0 +1,63 @@
+interactions:
+- request:
+    body: ''
+    headers:
+      Accept:
+      - application/json
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json
+      Host:
+      - api.app.shortcut.com
+      Shortcut-Token:
+      - DUMMY
+      User-Agent:
+      - python-httpx/0.28.1
+    method: GET
+    uri: https://api.app.shortcut.com/api/v3/members
+  response:
+    body:
+      string: '[{"role": "admin", "entity_type": "member", "disabled": false, "global_id":
+        "v2:p:6a1042c0-a06e-4711-80a9-0178a339396b:6a1042c0-f182-409f-90fb-98a30cc66b62",
+        "state": "full", "updated_at": "2026-05-22T11:49:20Z", "created_without_invite":
+        false, "group_ids": ["6a1042c0-9df8-4cea-b93d-c7ffd45a88d3"], "id": "6a1042c0-f182-409f-90fb-98a30cc66b62",
+        "profile": {"entity_type": "profile", "deactivated": false, "two_factor_auth_activated":
+        false, "mention_name": "mills6169", "name": "mills", "gravatar_hash": "938a10e5e8684a87b93bcb172ea95569",
+        "id": "6a1042c0-9bbc-48af-8d22-40b9f3e0bff5", "display_icon": null, "is_owner":
+        true, "email_address": "redacted@example.com"}, "created_at": "2026-05-22T11:49:20Z"}]'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '669'
+      Content-Type:
+      - application/json;charset=utf-8
+      Date:
+      - Tue, 26 May 2026 20:25:19 GMT
+      access-control-allow-credentials:
+      - 'true'
+      access-control-expose-headers:
+      - Vary, Server-Timing, Database-Time, Request-Key
+      cache-control:
+      - no-store
+      database-time:
+      - '1305515667'
+      pragma:
+      - no-cache
+      request-key:
+      - c8ea93ee154c
+      server-timing:
+      - respWOses;dur=12
+      strict-transport-security:
+      - max-age=31536000; includeSubDomains
+      vary:
+      - Accept, Tenant-Workspace2, Tenant-Organization2, origin, shortcut-token
+      x-content-type-options:
+      - nosniff
+    status:
+      code: 200
+      message: OK
+version: 1
