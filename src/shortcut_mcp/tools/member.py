@@ -7,7 +7,7 @@ from typing import Any
 from fastmcp import Context, FastMCP
 
 from shortcut_mcp.clients.shortcut import _seg
-from shortcut_mcp.tools._common import get_client, read_tags, shape_member_summary, shaped_list
+from shortcut_mcp.tools._common import get_client, get_object, read_tags, shape_member_summary, shaped_list
 
 _MODULE = "member"
 _READ_ANN = {"readOnlyHint": True, "openWorldHint": True}
@@ -31,7 +31,7 @@ def register(server: FastMCP) -> None:
         annotations=_READ_ANN,
     )
     async def shortcut_get_member(ctx: Context, member_id: str) -> dict[str, Any]:
-        return await get_client(ctx).get(f"/members/{_seg(member_id)}")
+        return await get_object(ctx, f"/members/{_seg(member_id)}")
 
     @server.tool(
         name="shortcut_get_current_member",
@@ -40,4 +40,4 @@ def register(server: FastMCP) -> None:
         annotations=_READ_ANN,
     )
     async def shortcut_get_current_member(ctx: Context) -> dict[str, Any]:
-        return await get_client(ctx).get("/member")
+        return await get_object(ctx, "/member")

@@ -10,6 +10,7 @@ from shortcut_mcp.clients.shortcut import _seg
 from shortcut_mcp.tools._common import (
     destructive_tags,
     get_client,
+    get_object,
     read_tags,
     require_destructive,
     require_update_fields,
@@ -43,7 +44,7 @@ def register(server: FastMCP) -> None:
         annotations=_READ_ANN,
     )
     async def shortcut_get_linked_file(ctx: Context, linked_file_id: int) -> dict[str, Any]:
-        return await get_client(ctx).get(f"/linked-files/{_seg(str(linked_file_id))}")
+        return await get_object(ctx, f"/linked-files/{_seg(str(linked_file_id))}")
 
     @server.tool(
         name="shortcut_create_linked_file",

@@ -10,6 +10,7 @@ from shortcut_mcp.clients.shortcut import _seg
 from shortcut_mcp.tools._common import (
     destructive_tags,
     get_client,
+    get_object,
     read_tags,
     require_destructive,
     require_writes,
@@ -42,7 +43,7 @@ def register(server: FastMCP) -> None:
         annotations=_READ_ANN,
     )
     async def shortcut_get_story_comment(ctx: Context, story_id: int, comment_id: int) -> dict[str, Any]:
-        return await get_client(ctx).get(f"/stories/{_seg(str(story_id))}/comments/{_seg(str(comment_id))}")
+        return await get_object(ctx, f"/stories/{_seg(str(story_id))}/comments/{_seg(str(comment_id))}")
 
     @server.tool(
         name="shortcut_create_story_comment",

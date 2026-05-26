@@ -45,6 +45,20 @@ def get_client(ctx: Context) -> ShortcutClient:
     return client
 
 
+async def get_object(ctx: Context, path: str) -> dict[str, Any]:
+    """GET a single Shortcut object, failing clearly on an empty body.
+
+    A missing resource is a 404 (which raises upstream), so an empty body here
+    means a 204/no-content response the single-object tools can't represent —
+    surface it as a clear ToolError instead of returning a null that violates
+    the tool's ``dict`` output contract.
+    """
+    result = await get_client(ctx).get(path)
+    if result is None:
+        raise ToolError(f"GET {path} returned an empty body; expected a single object")
+    return result
+
+
 def require_writes(ctx: Context) -> None:
     if not server_context(ctx).config.writes_enabled:
         raise ToolError("mode_denied: set SHORTCUT_MODE=readwrite to enable writes")

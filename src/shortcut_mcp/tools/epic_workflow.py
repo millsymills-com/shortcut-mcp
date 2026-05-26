@@ -6,7 +6,7 @@ from typing import Any
 
 from fastmcp import Context, FastMCP
 
-from shortcut_mcp.tools._common import get_client, read_tags
+from shortcut_mcp.tools._common import get_object, read_tags
 
 _MODULE = "epic_workflow"
 _READ_ANN = {"readOnlyHint": True, "openWorldHint": True}
@@ -20,4 +20,4 @@ def register(server: FastMCP) -> None:
         annotations=_READ_ANN,
     )
     async def shortcut_get_epic_workflow(ctx: Context) -> dict[str, Any]:
-        return await get_client(ctx).get("/epic-workflow")
+        return await get_object(ctx, "/epic-workflow")

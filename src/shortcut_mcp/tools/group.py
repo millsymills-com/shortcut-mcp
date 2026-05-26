@@ -9,6 +9,7 @@ from fastmcp import Context, FastMCP
 from shortcut_mcp.clients.shortcut import _seg
 from shortcut_mcp.tools._common import (
     get_client,
+    get_object,
     read_tags,
     require_update_fields,
     require_writes,
@@ -41,7 +42,7 @@ def register(server: FastMCP) -> None:
         annotations=_READ_ANN,
     )
     async def shortcut_get_group(ctx: Context, group_id: str) -> dict[str, Any]:
-        return await get_client(ctx).get(f"/groups/{_seg(group_id)}")
+        return await get_object(ctx, f"/groups/{_seg(group_id)}")
 
     @server.tool(
         name="shortcut_list_group_stories",

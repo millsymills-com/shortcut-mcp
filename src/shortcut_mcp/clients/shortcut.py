@@ -80,6 +80,22 @@ def _parse_retry_after(response: httpx.Response) -> float | None:
         return None
 
 
+def _transport_error(exc: httpx.HTTPError) -> ShortcutError:
+    """Map an httpx transport exception to the right ShortcutError.
+
+    DecodingError / RemoteProtocolError / TooManyRedirects are protocol-level
+    failures, not reachability problems, so they must not be reported as a
+    connection error ("check network/DNS") nor retried as one.
+    """
+    if isinstance(exc, httpx.TimeoutException):
+        return ShortcutTimeoutError(status_code=0, body=str(exc))
+    if isinstance(exc, httpx.ConnectError):
+        return ShortcutConnectionError(status_code=0, body=str(exc))
+    if isinstance(exc, httpx.DecodingError | httpx.RemoteProtocolError | httpx.TooManyRedirects):
+        return ShortcutError(status_code=0, body=f"{type(exc).__name__}: {exc}")
+    return ShortcutConnectionError(status_code=0, body=str(exc))
+
+
 def _map_status_to_error(response: httpx.Response) -> ShortcutError:
     body = _safe_body(response)
     if response.status_code == 401:
@@ -198,12 +214,8 @@ class ShortcutClient:
         req.headers["content-type"] = req.stream.content_type
         try:
             resp = await self._client.send(req)
-        except httpx.TimeoutException as exc:
-            raise ShortcutTimeoutError(status_code=0, body=str(exc)) from exc
-        except httpx.ConnectError as exc:
-            raise ShortcutConnectionError(status_code=0, body=str(exc)) from exc
         except httpx.HTTPError as exc:
-            raise ShortcutConnectionError(status_code=0, body=str(exc)) from exc
+            raise _transport_error(exc) from exc
         if resp.status_code >= 400:
             raise _map_status_to_error(resp)
         if resp.status_code == 204 or not resp.content:
@@ -251,12 +263,8 @@ class ShortcutClient:
     ) -> Any:
         try:
             response = await self._client.request(method, path, params=params, json=json)
-        except httpx.TimeoutException as exc:
-            raise ShortcutTimeoutError(status_code=0, body=str(exc)) from exc
-        except httpx.ConnectError as exc:
-            raise ShortcutConnectionError(status_code=0, body=str(exc)) from exc
         except httpx.HTTPError as exc:
-            raise ShortcutConnectionError(status_code=0, body=str(exc)) from exc
+            raise _transport_error(exc) from exc
 
         if response.status_code >= 400:
             raise _map_status_to_error(response)

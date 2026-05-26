@@ -2,14 +2,21 @@
 
 from __future__ import annotations
 
+import json
 from typing import Any
 
 BODY_TRUNCATE_BYTES = 4096
 
 
 def _truncate(body: Any) -> Any:
-    if isinstance(body, str) and len(body) > BODY_TRUNCATE_BYTES:
-        return body[:BODY_TRUNCATE_BYTES]
+    if isinstance(body, str):
+        return body[:BODY_TRUNCATE_BYTES] if len(body) > BODY_TRUNCATE_BYTES else body
+    try:
+        serialized = json.dumps(body)
+    except (TypeError, ValueError):
+        serialized = repr(body)
+    if len(serialized) > BODY_TRUNCATE_BYTES:
+        return serialized[:BODY_TRUNCATE_BYTES]
     return body
 
 

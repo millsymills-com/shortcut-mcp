@@ -37,6 +37,13 @@ def test_body_not_truncated_when_dict() -> None:
     assert err.body == body
 
 
+def test_body_truncated_when_non_str_serializes_too_large() -> None:
+    body = {"items": ["x" * 100 for _ in range(100)]}  # serialized length far exceeds the cap
+    err = ShortcutError(status_code=500, body=body)
+    assert isinstance(err.body, str)
+    assert len(err.body) == BODY_TRUNCATE_BYTES
+
+
 def test_subclasses_inherit_base() -> None:
     for cls in (
         ShortcutAuthError,
