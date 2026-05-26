@@ -26,6 +26,13 @@ _PII_FIELD_RES = {
     "mention_name": (re.compile(rb'"mention_name":\s*"([^"]*)"'), REDACTED_MENTION_NAME),
     "gravatar_hash": (re.compile(rb'"gravatar_hash":\s*"([^"]*)"'), REDACTED_GRAVATAR_HASH),
 }
+# The gravatar_hash MD5 is reversible (rainbow tables) and the same value rides
+# inside avatar URLs (e.g. display_icon), bypassing the key-based field guards.
+_GRAVATAR_URL_RE = re.compile(rb"gravatar\.com/avatar/([0-9a-fA-F]{32})")
+
+
+def _unredacted_gravatar_hashes(raw: bytes) -> set[str]:
+    return {h.decode() for h in _GRAVATAR_URL_RE.findall(raw) if h.decode() != REDACTED_GRAVATAR_HASH}
 
 
 @pytest.mark.contract
@@ -55,3 +62,24 @@ def test_cassettes_contain_no_unredacted_member_identity() -> None:
                 if value != sentinel:
                     leaked.setdefault(field, set()).add(value)
     assert not leaked, f"unredacted member-identity value(s) in cassettes: {leaked}"
+
+
+def test_unredacted_gravatar_hashes_flags_real_md5() -> None:
+    raw = b'{"display_icon": "https://www.gravatar.com/avatar/d41d8cd98f00b204e9800998ecf8427e?s=40"}'
+    assert _unredacted_gravatar_hashes(raw) == {"d41d8cd98f00b204e9800998ecf8427e"}
+
+
+def test_unredacted_gravatar_hashes_ignores_sentinel() -> None:
+    raw = f'{{"display_icon": "https://www.gravatar.com/avatar/{REDACTED_GRAVATAR_HASH}"}}'.encode()
+    assert _unredacted_gravatar_hashes(raw) == set()
+
+
+@pytest.mark.contract
+def test_cassettes_contain_no_unredacted_gravatar_url() -> None:
+    cassettes = list(_CASSETTE_DIR.rglob("*.yaml"))
+    if not cassettes:
+        pytest.skip("no cassettes recorded yet")
+    leaked: set[str] = set()
+    for cassette in cassettes:
+        leaked |= _unredacted_gravatar_hashes(cassette.read_bytes())
+    assert not leaked, f"unredacted gravatar MD5(s) in avatar URLs: {sorted(leaked)}"
