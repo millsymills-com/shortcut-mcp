@@ -1,0 +1,255 @@
+interactions:
+- request:
+    body: ''
+    headers:
+      Accept:
+      - application/json
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json
+      Host:
+      - api.app.shortcut.com
+      Shortcut-Token:
+      - DUMMY
+      User-Agent:
+      - python-httpx/0.28.1
+    method: GET
+    uri: https://api.app.shortcut.com/api/v3/labels
+  response:
+    body:
+      string: '[{"app_url": "https://app.shortcut.com/millsymills/label/48", "description":
+        "", "archived": false, "entity_type": "label", "color": null, "name": "area:ci",
+        "global_id": "v2:l:6a1042c0-a06e-4711-80a9-0178a339396b:48", "updated_at":
+        "2026-05-23T06:07:12Z", "external_id": null, "id": 48, "stats": {"num_related_documents":
+        0, "num_epics": 0, "num_stories_unstarted": 6, "num_stories_total": 9, "num_epics_unstarted":
+        0, "num_epics_in_progress": 0, "num_points_unstarted": 0, "num_stories_unestimated":
+        9, "num_points_in_progress": 0, "num_epics_total": 0, "num_stories_completed":
+        0, "num_points_completed": 0, "num_stories_backlog": 0, "num_points_total":
+        0, "num_stories_in_progress": 3, "num_points_backlog": 0, "num_epics_completed":
+        0}, "created_at": "2026-05-23T06:07:12Z"}, {"app_url": "https://app.shortcut.com/millsymills/label/55",
+        "description": "", "archived": false, "entity_type": "label", "color": null,
+        "name": "area:client", "global_id": "v2:l:6a1042c0-a06e-4711-80a9-0178a339396b:55",
+        "updated_at": "2026-05-23T06:07:13Z", "external_id": null, "id": 55, "stats":
+        {"num_related_documents": 0, "num_epics": 0, "num_stories_unstarted": 3, "num_stories_total":
+        5, "num_epics_unstarted": 0, "num_epics_in_progress": 0, "num_points_unstarted":
+        0, "num_stories_unestimated": 5, "num_points_in_progress": 0, "num_epics_total":
+        0, "num_stories_completed": 2, "num_points_completed": 0, "num_stories_backlog":
+        0, "num_points_total": 0, "num_stories_in_progress": 0, "num_points_backlog":
+        0, "num_epics_completed": 0}, "created_at": "2026-05-23T06:07:13Z"}, {"app_url":
+        "https://app.shortcut.com/millsymills/label/71", "description": "", "archived":
+        false, "entity_type": "label", "color": null, "name": "area:docs", "global_id":
+        "v2:l:6a1042c0-a06e-4711-80a9-0178a339396b:71", "updated_at": "2026-05-23T06:07:15Z",
+        "external_id": null, "id": 71, "stats": {"num_related_documents": 0, "num_epics":
+        0, "num_stories_unstarted": 2, "num_stories_total": 7, "num_epics_unstarted":
+        0, "num_epics_in_progress": 0, "num_points_unstarted": 0, "num_stories_unestimated":
+        7, "num_points_in_progress": 0, "num_epics_total": 0, "num_stories_completed":
+        2, "num_points_completed": 0, "num_stories_backlog": 0, "num_points_total":
+        0, "num_stories_in_progress": 3, "num_points_backlog": 0, "num_epics_completed":
+        0}, "created_at": "2026-05-23T06:07:15Z"}, {"app_url": "https://app.shortcut.com/millsymills/label/51",
+        "description": "", "archived": false, "entity_type": "label", "color": null,
+        "name": "area:server", "global_id": "v2:l:6a1042c0-a06e-4711-80a9-0178a339396b:51",
+        "updated_at": "2026-05-23T06:07:13Z", "external_id": null, "id": 51, "stats":
+        {"num_related_documents": 0, "num_epics": 0, "num_stories_unstarted": 4, "num_stories_total":
+        7, "num_epics_unstarted": 0, "num_epics_in_progress": 0, "num_points_unstarted":
+        0, "num_stories_unestimated": 7, "num_points_in_progress": 0, "num_epics_total":
+        0, "num_stories_completed": 3, "num_points_completed": 0, "num_stories_backlog":
+        0, "num_points_total": 0, "num_stories_in_progress": 0, "num_points_backlog":
+        0, "num_epics_completed": 0}, "created_at": "2026-05-23T06:07:13Z"}, {"app_url":
+        "https://app.shortcut.com/millsymills/label/61", "description": "", "archived":
+        false, "entity_type": "label", "color": null, "name": "area:tools", "global_id":
+        "v2:l:6a1042c0-a06e-4711-80a9-0178a339396b:61", "updated_at": "2026-05-23T06:07:14Z",
+        "external_id": null, "id": 61, "stats": {"num_related_documents": 0, "num_epics":
+        0, "num_stories_unstarted": 12, "num_stories_total": 24, "num_epics_unstarted":
+        0, "num_epics_in_progress": 0, "num_points_unstarted": 0, "num_stories_unestimated":
+        24, "num_points_in_progress": 0, "num_epics_total": 0, "num_stories_completed":
+        12, "num_points_completed": 0, "num_stories_backlog": 0, "num_points_total":
+        0, "num_stories_in_progress": 0, "num_points_backlog": 0, "num_epics_completed":
+        0}, "created_at": "2026-05-23T06:07:14Z"}, {"app_url": "https://app.shortcut.com/millsymills/label/28",
+        "description": "", "archived": false, "entity_type": "label", "color": null,
+        "name": "eval-prototype", "global_id": "v2:l:6a1042c0-a06e-4711-80a9-0178a339396b:28",
+        "updated_at": "2026-05-22T20:28:24Z", "external_id": null, "id": 28, "stats":
+        {"num_related_documents": 0, "num_epics": 0, "num_stories_unstarted": 0, "num_stories_total":
+        0, "num_epics_unstarted": 0, "num_epics_in_progress": 0, "num_points_unstarted":
+        0, "num_stories_unestimated": 0, "num_points_in_progress": 0, "num_epics_total":
+        0, "num_stories_completed": 0, "num_points_completed": 0, "num_stories_backlog":
+        0, "num_points_total": 0, "num_stories_in_progress": 0, "num_points_backlog":
+        0, "num_epics_completed": 0}, "created_at": "2026-05-22T20:28:24Z"}, {"app_url":
+        "https://app.shortcut.com/millsymills/label/8", "description": "", "archived":
+        false, "entity_type": "label", "color": "#ff5555", "name": "needs qa", "global_id":
+        "v2:l:6a1042c0-a06e-4711-80a9-0178a339396b:8", "updated_at": "2026-05-22T11:49:20Z",
+        "external_id": null, "id": 8, "stats": {"num_related_documents": 0, "num_epics":
+        0, "num_stories_unstarted": 0, "num_stories_total": 0, "num_epics_unstarted":
+        0, "num_epics_in_progress": 0, "num_points_unstarted": 0, "num_stories_unestimated":
+        0, "num_points_in_progress": 0, "num_epics_total": 0, "num_stories_completed":
+        0, "num_points_completed": 0, "num_stories_backlog": 0, "num_points_total":
+        0, "num_stories_in_progress": 0, "num_points_backlog": 0, "num_epics_completed":
+        0}, "created_at": "2026-05-22T11:49:20Z"}, {"app_url": "https://app.shortcut.com/millsymills/label/30",
+        "description": "", "archived": false, "entity_type": "label", "color": null,
+        "name": "only-this-one", "global_id": "v2:l:6a1042c0-a06e-4711-80a9-0178a339396b:30",
+        "updated_at": "2026-05-22T20:31:27Z", "external_id": null, "id": 30, "stats":
+        {"num_related_documents": 0, "num_epics": 0, "num_stories_unstarted": 1, "num_stories_total":
+        1, "num_epics_unstarted": 0, "num_epics_in_progress": 0, "num_points_unstarted":
+        0, "num_stories_unestimated": 1, "num_points_in_progress": 0, "num_epics_total":
+        0, "num_stories_completed": 0, "num_points_completed": 0, "num_stories_backlog":
+        0, "num_points_total": 0, "num_stories_in_progress": 0, "num_points_backlog":
+        0, "num_epics_completed": 0}, "created_at": "2026-05-22T20:31:27Z"}, {"app_url":
+        "https://app.shortcut.com/millsymills/label/7", "description": "", "archived":
+        false, "entity_type": "label", "color": "#67ad36", "name": "ready for design",
+        "global_id": "v2:l:6a1042c0-a06e-4711-80a9-0178a339396b:7", "updated_at":
+        "2026-05-22T11:49:20Z", "external_id": null, "id": 7, "stats": {"num_related_documents":
+        0, "num_epics": 0, "num_stories_unstarted": 0, "num_stories_total": 0, "num_epics_unstarted":
+        0, "num_epics_in_progress": 0, "num_points_unstarted": 0, "num_stories_unestimated":
+        0, "num_points_in_progress": 0, "num_epics_total": 0, "num_stories_completed":
+        0, "num_points_completed": 0, "num_stories_backlog": 0, "num_points_total":
+        0, "num_stories_in_progress": 0, "num_points_backlog": 0, "num_epics_completed":
+        0}, "created_at": "2026-05-22T11:49:20Z"}, {"app_url": "https://app.shortcut.com/millsymills/label/9",
+        "description": "", "archived": false, "entity_type": "label", "color": "#8b78fa",
+        "name": "release 1.0", "global_id": "v2:l:6a1042c0-a06e-4711-80a9-0178a339396b:9",
+        "updated_at": "2026-05-22T11:49:20Z", "external_id": null, "id": 9, "stats":
+        {"num_related_documents": 0, "num_epics": 0, "num_stories_unstarted": 0, "num_stories_total":
+        0, "num_epics_unstarted": 0, "num_epics_in_progress": 0, "num_points_unstarted":
+        0, "num_stories_unestimated": 0, "num_points_in_progress": 0, "num_epics_total":
+        0, "num_stories_completed": 0, "num_points_completed": 0, "num_stories_backlog":
+        0, "num_points_total": 0, "num_stories_in_progress": 0, "num_points_backlog":
+        0, "num_epics_completed": 0}, "created_at": "2026-05-22T11:49:20Z"}, {"app_url":
+        "https://app.shortcut.com/millsymills/label/29", "description": "", "archived":
+        false, "entity_type": "label", "color": null, "name": "second-label", "global_id":
+        "v2:l:6a1042c0-a06e-4711-80a9-0178a339396b:29", "updated_at": "2026-05-22T20:31:19Z",
+        "external_id": null, "id": 29, "stats": {"num_related_documents": 0, "num_epics":
+        0, "num_stories_unstarted": 0, "num_stories_total": 0, "num_epics_unstarted":
+        0, "num_epics_in_progress": 0, "num_points_unstarted": 0, "num_stories_unestimated":
+        0, "num_points_in_progress": 0, "num_epics_total": 0, "num_stories_completed":
+        0, "num_points_completed": 0, "num_stories_backlog": 0, "num_points_total":
+        0, "num_stories_in_progress": 0, "num_points_backlog": 0, "num_epics_completed":
+        0}, "created_at": "2026-05-22T20:31:19Z"}, {"app_url": "https://app.shortcut.com/millsymills/label/33",
+        "description": "", "archived": false, "entity_type": "label", "color": null,
+        "name": "smoke-474cba55", "global_id": "v2:l:6a1042c0-a06e-4711-80a9-0178a339396b:33",
+        "updated_at": "2026-05-22T20:34:20Z", "external_id": null, "id": 33, "stats":
+        {"num_related_documents": 0, "num_epics": 0, "num_stories_unstarted": 1, "num_stories_total":
+        1, "num_epics_unstarted": 0, "num_epics_in_progress": 0, "num_points_unstarted":
+        0, "num_stories_unestimated": 1, "num_points_in_progress": 0, "num_epics_total":
+        0, "num_stories_completed": 0, "num_points_completed": 0, "num_stories_backlog":
+        0, "num_points_total": 0, "num_stories_in_progress": 0, "num_points_backlog":
+        0, "num_epics_completed": 0}, "created_at": "2026-05-22T20:34:20Z"}, {"app_url":
+        "https://app.shortcut.com/millsymills/label/42", "description": "", "archived":
+        false, "entity_type": "label", "color": null, "name": "smoke-7a573894", "global_id":
+        "v2:l:6a1042c0-a06e-4711-80a9-0178a339396b:42", "updated_at": "2026-05-22T20:41:30Z",
+        "external_id": null, "id": 42, "stats": {"num_related_documents": 0, "num_epics":
+        0, "num_stories_unstarted": 1, "num_stories_total": 1, "num_epics_unstarted":
+        0, "num_epics_in_progress": 0, "num_points_unstarted": 0, "num_stories_unestimated":
+        1, "num_points_in_progress": 0, "num_epics_total": 0, "num_stories_completed":
+        0, "num_points_completed": 0, "num_stories_backlog": 0, "num_points_total":
+        0, "num_stories_in_progress": 0, "num_points_backlog": 0, "num_epics_completed":
+        0}, "created_at": "2026-05-22T20:41:30Z"}, {"app_url": "https://app.shortcut.com/millsymills/label/39",
+        "description": "", "archived": false, "entity_type": "label", "color": null,
+        "name": "smoke-a359f6e6", "global_id": "v2:l:6a1042c0-a06e-4711-80a9-0178a339396b:39",
+        "updated_at": "2026-05-22T20:39:32Z", "external_id": null, "id": 39, "stats":
+        {"num_related_documents": 0, "num_epics": 0, "num_stories_unstarted": 1, "num_stories_total":
+        1, "num_epics_unstarted": 0, "num_epics_in_progress": 0, "num_points_unstarted":
+        0, "num_stories_unestimated": 1, "num_points_in_progress": 0, "num_epics_total":
+        0, "num_stories_completed": 0, "num_points_completed": 0, "num_stories_backlog":
+        0, "num_points_total": 0, "num_stories_in_progress": 0, "num_points_backlog":
+        0, "num_epics_completed": 0}, "created_at": "2026-05-22T20:39:32Z"}, {"app_url":
+        "https://app.shortcut.com/millsymills/label/43", "description": "", "archived":
+        false, "entity_type": "label", "color": null, "name": "smoke-added-7a573894",
+        "global_id": "v2:l:6a1042c0-a06e-4711-80a9-0178a339396b:43", "updated_at":
+        "2026-05-22T20:41:30Z", "external_id": null, "id": 43, "stats": {"num_related_documents":
+        0, "num_epics": 0, "num_stories_unstarted": 1, "num_stories_total": 1, "num_epics_unstarted":
+        0, "num_epics_in_progress": 0, "num_points_unstarted": 0, "num_stories_unestimated":
+        1, "num_points_in_progress": 0, "num_epics_total": 0, "num_stories_completed":
+        0, "num_points_completed": 0, "num_stories_backlog": 0, "num_points_total":
+        0, "num_stories_in_progress": 0, "num_points_backlog": 0, "num_epics_completed":
+        0}, "created_at": "2026-05-22T20:41:30Z"}, {"app_url": "https://app.shortcut.com/millsymills/label/36",
+        "description": "", "archived": false, "entity_type": "label", "color": null,
+        "name": "smoke-de385963", "global_id": "v2:l:6a1042c0-a06e-4711-80a9-0178a339396b:36",
+        "updated_at": "2026-05-22T20:34:57Z", "external_id": null, "id": 36, "stats":
+        {"num_related_documents": 0, "num_epics": 0, "num_stories_unstarted": 1, "num_stories_total":
+        1, "num_epics_unstarted": 0, "num_epics_in_progress": 0, "num_points_unstarted":
+        0, "num_stories_unestimated": 1, "num_points_in_progress": 0, "num_epics_total":
+        0, "num_stories_completed": 0, "num_points_completed": 0, "num_stories_backlog":
+        0, "num_points_total": 0, "num_stories_in_progress": 0, "num_points_backlog":
+        0, "num_epics_completed": 0}, "created_at": "2026-05-22T20:34:57Z"}, {"app_url":
+        "https://app.shortcut.com/millsymills/label/62", "description": "", "archived":
+        false, "entity_type": "label", "color": null, "name": "tracer-bullet", "global_id":
+        "v2:l:6a1042c0-a06e-4711-80a9-0178a339396b:62", "updated_at": "2026-05-23T06:07:14Z",
+        "external_id": null, "id": 62, "stats": {"num_related_documents": 0, "num_epics":
+        0, "num_stories_unstarted": 0, "num_stories_total": 1, "num_epics_unstarted":
+        0, "num_epics_in_progress": 0, "num_points_unstarted": 0, "num_stories_unestimated":
+        1, "num_points_in_progress": 0, "num_epics_total": 0, "num_stories_completed":
+        1, "num_points_completed": 0, "num_stories_backlog": 0, "num_points_total":
+        0, "num_stories_in_progress": 0, "num_points_backlog": 0, "num_epics_completed":
+        0}, "created_at": "2026-05-23T06:07:14Z"}, {"app_url": "https://app.shortcut.com/millsymills/label/53",
+        "description": "", "archived": false, "entity_type": "label", "color": null,
+        "name": "type:feature", "global_id": "v2:l:6a1042c0-a06e-4711-80a9-0178a339396b:53",
+        "updated_at": "2026-05-23T06:07:13Z", "external_id": null, "id": 53, "stats":
+        {"num_related_documents": 0, "num_epics": 0, "num_stories_unstarted": 13,
+        "num_stories_total": 29, "num_epics_unstarted": 0, "num_epics_in_progress":
+        0, "num_points_unstarted": 0, "num_stories_unestimated": 29, "num_points_in_progress":
+        0, "num_epics_total": 0, "num_stories_completed": 16, "num_points_completed":
+        0, "num_stories_backlog": 0, "num_points_total": 0, "num_stories_in_progress":
+        0, "num_points_backlog": 0, "num_epics_completed": 0}, "created_at": "2026-05-23T06:07:13Z"},
+        {"app_url": "https://app.shortcut.com/millsymills/label/73", "description":
+        "", "archived": false, "entity_type": "label", "color": null, "name": "type:release",
+        "global_id": "v2:l:6a1042c0-a06e-4711-80a9-0178a339396b:73", "updated_at":
+        "2026-05-23T06:07:15Z", "external_id": null, "id": 73, "stats": {"num_related_documents":
+        0, "num_epics": 0, "num_stories_unstarted": 2, "num_stories_total": 5, "num_epics_unstarted":
+        0, "num_epics_in_progress": 0, "num_points_unstarted": 0, "num_stories_unestimated":
+        5, "num_points_in_progress": 0, "num_epics_total": 0, "num_stories_completed":
+        1, "num_points_completed": 0, "num_stories_backlog": 0, "num_points_total":
+        0, "num_stories_in_progress": 2, "num_points_backlog": 0, "num_epics_completed":
+        0}, "created_at": "2026-05-23T06:07:15Z"}, {"app_url": "https://app.shortcut.com/millsymills/label/49",
+        "description": "", "archived": false, "entity_type": "label", "color": null,
+        "name": "type:scaffold", "global_id": "v2:l:6a1042c0-a06e-4711-80a9-0178a339396b:49",
+        "updated_at": "2026-05-23T06:07:12Z", "external_id": null, "id": 49, "stats":
+        {"num_related_documents": 0, "num_epics": 0, "num_stories_unstarted": 5, "num_stories_total":
+        9, "num_epics_unstarted": 0, "num_epics_in_progress": 0, "num_points_unstarted":
+        0, "num_stories_unestimated": 9, "num_points_in_progress": 0, "num_epics_total":
+        0, "num_stories_completed": 0, "num_points_completed": 0, "num_stories_backlog":
+        0, "num_points_total": 0, "num_stories_in_progress": 4, "num_points_backlog":
+        0, "num_epics_completed": 0}, "created_at": "2026-05-23T06:07:12Z"}, {"app_url":
+        "https://app.shortcut.com/millsymills/label/58", "description": "", "archived":
+        false, "entity_type": "label", "color": null, "name": "type:test", "global_id":
+        "v2:l:6a1042c0-a06e-4711-80a9-0178a339396b:58", "updated_at": "2026-05-23T06:07:14Z",
+        "external_id": null, "id": 58, "stats": {"num_related_documents": 0, "num_epics":
+        0, "num_stories_unstarted": 7, "num_stories_total": 9, "num_epics_unstarted":
+        0, "num_epics_in_progress": 0, "num_points_unstarted": 0, "num_stories_unestimated":
+        9, "num_points_in_progress": 0, "num_epics_total": 0, "num_stories_completed":
+        2, "num_points_completed": 0, "num_stories_backlog": 0, "num_points_total":
+        0, "num_stories_in_progress": 0, "num_points_backlog": 0, "num_epics_completed":
+        0}, "created_at": "2026-05-23T06:07:14Z"}]'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json;charset=utf-8
+      Date:
+      - Tue, 26 May 2026 20:25:18 GMT
+      access-control-allow-credentials:
+      - 'true'
+      access-control-expose-headers:
+      - Vary, Server-Timing, Database-Time, Request-Key
+      cache-control:
+      - no-store
+      content-length:
+      - '15413'
+      database-time:
+      - '1305515663'
+      pragma:
+      - no-cache
+      request-key:
+      - 9702fbff3612
+      server-timing:
+      - respWOses;dur=25
+      strict-transport-security:
+      - max-age=31536000; includeSubDomains
+      vary:
+      - Accept, Tenant-Workspace2, Tenant-Organization2, origin, shortcut-token, Accept-Encoding
+      x-content-type-options:
+      - nosniff
+    status:
+      code: 200
+      message: OK
+version: 1
