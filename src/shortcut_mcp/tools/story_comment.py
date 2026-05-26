@@ -1,4 +1,4 @@
-"""Story comment read tools."""
+"""Story comment read and write tools."""
 
 from __future__ import annotations
 
@@ -7,10 +7,18 @@ from typing import Any
 from fastmcp import Context, FastMCP
 
 from shortcut_mcp.clients.shortcut import _seg
-from shortcut_mcp.tools._common import get_client, read_tags, shape_comment_summary, shaped_list
+from shortcut_mcp.tools._common import (
+    get_client,
+    read_tags,
+    require_writes,
+    shape_comment_summary,
+    shaped_list,
+    write_tags,
+)
 
 _MODULE = "story_comment"
 _READ_ANN = {"readOnlyHint": True, "openWorldHint": True}
+_WRITE_ANN: dict[str, Any] = {"readOnlyHint": False, "destructiveHint": False}
 
 
 def register(server: FastMCP) -> None:
@@ -32,3 +40,58 @@ def register(server: FastMCP) -> None:
     )
     async def shortcut_get_story_comment(ctx: Context, story_id: int, comment_id: int) -> dict[str, Any]:
         return await get_client(ctx).get(f"/stories/{_seg(str(story_id))}/comments/{_seg(str(comment_id))}")
+
+    @server.tool(
+        name="shortcut_create_story_comment",
+        description="Create a comment on a story.",
+        tags=write_tags(_MODULE),
+        annotations={**_WRITE_ANN, "idempotentHint": False},
+    )
+    async def shortcut_create_story_comment(ctx: Context, story_id: int, text: str) -> dict[str, Any]:
+        require_writes(ctx)
+        return await get_client(ctx).post(f"/stories/{_seg(str(story_id))}/comments", json={"text": text})
+
+    @server.tool(
+        name="shortcut_update_story_comment",
+        description="Update the text of an existing story comment.",
+        tags=write_tags(_MODULE),
+        annotations={**_WRITE_ANN, "idempotentHint": True},
+    )
+    async def shortcut_update_story_comment(ctx: Context, story_id: int, comment_id: int, text: str) -> dict[str, Any]:
+        require_writes(ctx)
+        client = get_client(ctx)
+        result = await client.put(
+            f"/stories/{_seg(str(story_id))}/comments/{_seg(str(comment_id))}",
+            json={"text": text},
+        )
+        return result if result is not None else {"id": comment_id}
+
+    @server.tool(
+        name="shortcut_add_story_comment_reaction",
+        description="Add an emoji reaction to a story comment.",
+        tags=write_tags(_MODULE),
+        annotations={**_WRITE_ANN, "idempotentHint": False},
+    )
+    async def shortcut_add_story_comment_reaction(
+        ctx: Context, story_id: int, comment_id: int, emoji: str
+    ) -> dict[str, Any]:
+        require_writes(ctx)
+        return await get_client(ctx).post(
+            f"/stories/{_seg(str(story_id))}/comments/{_seg(str(comment_id))}/reactions",
+            json={"emoji": emoji},
+        )
+
+    @server.tool(
+        name="shortcut_remove_story_comment_reaction",
+        description="Remove an emoji reaction from a story comment.",
+        tags=write_tags(_MODULE),
+        annotations={**_WRITE_ANN, "idempotentHint": True},
+    )
+    async def shortcut_remove_story_comment_reaction(
+        ctx: Context, story_id: int, comment_id: int, emoji: str
+    ) -> dict[str, Any] | None:
+        require_writes(ctx)
+        return await get_client(ctx).delete(
+            f"/stories/{_seg(str(story_id))}/comments/{_seg(str(comment_id))}/reactions",
+            json={"emoji": emoji},
+        )

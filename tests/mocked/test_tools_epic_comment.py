@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import json
+
 import httpx
 import pytest
 import respx
@@ -37,3 +39,63 @@ async def test_get_epic_comment_returns_full_object(monkeypatch):
         result = await client.call_tool("shortcut_get_epic_comment", {"epic_id": 7, "comment_id": 11})
     assert not result.is_error
     assert result.data["id"] == 11
+
+
+# ---------------------------------------------------------------------------
+# Write tool tests
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.asyncio
+@respx.mock
+async def test_create_epic_comment_posts_and_returns_id(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("SHORTCUT_API_TOKEN", "x")
+    monkeypatch.setenv("SHORTCUT_MODE", "readwrite")
+    respx.get(f"{BASE}/member").mock(return_value=httpx.Response(200, json={"id": "u"}))
+    route = respx.post(f"{BASE}/epics/1/comments").mock(
+        return_value=httpx.Response(201, json={"id": 3, "text": "hello"})
+    )
+    server = create_server()
+    async with Client(server) as client:
+        result = await client.call_tool("shortcut_create_epic_comment", {"epic_id": 1, "text": "hello"})
+    assert not result.is_error
+    assert result.data["id"] == 3
+    body = json.loads(route.calls.last.request.content)
+    assert body["text"] == "hello"
+
+
+@pytest.mark.asyncio
+@respx.mock
+async def test_create_epic_comment_reply_posts_to_comment_path(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("SHORTCUT_API_TOKEN", "x")
+    monkeypatch.setenv("SHORTCUT_MODE", "readwrite")
+    respx.get(f"{BASE}/member").mock(return_value=httpx.Response(200, json={"id": "u"}))
+    route = respx.post(f"{BASE}/epics/1/comments/3").mock(
+        return_value=httpx.Response(201, json={"id": 4, "text": "reply"})
+    )
+    server = create_server()
+    async with Client(server) as client:
+        result = await client.call_tool(
+            "shortcut_create_epic_comment_reply", {"epic_id": 1, "comment_id": 3, "text": "reply"}
+        )
+    assert not result.is_error
+    assert result.data["id"] == 4
+    body = json.loads(route.calls.last.request.content)
+    assert body["text"] == "reply"
+    assert str(route.calls.last.request.url).endswith("/epics/1/comments/3")
+
+
+@pytest.mark.asyncio
+@respx.mock
+async def test_update_epic_comment_returns_id(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("SHORTCUT_API_TOKEN", "x")
+    monkeypatch.setenv("SHORTCUT_MODE", "readwrite")
+    respx.get(f"{BASE}/member").mock(return_value=httpx.Response(200, json={"id": "u"}))
+    respx.put(f"{BASE}/epics/1/comments/3").mock(return_value=httpx.Response(200, json={"id": 3}))
+    server = create_server()
+    async with Client(server) as client:
+        result = await client.call_tool(
+            "shortcut_update_epic_comment", {"epic_id": 1, "comment_id": 3, "text": "updated"}
+        )
+    assert not result.is_error
+    assert result.data["id"] == 3

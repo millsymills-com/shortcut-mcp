@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import json
+
 import httpx
 import pytest
 import respx
@@ -42,3 +44,48 @@ async def test_get_linked_file_returns_full_object(monkeypatch: pytest.MonkeyPat
         result = await client.call_tool("shortcut_get_linked_file", {"linked_file_id": 2})
     assert not result.is_error
     assert result.data["id"] == 2
+
+
+# ---------------------------------------------------------------------------
+# Write tool tests
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.asyncio
+@respx.mock
+async def test_create_linked_file_posts_and_returns_id(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("SHORTCUT_API_TOKEN", "x")
+    monkeypatch.setenv("SHORTCUT_MODE", "readwrite")
+    monkeypatch.setenv("SHORTCUT_PROFILE", "all")
+    respx.get(f"{BASE}/member").mock(return_value=httpx.Response(200, json={"id": "u"}))
+    route = respx.post(f"{BASE}/linked-files").mock(return_value=httpx.Response(201, json={"id": 3}))
+    server = create_server()
+    async with Client(server) as client:
+        result = await client.call_tool(
+            "shortcut_create_linked_file",
+            {"name": "Design doc", "url": "https://example.com/doc", "type": "google"},
+        )
+    assert not result.is_error
+    assert result.data["id"] == 3
+    body = json.loads(route.calls.last.request.content)
+    assert body["name"] == "Design doc"
+    assert body["url"] == "https://example.com/doc"
+    assert body["type"] == "google"
+    assert "description" not in body
+
+
+@pytest.mark.asyncio
+@respx.mock
+async def test_update_linked_file_sends_partial_body(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("SHORTCUT_API_TOKEN", "x")
+    monkeypatch.setenv("SHORTCUT_MODE", "readwrite")
+    monkeypatch.setenv("SHORTCUT_PROFILE", "all")
+    respx.get(f"{BASE}/member").mock(return_value=httpx.Response(200, json={"id": "u"}))
+    route = respx.put(f"{BASE}/linked-files/3").mock(return_value=httpx.Response(200, json={"id": 3}))
+    server = create_server()
+    async with Client(server) as client:
+        result = await client.call_tool("shortcut_update_linked_file", {"linked_file_id": 3, "name": "x"})
+    assert not result.is_error
+    assert result.data["id"] == 3
+    body = json.loads(route.calls.last.request.content)
+    assert body == {"name": "x"}
