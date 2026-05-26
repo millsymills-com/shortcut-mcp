@@ -8,6 +8,7 @@ from fastmcp import Context, FastMCP
 
 from shortcut_mcp.clients.shortcut import _seg
 from shortcut_mcp.tools._common import (
+    LimitParam,
     destructive_tags,
     get_client,
     read_tags,
@@ -32,7 +33,7 @@ def register(server: FastMCP) -> None:
         tags=read_tags(_MODULE),
         annotations=_READ_ANN,
     )
-    async def shortcut_list_linked_files(ctx: Context, limit: int = 50) -> dict[str, Any]:
+    async def shortcut_list_linked_files(ctx: Context, limit: LimitParam = 50) -> dict[str, Any]:
         rows = await get_client(ctx).get("/linked-files")
         return shaped_list(rows, shape_linked_file_summary, limit=limit)
 

@@ -142,6 +142,32 @@ async def test_search_stories_truncates_at_limit(monkeypatch):
 
 @pytest.mark.asyncio
 @respx.mock
+async def test_search_stories_rejects_limit_below_one(monkeypatch):
+    monkeypatch.setenv("SHORTCUT_API_TOKEN", "x")
+    respx.get(f"{BASE}/member").mock(return_value=httpx.Response(200, json={"id": "u"}))
+    route = respx.get(f"{BASE}/search/stories").mock(return_value=httpx.Response(200, json={"data": []}))
+    server = create_server()
+    async with Client(server) as client:
+        result = await client.call_tool("shortcut_search_stories", {"query": "x", "limit": 0}, raise_on_error=False)
+    assert result.is_error
+    assert not route.called  # validation rejects before any HTTP call
+
+
+@pytest.mark.asyncio
+@respx.mock
+async def test_search_stories_rejects_negative_limit(monkeypatch):
+    monkeypatch.setenv("SHORTCUT_API_TOKEN", "x")
+    respx.get(f"{BASE}/member").mock(return_value=httpx.Response(200, json={"id": "u"}))
+    route = respx.get(f"{BASE}/search/stories").mock(return_value=httpx.Response(200, json={"data": []}))
+    server = create_server()
+    async with Client(server) as client:
+        result = await client.call_tool("shortcut_search_stories", {"query": "x", "limit": -5}, raise_on_error=False)
+    assert result.is_error
+    assert not route.called
+
+
+@pytest.mark.asyncio
+@respx.mock
 async def test_global_search_returns_stories_and_epics_shape(monkeypatch):
     monkeypatch.setenv("SHORTCUT_API_TOKEN", "x")
     respx.get(f"{BASE}/member").mock(return_value=httpx.Response(200, json={"id": "u"}))
