@@ -21,7 +21,7 @@ interactions:
   response:
     body:
       string: '{"id": "6a1042c0-f182-409f-90fb-98a30cc66b62", "is_owner": true, "mention_name":
-        "mills6169", "name": "mills", "role": "admin", "workspace2": {"id": "6a1042c0-a06e-4711-80a9-0178a339396b",
+        "redacted", "name": "mills", "role": "admin", "workspace2": {"id": "6a1042c0-a06e-4711-80a9-0178a339396b",
         "created_at": "2026-05-22T11:49:20Z", "default_workflow_id": 500000005, "estimate_scale":
         [0, 1, 2, 4, 8], "korey_enabled": true, "name": "millsymills", "url_slug":
         "millsymills", "utc_offset": "-05:00"}, "organization2": {"id": "6a1042c0-958a-4fe0-90fa-07c3b7a37651"}}'

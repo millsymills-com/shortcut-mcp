@@ -6,9 +6,10 @@ workspace:
 
     SHORTCUT_API_TOKEN=<token> uv run pytest tests/contract --record-mode=once
 
-Two scrubbers keep cassettes safe to commit to a public repo: the
-``Shortcut-Token`` auth header is filtered out, and member ``email_address``
-values are redacted from response bodies before write.
+Scrubbers keep cassettes safe to commit to a public repo: the ``Shortcut-Token``
+auth header is filtered out, email addresses are redacted from response bodies,
+and member-identity fields are replaced by key — ``gravatar_hash`` is an MD5 of
+the real email (reversible via rainbow tables) and ``mention_name`` is a handle.
 """
 
 from __future__ import annotations
@@ -20,17 +21,30 @@ from typing import Any
 import pytest
 
 REDACTED_EMAIL = "redacted@example.com"
+REDACTED_MENTION_NAME = "redacted"
+REDACTED_GRAVATAR_HASH = "0" * 32
+
+# Member-identity fields scrubbed by key, avoiding a broad `name` redaction that
+# would clobber workspace/label/epic names. `mention_name` also appears on groups;
+# scrubbing it there is a harmless fixture-only side effect.
+_PII_KEYS = {
+    "mention_name": REDACTED_MENTION_NAME,
+    "gravatar_hash": REDACTED_GRAVATAR_HASH,
+}
 
 # Match an email in any string value, not just the `email_address` key — emails
 # also surface in descriptions, comment text and mention fields.
 _EMAIL_RE = re.compile(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}")
 
 
-def _scrub_emails(value: Any) -> Any:
+def _scrub_pii(value: Any) -> Any:
     if isinstance(value, dict):
-        return {key: _scrub_emails(val) for key, val in value.items()}
+        return {
+            key: _PII_KEYS[key] if key in _PII_KEYS and isinstance(val, str) else _scrub_pii(val)
+            for key, val in value.items()
+        }
     if isinstance(value, list):
-        return [_scrub_emails(item) for item in value]
+        return [_scrub_pii(item) for item in value]
     if isinstance(value, str):
         return _EMAIL_RE.sub(REDACTED_EMAIL, value)
     return value
@@ -45,7 +59,7 @@ def _before_record_response(response: dict[str, Any]) -> dict[str, Any]:
         parsed = json.loads(text)
     except (ValueError, TypeError):
         return response
-    scrubbed = json.dumps(_scrub_emails(parsed))
+    scrubbed = json.dumps(_scrub_pii(parsed))
     response["body"]["string"] = scrubbed.encode("utf-8") if isinstance(raw, bytes | bytearray) else scrubbed
     return response
 
