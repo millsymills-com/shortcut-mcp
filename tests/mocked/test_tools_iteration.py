@@ -112,3 +112,19 @@ async def test_update_iteration_tolerates_empty_response(monkeypatch: pytest.Mon
         result = await client.call_tool("shortcut_update_iteration", {"iteration_id": 1, "name": "X"})
     assert not result.is_error
     assert result.data == {"id": 1}
+
+
+@pytest.mark.asyncio
+@respx.mock
+async def test_delete_iteration_confirms(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("SHORTCUT_API_TOKEN", "x")
+    monkeypatch.setenv("SHORTCUT_MODE", "readwrite")
+    monkeypatch.setenv("SHORTCUT_ALLOW_DESTRUCTIVE", "true")
+    respx.get(f"{BASE}/member").mock(return_value=httpx.Response(200, json={"id": "u"}))
+    route = respx.delete(f"{BASE}/iterations/2").mock(return_value=httpx.Response(204))
+    server = create_server()
+    async with Client(server) as client:
+        result = await client.call_tool("shortcut_delete_iteration", {"iteration_id": 2})
+    assert not result.is_error
+    assert result.data == {"id": 2, "deleted": True}
+    assert route.called
