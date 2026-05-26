@@ -8,6 +8,7 @@ from fastmcp import Context, FastMCP
 
 from shortcut_mcp.clients.shortcut import _seg
 from shortcut_mcp.tools._common import (
+    LimitParam,
     destructive_tags,
     get_client,
     get_object,
@@ -40,7 +41,7 @@ def register(server: FastMCP) -> None:
         tags=read_tags(_MODULE),
         annotations={"readOnlyHint": True, "openWorldHint": True},
     )
-    async def shortcut_list_story_history(ctx: Context, story_id: int, limit: int = 50) -> dict[str, Any]:
+    async def shortcut_list_story_history(ctx: Context, story_id: int, limit: LimitParam = 50) -> dict[str, Any]:
         rows = await get_client(ctx).get(f"/stories/{_seg(str(story_id))}/history")
         return shaped_list(rows, lambda r: r, limit=limit)
 

@@ -8,6 +8,7 @@ from fastmcp import Context, FastMCP
 
 from shortcut_mcp.clients.shortcut import _seg
 from shortcut_mcp.tools._common import (
+    LimitParam,
     get_client,
     get_object,
     read_tags,
@@ -31,7 +32,7 @@ def register(server: FastMCP) -> None:
         tags=read_tags(_MODULE),
         annotations=_READ_ANN,
     )
-    async def shortcut_list_groups(ctx: Context, limit: int = 50) -> dict[str, Any]:
+    async def shortcut_list_groups(ctx: Context, limit: LimitParam = 50) -> dict[str, Any]:
         rows = await get_client(ctx).get("/groups")
         return shaped_list(rows, shape_group_summary, limit=limit)
 
@@ -50,7 +51,7 @@ def register(server: FastMCP) -> None:
         tags=read_tags(_MODULE),
         annotations=_READ_ANN,
     )
-    async def shortcut_list_group_stories(ctx: Context, group_id: str, limit: int = 50) -> dict[str, Any]:
+    async def shortcut_list_group_stories(ctx: Context, group_id: str, limit: LimitParam = 50) -> dict[str, Any]:
         rows = await get_client(ctx).get(f"/groups/{_seg(group_id)}/stories")
         return shaped_list(rows, shape_story_summary, limit=limit)
 

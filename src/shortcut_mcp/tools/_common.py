@@ -7,16 +7,20 @@ TC001/TC002 in pyproject.toml covers this.
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, cast
+from typing import TYPE_CHECKING, Annotated, Any, cast
 
 from fastmcp import Context
 from fastmcp.exceptions import ToolError
+from pydantic import Field
 
 if TYPE_CHECKING:
     from collections.abc import Callable
 
     from shortcut_mcp.clients.shortcut import ShortcutClient
     from shortcut_mcp.server import ServerContext
+
+LimitParam = Annotated[int, Field(ge=1)]
+"""Page-size cap for list/search tools; rejects values below 1 at the boundary."""
 
 
 def read_tags(module: str) -> set[str]:
@@ -93,7 +97,7 @@ def shaped_list(
         )
     truncated = len(rows) > limit or (total is not None and total > min(len(rows), limit))
     out: dict[str, Any] = {
-        "items": [shaper(r) for r in rows[:limit]],
+        "items": [shaped for r in rows[:limit] if (shaped := shaper(r))],
         "truncated": truncated,
     }
     if total is not None:

@@ -1,0 +1,279 @@
+interactions:
+- request:
+    body: ''
+    headers:
+      Accept:
+      - application/json
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json
+      Host:
+      - api.app.shortcut.com
+      Shortcut-Token:
+      - DUMMY
+      User-Agent:
+      - python-httpx/0.28.1
+    method: GET
+    uri: https://api.app.shortcut.com/api/v3/epics
+  response:
+    body:
+      string: '[{"app_url": "https://app.shortcut.com/millsymills/epic/16", "archived":
+        false, "started": false, "entity_type": "epic", "labels": [], "mention_ids":
+        [], "member_mention_ids": [], "associated_groups": null, "project_ids": [],
+        "stories_without_projects": 9, "completed_at_override": null, "productboard_plugin_id":
+        null, "started_at": null, "completed_at": null, "objective_ids": [14], "name":
+        "Get Started", "global_id": "v2:e:6a1042c0-a06e-4711-80a9-0178a339396b:16",
+        "completed": false, "productboard_url": null, "planned_start_date": "2026-05-22T11:49:20Z",
+        "state": "to do", "milestone_id": 14, "requested_by_id": "6a1042c0-f182-409f-90fb-98a30cc66b62",
+        "epic_state_id": 500000002, "label_ids": [], "started_at_override": null,
+        "group_id": "6a1042c0-9df8-4cea-b93d-c7ffd45a88d3", "updated_at": "2026-05-22T11:49:20Z",
+        "group_mention_ids": [], "productboard_id": null, "follower_ids": ["6a1042c0-f182-409f-90fb-98a30cc66b62"],
+        "group_ids": ["6a1042c0-9df8-4cea-b93d-c7ffd45a88d3"], "owner_ids": ["6a1042c0-f182-409f-90fb-98a30cc66b62"],
+        "external_id": null, "id": 16, "position": 0, "productboard_name": null, "deadline":
+        "2026-06-21T00:00:00Z", "stats": {"num_points_done": 0, "num_related_documents":
+        0, "num_stories_unstarted": 9, "num_stories_total": 9, "last_story_update":
+        "2026-05-22T11:49:20Z", "num_points_started": 0, "num_points_unstarted": 0,
+        "num_stories_started": 0, "num_stories_unestimated": 9, "num_stories_backlog":
+        0, "num_points_backlog": 0, "num_points": 0, "num_stories_done": 0}, "created_at":
+        "2026-05-22T11:49:20Z"}, {"app_url": "https://app.shortcut.com/millsymills/epic/26",
+        "archived": false, "started": false, "entity_type": "epic", "labels": [],
+        "mention_ids": [], "member_mention_ids": [], "associated_groups": null, "project_ids":
+        [], "stories_without_projects": 0, "completed_at_override": null, "productboard_plugin_id":
+        null, "started_at": null, "completed_at": null, "objective_ids": [], "name":
+        "Eval Epic", "global_id": "v2:e:6a1042c0-a06e-4711-80a9-0178a339396b:26",
+        "completed": false, "productboard_url": null, "planned_start_date": null,
+        "state": "to do", "milestone_id": null, "requested_by_id": "6a1042c0-f182-409f-90fb-98a30cc66b62",
+        "epic_state_id": 500000002, "label_ids": [], "started_at_override": null,
+        "group_id": null, "updated_at": "2026-05-22T20:28:22Z", "group_mention_ids":
+        [], "productboard_id": null, "follower_ids": ["6a1042c0-f182-409f-90fb-98a30cc66b62"],
+        "group_ids": [], "owner_ids": [], "external_id": null, "id": 26, "position":
+        1, "productboard_name": null, "deadline": null, "stats": {"num_points_done":
+        0, "num_related_documents": 0, "num_stories_unstarted": 0, "num_stories_total":
+        0, "last_story_update": null, "num_points_started": 0, "num_points_unstarted":
+        0, "num_stories_started": 0, "num_stories_unestimated": 0, "num_stories_backlog":
+        0, "num_points_backlog": 0, "num_points": 0, "num_stories_done": 0}, "created_at":
+        "2026-05-22T20:28:22Z"}, {"app_url": "https://app.shortcut.com/millsymills/epic/31",
+        "archived": false, "started": false, "entity_type": "epic", "labels": [],
+        "mention_ids": [], "member_mention_ids": [], "associated_groups": null, "project_ids":
+        [], "stories_without_projects": 1, "completed_at_override": null, "productboard_plugin_id":
+        null, "started_at": null, "completed_at": null, "objective_ids": [], "name":
+        "smoke-epic-474cba55", "global_id": "v2:e:6a1042c0-a06e-4711-80a9-0178a339396b:31",
+        "completed": false, "productboard_url": null, "planned_start_date": null,
+        "state": "to do", "milestone_id": null, "requested_by_id": "6a1042c0-f182-409f-90fb-98a30cc66b62",
+        "epic_state_id": 500000002, "label_ids": [], "started_at_override": null,
+        "group_id": null, "updated_at": "2026-05-22T20:34:20Z", "group_mention_ids":
+        [], "productboard_id": null, "follower_ids": ["6a1042c0-f182-409f-90fb-98a30cc66b62"],
+        "group_ids": [], "owner_ids": [], "external_id": null, "id": 31, "position":
+        2, "productboard_name": null, "deadline": null, "stats": {"num_points_done":
+        0, "num_related_documents": 0, "num_stories_unstarted": 1, "num_stories_total":
+        1, "last_story_update": "2026-05-22T20:34:20Z", "num_points_started": 0, "num_points_unstarted":
+        0, "num_stories_started": 0, "num_stories_unestimated": 1, "num_stories_backlog":
+        0, "num_points_backlog": 0, "num_points": 0, "num_stories_done": 0}, "created_at":
+        "2026-05-22T20:34:20Z"}, {"app_url": "https://app.shortcut.com/millsymills/epic/34",
+        "archived": false, "started": false, "entity_type": "epic", "labels": [],
+        "mention_ids": [], "member_mention_ids": [], "associated_groups": null, "project_ids":
+        [], "stories_without_projects": 1, "completed_at_override": null, "productboard_plugin_id":
+        null, "started_at": null, "completed_at": null, "objective_ids": [], "name":
+        "smoke-epic-de385963", "global_id": "v2:e:6a1042c0-a06e-4711-80a9-0178a339396b:34",
+        "completed": false, "productboard_url": null, "planned_start_date": null,
+        "state": "to do", "milestone_id": null, "requested_by_id": "6a1042c0-f182-409f-90fb-98a30cc66b62",
+        "epic_state_id": 500000002, "label_ids": [], "started_at_override": null,
+        "group_id": null, "updated_at": "2026-05-22T20:34:57Z", "group_mention_ids":
+        [], "productboard_id": null, "follower_ids": ["6a1042c0-f182-409f-90fb-98a30cc66b62"],
+        "group_ids": [], "owner_ids": [], "external_id": null, "id": 34, "position":
+        3, "productboard_name": null, "deadline": null, "stats": {"num_points_done":
+        0, "num_related_documents": 0, "num_stories_unstarted": 1, "num_stories_total":
+        1, "last_story_update": "2026-05-22T20:34:57Z", "num_points_started": 0, "num_points_unstarted":
+        0, "num_stories_started": 0, "num_stories_unestimated": 1, "num_stories_backlog":
+        0, "num_points_backlog": 0, "num_points": 0, "num_stories_done": 0}, "created_at":
+        "2026-05-22T20:34:57Z"}, {"app_url": "https://app.shortcut.com/millsymills/epic/37",
+        "archived": false, "started": false, "entity_type": "epic", "labels": [],
+        "mention_ids": [], "member_mention_ids": [], "associated_groups": null, "project_ids":
+        [], "stories_without_projects": 1, "completed_at_override": null, "productboard_plugin_id":
+        null, "started_at": null, "completed_at": null, "objective_ids": [], "name":
+        "smoke-epic-a359f6e6", "global_id": "v2:e:6a1042c0-a06e-4711-80a9-0178a339396b:37",
+        "completed": false, "productboard_url": null, "planned_start_date": null,
+        "state": "to do", "milestone_id": null, "requested_by_id": "6a1042c0-f182-409f-90fb-98a30cc66b62",
+        "epic_state_id": 500000002, "label_ids": [], "started_at_override": null,
+        "group_id": null, "updated_at": "2026-05-22T20:39:32Z", "group_mention_ids":
+        [], "productboard_id": null, "follower_ids": ["6a1042c0-f182-409f-90fb-98a30cc66b62"],
+        "group_ids": [], "owner_ids": [], "external_id": null, "id": 37, "position":
+        4, "productboard_name": null, "deadline": null, "stats": {"num_points_done":
+        0, "num_related_documents": 0, "num_stories_unstarted": 1, "num_stories_total":
+        1, "last_story_update": "2026-05-22T20:39:32Z", "num_points_started": 0, "num_points_unstarted":
+        0, "num_stories_started": 0, "num_stories_unestimated": 1, "num_stories_backlog":
+        0, "num_points_backlog": 0, "num_points": 0, "num_stories_done": 0}, "created_at":
+        "2026-05-22T20:39:32Z"}, {"app_url": "https://app.shortcut.com/millsymills/epic/40",
+        "archived": false, "started": false, "entity_type": "epic", "labels": [],
+        "mention_ids": [], "member_mention_ids": [], "associated_groups": null, "project_ids":
+        [], "stories_without_projects": 1, "completed_at_override": null, "productboard_plugin_id":
+        null, "started_at": null, "completed_at": null, "objective_ids": [], "name":
+        "smoke-epic-7a573894", "global_id": "v2:e:6a1042c0-a06e-4711-80a9-0178a339396b:40",
+        "completed": false, "productboard_url": null, "planned_start_date": null,
+        "state": "to do", "milestone_id": null, "requested_by_id": "6a1042c0-f182-409f-90fb-98a30cc66b62",
+        "epic_state_id": 500000002, "label_ids": [], "started_at_override": null,
+        "group_id": null, "updated_at": "2026-05-22T20:41:30Z", "group_mention_ids":
+        [], "productboard_id": null, "follower_ids": ["6a1042c0-f182-409f-90fb-98a30cc66b62"],
+        "group_ids": [], "owner_ids": [], "external_id": null, "id": 40, "position":
+        5, "productboard_name": null, "deadline": null, "stats": {"num_points_done":
+        0, "num_related_documents": 0, "num_stories_unstarted": 1, "num_stories_total":
+        1, "last_story_update": "2026-05-22T20:41:30Z", "num_points_started": 0, "num_points_unstarted":
+        0, "num_stories_started": 0, "num_stories_unestimated": 1, "num_stories_backlog":
+        0, "num_points_backlog": 0, "num_points": 0, "num_stories_done": 0}, "created_at":
+        "2026-05-22T20:41:30Z"}, {"app_url": "https://app.shortcut.com/millsymills/epic/44",
+        "archived": false, "started": true, "entity_type": "epic", "labels": [], "mention_ids":
+        [], "member_mention_ids": [], "associated_groups": null, "project_ids": [],
+        "stories_without_projects": 17, "completed_at_override": null, "productboard_plugin_id":
+        null, "started_at": "2026-05-23T06:49:01Z", "completed_at": null, "objective_ids":
+        [], "name": "Ship shortcut-mcp v0.1 (read-only)", "global_id": "v2:e:6a1042c0-a06e-4711-80a9-0178a339396b:44",
+        "completed": false, "productboard_url": null, "planned_start_date": null,
+        "state": "in progress", "milestone_id": null, "requested_by_id": "6a1042c0-f182-409f-90fb-98a30cc66b62",
+        "epic_state_id": 500000003, "label_ids": [], "started_at_override": null,
+        "group_id": null, "updated_at": "2026-05-23T06:49:01Z", "group_mention_ids":
+        [], "productboard_id": null, "follower_ids": ["6a1042c0-f182-409f-90fb-98a30cc66b62"],
+        "group_ids": [], "owner_ids": [], "external_id": null, "id": 44, "position":
+        6, "productboard_name": null, "deadline": null, "stats": {"num_points_done":
+        0, "num_related_documents": 0, "num_stories_unstarted": 16, "num_stories_total":
+        17, "last_story_update": "2026-05-23T06:58:00Z", "num_points_started": 0,
+        "num_points_unstarted": 0, "num_stories_started": 0, "num_stories_unestimated":
+        17, "num_stories_backlog": 0, "num_points_backlog": 0, "num_points": 0, "num_stories_done":
+        1}, "created_at": "2026-05-23T06:00:55Z"}, {"app_url": "https://app.shortcut.com/millsymills/epic/75",
+        "archived": false, "started": true, "entity_type": "epic", "labels": [], "mention_ids":
+        [], "member_mention_ids": [], "associated_groups": null, "project_ids": [],
+        "stories_without_projects": 9, "completed_at_override": null, "productboard_plugin_id":
+        null, "started_at": "2026-05-23T10:05:08Z", "completed_at": "2026-05-23T10:05:08Z",
+        "objective_ids": [74], "name": "v0.2 - read surface (43 read tools, 17 modules)",
+        "global_id": "v2:e:6a1042c0-a06e-4711-80a9-0178a339396b:75", "completed":
+        true, "productboard_url": null, "planned_start_date": null, "state": "done",
+        "milestone_id": 74, "requested_by_id": "6a1042c0-f182-409f-90fb-98a30cc66b62",
+        "epic_state_id": 500000004, "label_ids": [], "started_at_override": null,
+        "group_id": null, "updated_at": "2026-05-23T10:05:08Z", "group_mention_ids":
+        [], "productboard_id": null, "follower_ids": ["6a1042c0-f182-409f-90fb-98a30cc66b62"],
+        "group_ids": [], "owner_ids": [], "external_id": null, "id": 75, "position":
+        7, "productboard_name": null, "deadline": null, "stats": {"num_points_done":
+        0, "num_related_documents": 0, "num_stories_unstarted": 0, "num_stories_total":
+        9, "last_story_update": "2026-05-23T10:05:54Z", "num_points_started": 0, "num_points_unstarted":
+        0, "num_stories_started": 0, "num_stories_unestimated": 9, "num_stories_backlog":
+        0, "num_points_backlog": 0, "num_points": 0, "num_stories_done": 9}, "created_at":
+        "2026-05-23T10:05:08Z"}, {"app_url": "https://app.shortcut.com/millsymills/epic/76",
+        "archived": false, "started": true, "entity_type": "epic", "labels": [], "mention_ids":
+        [], "member_mention_ids": [], "associated_groups": null, "project_ids": [],
+        "stories_without_projects": 9, "completed_at_override": null, "productboard_plugin_id":
+        null, "started_at": "2026-05-23T10:42:58Z", "completed_at": "2026-05-23T11:37:00Z",
+        "objective_ids": [74], "name": "v0.3 - write tier (~36 tools)", "global_id":
+        "v2:e:6a1042c0-a06e-4711-80a9-0178a339396b:76", "completed": true, "productboard_url":
+        null, "planned_start_date": null, "state": "done", "milestone_id": 74, "requested_by_id":
+        "6a1042c0-f182-409f-90fb-98a30cc66b62", "epic_state_id": 500000004, "label_ids":
+        [], "started_at_override": null, "group_id": null, "updated_at": "2026-05-23T11:37:00Z",
+        "group_mention_ids": [], "productboard_id": null, "follower_ids": ["6a1042c0-f182-409f-90fb-98a30cc66b62"],
+        "group_ids": [], "owner_ids": [], "external_id": null, "id": 76, "position":
+        8, "productboard_name": null, "deadline": null, "stats": {"num_points_done":
+        0, "num_related_documents": 0, "num_stories_unstarted": 0, "num_stories_total":
+        9, "last_story_update": "2026-05-23T11:37:00Z", "num_points_started": 0, "num_points_unstarted":
+        0, "num_stories_started": 0, "num_stories_unestimated": 9, "num_stories_backlog":
+        0, "num_points_backlog": 0, "num_points": 0, "num_stories_done": 9}, "created_at":
+        "2026-05-23T10:05:08Z"}, {"app_url": "https://app.shortcut.com/millsymills/epic/86",
+        "archived": false, "started": false, "entity_type": "epic", "labels": [],
+        "mention_ids": [], "member_mention_ids": [], "associated_groups": null, "project_ids":
+        [], "stories_without_projects": 4, "completed_at_override": null, "productboard_plugin_id":
+        null, "started_at": null, "completed_at": null, "objective_ids": [74], "name":
+        "v0.4 - destructive tier (~13 tools)", "global_id": "v2:e:6a1042c0-a06e-4711-80a9-0178a339396b:86",
+        "completed": false, "productboard_url": null, "planned_start_date": null,
+        "state": "to do", "milestone_id": 74, "requested_by_id": "6a1042c0-f182-409f-90fb-98a30cc66b62",
+        "epic_state_id": 500000002, "label_ids": [], "started_at_override": null,
+        "group_id": null, "updated_at": "2026-05-23T10:05:10Z", "group_mention_ids":
+        [], "productboard_id": null, "follower_ids": ["6a1042c0-f182-409f-90fb-98a30cc66b62"],
+        "group_ids": [], "owner_ids": [], "external_id": null, "id": 86, "position":
+        9, "productboard_name": null, "deadline": null, "stats": {"num_points_done":
+        0, "num_related_documents": 0, "num_stories_unstarted": 4, "num_stories_total":
+        4, "last_story_update": "2026-05-23T10:05:10Z", "num_points_started": 0, "num_points_unstarted":
+        0, "num_stories_started": 0, "num_stories_unestimated": 4, "num_stories_backlog":
+        0, "num_points_backlog": 0, "num_points": 0, "num_stories_done": 0}, "created_at":
+        "2026-05-23T10:05:10Z"}, {"app_url": "https://app.shortcut.com/millsymills/epic/91",
+        "archived": false, "started": false, "entity_type": "epic", "labels": [],
+        "mention_ids": [], "member_mention_ids": [], "associated_groups": null, "project_ids":
+        [], "stories_without_projects": 4, "completed_at_override": null, "productboard_plugin_id":
+        null, "started_at": null, "completed_at": null, "objective_ids": [74], "name":
+        "v0.5 - niche resources (true 1:1)", "global_id": "v2:e:6a1042c0-a06e-4711-80a9-0178a339396b:91",
+        "completed": false, "productboard_url": null, "planned_start_date": null,
+        "state": "to do", "milestone_id": 74, "requested_by_id": "6a1042c0-f182-409f-90fb-98a30cc66b62",
+        "epic_state_id": 500000002, "label_ids": [], "started_at_override": null,
+        "group_id": null, "updated_at": "2026-05-23T10:05:10Z", "group_mention_ids":
+        [], "productboard_id": null, "follower_ids": ["6a1042c0-f182-409f-90fb-98a30cc66b62"],
+        "group_ids": [], "owner_ids": [], "external_id": null, "id": 91, "position":
+        10, "productboard_name": null, "deadline": null, "stats": {"num_points_done":
+        0, "num_related_documents": 0, "num_stories_unstarted": 4, "num_stories_total":
+        4, "last_story_update": "2026-05-23T10:05:11Z", "num_points_started": 0, "num_points_unstarted":
+        0, "num_stories_started": 0, "num_stories_unestimated": 4, "num_stories_backlog":
+        0, "num_points_backlog": 0, "num_points": 0, "num_stories_done": 0}, "created_at":
+        "2026-05-23T10:05:10Z"}, {"app_url": "https://app.shortcut.com/millsymills/epic/96",
+        "archived": false, "started": true, "entity_type": "epic", "labels": [], "mention_ids":
+        [], "member_mention_ids": [], "associated_groups": null, "project_ids": [],
+        "stories_without_projects": 4, "completed_at_override": null, "productboard_plugin_id":
+        null, "started_at": "2026-05-26T19:57:45Z", "completed_at": null, "objective_ids":
+        [74], "name": "CI/CD & test infrastructure", "global_id": "v2:e:6a1042c0-a06e-4711-80a9-0178a339396b:96",
+        "completed": false, "productboard_url": null, "planned_start_date": null,
+        "state": "in progress", "milestone_id": 74, "requested_by_id": "6a1042c0-f182-409f-90fb-98a30cc66b62",
+        "epic_state_id": 500000003, "label_ids": [], "started_at_override": null,
+        "group_id": null, "updated_at": "2026-05-26T19:57:45Z", "group_mention_ids":
+        [], "productboard_id": null, "follower_ids": ["6a1042c0-f182-409f-90fb-98a30cc66b62"],
+        "group_ids": [], "owner_ids": [], "external_id": null, "id": 96, "position":
+        11, "productboard_name": null, "deadline": null, "stats": {"num_points_done":
+        0, "num_related_documents": 0, "num_stories_unstarted": 2, "num_stories_total":
+        4, "last_story_update": "2026-05-26T19:57:45Z", "num_points_started": 0, "num_points_unstarted":
+        0, "num_stories_started": 2, "num_stories_unestimated": 4, "num_stories_backlog":
+        0, "num_points_backlog": 0, "num_points": 0, "num_stories_done": 0}, "created_at":
+        "2026-05-23T10:05:11Z"}, {"app_url": "https://app.shortcut.com/millsymills/epic/101",
+        "archived": false, "started": true, "entity_type": "epic", "labels": [], "mention_ids":
+        [], "member_mention_ids": [], "associated_groups": null, "project_ids": [],
+        "stories_without_projects": 5, "completed_at_override": null, "productboard_plugin_id":
+        null, "started_at": "2026-05-26T19:57:45Z", "completed_at": null, "objective_ids":
+        [74], "name": "Community & release", "global_id": "v2:e:6a1042c0-a06e-4711-80a9-0178a339396b:101",
+        "completed": false, "productboard_url": null, "planned_start_date": null,
+        "state": "in progress", "milestone_id": 74, "requested_by_id": "6a1042c0-f182-409f-90fb-98a30cc66b62",
+        "epic_state_id": 500000003, "label_ids": [], "started_at_override": null,
+        "group_id": null, "updated_at": "2026-05-26T19:57:45Z", "group_mention_ids":
+        [], "productboard_id": null, "follower_ids": ["6a1042c0-f182-409f-90fb-98a30cc66b62"],
+        "group_ids": [], "owner_ids": [], "external_id": null, "id": 101, "position":
+        12, "productboard_name": null, "deadline": null, "stats": {"num_points_done":
+        0, "num_related_documents": 0, "num_stories_unstarted": 1, "num_stories_total":
+        5, "last_story_update": "2026-05-26T20:06:36Z", "num_points_started": 0, "num_points_unstarted":
+        0, "num_stories_started": 4, "num_stories_unestimated": 5, "num_stories_backlog":
+        0, "num_points_backlog": 0, "num_points": 0, "num_stories_done": 0}, "created_at":
+        "2026-05-23T10:05:11Z"}]'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json;charset=utf-8
+      Date:
+      - Tue, 26 May 2026 20:25:18 GMT
+      access-control-allow-credentials:
+      - 'true'
+      access-control-expose-headers:
+      - Vary, Server-Timing, Database-Time, Request-Key
+      cache-control:
+      - no-store
+      content-length:
+      - '17326'
+      database-time:
+      - '1305515657'
+      pragma:
+      - no-cache
+      request-key:
+      - 8c6fe69adc25
+      server-timing:
+      - respWOses;dur=82
+      strict-transport-security:
+      - max-age=31536000; includeSubDomains
+      vary:
+      - Accept, Tenant-Workspace2, Tenant-Organization2, origin, shortcut-token, Accept-Encoding
+      x-content-type-options:
+      - nosniff
+    status:
+      code: 200
+      message: OK
+version: 1

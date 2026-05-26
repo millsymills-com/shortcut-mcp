@@ -8,6 +8,7 @@ from fastmcp import Context, FastMCP
 
 from shortcut_mcp.clients.shortcut import _seg
 from shortcut_mcp.tools._common import (
+    LimitParam,
     destructive_tags,
     get_client,
     get_object,
@@ -34,7 +35,7 @@ def register(server: FastMCP) -> None:
         tags=read_tags(_MODULE),
         annotations=_READ_ANN,
     )
-    async def shortcut_list_objectives(ctx: Context, limit: int = 50) -> dict[str, Any]:
+    async def shortcut_list_objectives(ctx: Context, limit: LimitParam = 50) -> dict[str, Any]:
         rows = await get_client(ctx).get("/objectives")
         return shaped_list(rows, shape_objective_summary, limit=limit)
 
@@ -53,7 +54,7 @@ def register(server: FastMCP) -> None:
         tags=read_tags(_MODULE),
         annotations=_READ_ANN,
     )
-    async def shortcut_list_objective_epics(ctx: Context, objective_id: int, limit: int = 50) -> dict[str, Any]:
+    async def shortcut_list_objective_epics(ctx: Context, objective_id: int, limit: LimitParam = 50) -> dict[str, Any]:
         rows = await get_client(ctx).get(f"/objectives/{_seg(str(objective_id))}/epics")
         return shaped_list(rows, shape_epic_summary, limit=limit)
 

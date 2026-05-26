@@ -104,6 +104,18 @@ def test_shapers_tolerate_missing_optional_fields():
     assert shape_member_summary({"id": "m2"})["id"] == "m2"
 
 
+def test_shaped_list_drops_rows_with_no_recognized_fields():
+    rows = [{"id": 1, "name": "keep"}, {"unknown": "x"}, {"id": 3, "name": "also"}]
+    out = shaped_list(rows, shape_story_summary, limit=10, total=3)
+    assert [r["id"] for r in out["items"]] == [1, 3]
+    assert out["total"] == 3  # total reflects the API count, not the post-filter length
+
+
+def test_shaped_list_empty_page_is_not_truncated():
+    out = shaped_list([], shape_story_summary, limit=10)
+    assert out == {"items": [], "truncated": False}
+
+
 def test_shaped_list_rejects_none():
     with pytest.raises(ToolError, match="expected a list"):
         shaped_list(None, lambda r: r, limit=10)  # type: ignore[arg-type]  # ty: ignore[invalid-argument-type]

@@ -171,9 +171,8 @@ class ShortcutClient:
                     body=f"paginate({path!r}): expected a paginated object, got {type(page).__name__}",
                 )
             items.extend(page.get("data", []))
-            page_total = page.get("total")
-            if page_total is not None:
-                total = page_total
+            if total is None:
+                total = page.get("total")
             pages += 1
             nxt = page.get("next")
             if not nxt or pages >= max_pages or (limit is not None and len(items) >= limit):

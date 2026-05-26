@@ -50,6 +50,23 @@ async def test_paginate_follows_next_until_exhausted():
 
 @pytest.mark.asyncio
 @respx.mock
+async def test_paginate_total_taken_from_first_page():
+    base = "https://api.app.shortcut.com/api/v3"
+    page1_next = "/api/v3/search/stories?token=t2"
+    respx.get(f"{base}/search/stories", params={"query": "x"}).mock(
+        return_value=httpx.Response(200, json={"data": [{"id": 1}], "next": page1_next, "total": 2})
+    )
+    respx.get(f"{base}/search/stories", params={"token": "t2"}).mock(
+        return_value=httpx.Response(200, json={"data": [{"id": 2}], "next": None, "total": 5})
+    )
+    client = ShortcutClient(token="x")
+    page = await client.paginate("/search/stories", params={"query": "x"}, max_pages=5, limit=10)
+    await client.close()
+    assert page["total"] == 2  # first page's snapshot, not the last page's drifted count
+
+
+@pytest.mark.asyncio
+@respx.mock
 async def test_paginate_respects_max_pages():
     base = "https://api.app.shortcut.com/api/v3"
     loop_next = "/api/v3/search/stories?token=loop"

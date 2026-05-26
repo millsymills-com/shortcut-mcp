@@ -7,6 +7,8 @@ This project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-05-26
+
 ### Added
 
 - **v0.4 destructive tier — 13 delete tools**, gated by `SHORTCUT_MODE=readwrite`
@@ -20,6 +22,11 @@ This project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - **Opt-in live destructive test harness** (`SHORTCUT_LIVE_WRITE_TESTS` +
   `SHORTCUT_TEST_WORKSPACE_TOKEN`) using disposable fixtures in an isolated workspace;
   never runs on the default suite or the nightly read cron.
+
+## [0.3.0] - 2026-05-26
+
+### Added
+
 - **v0.3 write tier — 38 write tools across all resource modules**, gated by
   `SHORTCUT_MODE=readwrite` (hidden entirely in readonly mode):
   - `story`: create, update, archive, unarchive, add labels, add owners,
@@ -77,3 +84,9 @@ This project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - `shortcut_get_story` tracer-bullet tool.
 - `SHORTCUT_MODE` and `SHORTCUT_ALLOW_DESTRUCTIVE` safety gates.
 - `SHORTCUT_API_TOKEN` authentication via env / `.env` file.
+
+[Unreleased]: https://github.com/millsymills-com/shortcut-mcp/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/millsymills-com/shortcut-mcp/compare/v0.3.0...v0.4.0
+[0.3.0]: https://github.com/millsymills-com/shortcut-mcp/compare/v0.2.0...v0.3.0
+[0.2.0]: https://github.com/millsymills-com/shortcut-mcp/compare/v0.1.0...v0.2.0
+[0.1.0]: https://github.com/millsymills-com/shortcut-mcp/releases/tag/v0.1.0
