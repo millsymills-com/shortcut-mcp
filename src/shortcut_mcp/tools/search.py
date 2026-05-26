@@ -8,6 +8,7 @@ from fastmcp import Context, FastMCP
 from fastmcp.exceptions import ToolError
 
 from shortcut_mcp.tools._common import (
+    LimitParam,
     get_client,
     read_tags,
     shape_epic_summary,
@@ -44,7 +45,7 @@ def register(server: FastMCP) -> None:
         tags=read_tags(_MODULE),
         annotations=_READ_ANN,
     )
-    async def shortcut_search_stories(ctx: Context, query: str, limit: int = 25) -> dict[str, Any]:
+    async def shortcut_search_stories(ctx: Context, query: str, limit: LimitParam = 25) -> dict[str, Any]:
         return await _entity_search(ctx, "/search/stories", query, limit, shape_story_summary)
 
     @server.tool(
@@ -53,7 +54,7 @@ def register(server: FastMCP) -> None:
         tags=read_tags(_MODULE),
         annotations=_READ_ANN,
     )
-    async def shortcut_search_epics(ctx: Context, query: str, limit: int = 25) -> dict[str, Any]:
+    async def shortcut_search_epics(ctx: Context, query: str, limit: LimitParam = 25) -> dict[str, Any]:
         return await _entity_search(ctx, "/search/epics", query, limit, shape_epic_summary)
 
     @server.tool(
@@ -62,7 +63,7 @@ def register(server: FastMCP) -> None:
         tags=read_tags(_MODULE),
         annotations=_READ_ANN,
     )
-    async def shortcut_search_iterations(ctx: Context, query: str, limit: int = 25) -> dict[str, Any]:
+    async def shortcut_search_iterations(ctx: Context, query: str, limit: LimitParam = 25) -> dict[str, Any]:
         return await _entity_search(ctx, "/search/iterations", query, limit, shape_iteration_summary)
 
     @server.tool(
@@ -71,7 +72,7 @@ def register(server: FastMCP) -> None:
         tags=read_tags(_MODULE),
         annotations=_READ_ANN,
     )
-    async def shortcut_search_objectives(ctx: Context, query: str, limit: int = 25) -> dict[str, Any]:
+    async def shortcut_search_objectives(ctx: Context, query: str, limit: LimitParam = 25) -> dict[str, Any]:
         return await _entity_search(ctx, "/search/objectives", query, limit, shape_objective_summary)
 
     @server.tool(
@@ -84,7 +85,7 @@ def register(server: FastMCP) -> None:
         tags=read_tags(_MODULE),
         annotations=_READ_ANN,
     )
-    async def shortcut_search(ctx: Context, query: str, limit: int = 25) -> dict[str, Any]:
+    async def shortcut_search(ctx: Context, query: str, limit: LimitParam = 25) -> dict[str, Any]:
         raw = await get_client(ctx).get("/search", params={"query": query, "page_size": min(limit, 25)})
         if not isinstance(raw, dict):
             raise ToolError(f"shortcut_search: /search returned {type(raw).__name__}, expected an object")
@@ -114,7 +115,7 @@ def register(server: FastMCP) -> None:
         owner_ids: list[str] | None = None,
         workflow_state_id: int | None = None,
         epic_id: int | None = None,
-        limit: int = 25,
+        limit: LimitParam = 25,
     ) -> dict[str, Any]:
         body: dict[str, Any] = {}
         if archived is not None:

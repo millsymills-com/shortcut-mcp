@@ -8,6 +8,7 @@ from fastmcp import Context, FastMCP
 
 from shortcut_mcp.clients.shortcut import _seg
 from shortcut_mcp.tools._common import (
+    LimitParam,
     destructive_tags,
     get_client,
     read_tags,
@@ -33,7 +34,7 @@ def register(server: FastMCP) -> None:
         tags=read_tags(_MODULE),
         annotations=_READ_ANN,
     )
-    async def shortcut_list_iterations(ctx: Context, limit: int = 50) -> dict[str, Any]:
+    async def shortcut_list_iterations(ctx: Context, limit: LimitParam = 50) -> dict[str, Any]:
         rows = await get_client(ctx).get("/iterations")
         return shaped_list(rows, shape_iteration_summary, limit=limit)
 
@@ -52,7 +53,9 @@ def register(server: FastMCP) -> None:
         tags=read_tags(_MODULE),
         annotations=_READ_ANN,
     )
-    async def shortcut_list_iteration_stories(ctx: Context, iteration_id: int, limit: int = 50) -> dict[str, Any]:
+    async def shortcut_list_iteration_stories(
+        ctx: Context, iteration_id: int, limit: LimitParam = 50
+    ) -> dict[str, Any]:
         rows = await get_client(ctx).get(f"/iterations/{_seg(str(iteration_id))}/stories")
         return shaped_list(rows, shape_story_summary, limit=limit)
 
