@@ -24,6 +24,8 @@ from shortcut_mcp.tools._common import (
 )
 
 _MODULE = "document"
+_SEARCH_PAGE_CAP = 25
+"""Max rows the /search/documents endpoint returns per page; larger limits are clamped to it."""
 _READ_ANN = {"readOnlyHint": True, "openWorldHint": True}
 _WRITE_ANN: dict[str, Any] = {"readOnlyHint": False, "destructiveHint": False}
 _DESTRUCTIVE_ANN: dict[str, Any] = {"readOnlyHint": False, "destructiveHint": True, "idempotentHint": True}
@@ -76,7 +78,10 @@ def register(server: FastMCP) -> None:
 
     @server.tool(
         name="shortcut_search_documents",
-        description="Search documents by title (substring match). Returns shaped summary rows.",
+        description=(
+            "Search documents by title (substring match). Returns shaped summary rows; "
+            "the API caps results at 25 per page."
+        ),
         tags=read_tags(_MODULE),
         annotations=_READ_ANN,
     )
@@ -88,7 +93,7 @@ def register(server: FastMCP) -> None:
         followed_by_me: bool | None = None,
         limit: LimitParam = 25,
     ) -> dict[str, Any]:
-        params: dict[str, Any] = {"title": title, "page_size": min(limit, 25)}
+        params: dict[str, Any] = {"title": title, "page_size": min(limit, _SEARCH_PAGE_CAP)}
         if archived is not None:
             params["archived"] = archived
         if created_by_me is not None:
