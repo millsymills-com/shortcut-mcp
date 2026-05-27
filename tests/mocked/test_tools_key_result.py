@@ -107,6 +107,37 @@ async def test_update_key_result_no_fields_fails_fast(monkeypatch: pytest.Monkey
 
 @pytest.mark.asyncio
 @respx.mock
+@pytest.mark.parametrize(
+    "value",
+    [
+        {},  # empty dict slips past require_update_fields but is a no-op
+        {"numeric_value": 5},  # int, not the decimal string the API expects
+        {"boolean_value": "true"},  # str, not bool
+        {"numeric_value": "5", "boolean_value": True},  # both keys
+        {"unexpected": "x"},  # unknown key
+    ],
+)
+async def test_update_key_result_rejects_malformed_value(
+    monkeypatch: pytest.MonkeyPatch, value: dict[str, object]
+) -> None:
+    monkeypatch.setenv("SHORTCUT_API_TOKEN", "x")
+    monkeypatch.setenv("SHORTCUT_MODE", "readwrite")
+    monkeypatch.setenv("SHORTCUT_PROFILE", "all")
+    respx.get(f"{BASE}/member").mock(return_value=httpx.Response(200, json={"id": "u"}))
+    put_route = respx.put(f"{BASE}/key-results/{KR}").mock(return_value=httpx.Response(200, json={"id": KR}))
+    server = create_server()
+    async with Client(server) as client:
+        result = await client.call_tool(
+            "shortcut_update_key_result",
+            {"key_result_id": KR, "observed_value": value},
+            raise_on_error=False,
+        )
+    assert result.is_error
+    assert not put_route.called
+
+
+@pytest.mark.asyncio
+@respx.mock
 async def test_update_key_result_hidden_in_readonly(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setenv("SHORTCUT_API_TOKEN", "x")
     monkeypatch.setenv("SHORTCUT_PROFILE", "all")

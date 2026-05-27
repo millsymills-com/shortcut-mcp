@@ -5,7 +5,15 @@ from __future__ import annotations
 import pytest
 from pydantic import SecretStr, ValidationError
 
-from shortcut_mcp.config import ALL_MODULES, ShortcutConfig, ShortcutMode, ToolProfile
+from shortcut_mcp.config import (
+    ALL_MODULES,
+    PROFILE_MODULES,
+    ShortcutConfig,
+    ShortcutMode,
+    ToolProfile,
+)
+
+_NICHE_MODULES = {"repository", "external_link", "key_result"}
 
 
 def test_loads_token_from_env(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -99,6 +107,14 @@ def test_planning_profile_adds_group_and_project(monkeypatch: pytest.MonkeyPatch
     assert "project" in modules
     assert "file" not in modules
     assert "linked_file" not in modules
+
+
+def test_niche_modules_excluded_from_all_non_all_profiles() -> None:
+    for profile, modules in PROFILE_MODULES.items():
+        if profile is ToolProfile.ALL:
+            assert modules >= _NICHE_MODULES
+        else:
+            assert _NICHE_MODULES.isdisjoint(modules), f"{profile} must not expose niche modules"
 
 
 def test_files_profile_adds_file_and_linked_file(monkeypatch: pytest.MonkeyPatch) -> None:
