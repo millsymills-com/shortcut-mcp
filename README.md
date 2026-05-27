@@ -323,7 +323,7 @@ track the gates in [Safety model](#safety-model).
 - `shortcut_get_document` — Fetch one document by ID (full object, including markdown content).
 - `shortcut_list_document_epics` — List the epics linked to a document (summary rows).
 - `shortcut_load_document_tiptap` — Load a document's content as Tiptap JSON (rich-text editor format).
-- `shortcut_search_documents` — Search documents by title (substring match). Returns shaped summary rows.
+- `shortcut_search_documents` — Search documents by title (substring match). Returns shaped summary rows; the API caps results at 25 per page.
 
 #### health (4 tools)
 
