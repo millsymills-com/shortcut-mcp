@@ -8,9 +8,15 @@ feature toggles) additionally require `SHORTCUT_ALLOW_DESTRUCTIVE=true`.
 
 ## Installation
 
+shortcut-mcp is **not published to PyPI** — install it from source:
+
 ```bash
 uv tool install git+https://github.com/millsymills-com/shortcut-mcp
 ```
+
+This puts a `shortcut-mcp` executable on your PATH. To run without installing
+(handy for MCP clients), use `uvx --from git+… shortcut-mcp` instead — see
+[Client configuration](#client-configuration).
 
 ## Usage
 
@@ -19,6 +25,84 @@ Set `SHORTCUT_API_TOKEN` and run:
 ```bash
 shortcut-mcp
 ```
+
+## Client configuration
+
+shortcut-mcp speaks MCP over stdio, so any stdio-capable client launches it the
+same way: a `command`, optional `args`, and an `env` block carrying your token.
+
+Because there is no PyPI package, the `command` is either the installed
+`shortcut-mcp` binary or `uvx` resolving the package straight from git. Pick one:
+
+- **Installed** (`uv tool install git+…` first): `"command": "shortcut-mcp"`.
+  If your client doesn't inherit your shell PATH, use the absolute path that
+  `uv tool install` prints (or run `which shortcut-mcp` to find it).
+- **No install** (`uvx` builds it on first launch, then caches):
+  `"command": "uvx", "args": ["--from", "git+https://github.com/millsymills-com/shortcut-mcp", "shortcut-mcp"]`.
+
+### Claude Desktop
+
+Edit `claude_desktop_config.json` (macOS: `~/Library/Application Support/Claude/`,
+Windows: `%APPDATA%\Claude\`):
+
+```json
+{
+  "mcpServers": {
+    "shortcut": {
+      "command": "shortcut-mcp",
+      "env": { "SHORTCUT_API_TOKEN": "your-token" }
+    }
+  }
+}
+```
+
+### Cursor
+
+Edit `~/.cursor/mcp.json` (global) or `.cursor/mcp.json` (per-project):
+
+```json
+{
+  "mcpServers": {
+    "shortcut": {
+      "command": "uvx",
+      "args": ["--from", "git+https://github.com/millsymills-com/shortcut-mcp", "shortcut-mcp"],
+      "env": { "SHORTCUT_API_TOKEN": "your-token" }
+    }
+  }
+}
+```
+
+### Windsurf
+
+Edit `~/.codeium/windsurf/mcp_config.json`:
+
+```json
+{
+  "mcpServers": {
+    "shortcut": {
+      "command": "uvx",
+      "args": ["--from", "git+https://github.com/millsymills-com/shortcut-mcp", "shortcut-mcp"],
+      "env": { "SHORTCUT_API_TOKEN": "your-token" }
+    }
+  }
+}
+```
+
+### Generic stdio client
+
+Any other MCP client that launches a subprocess uses the same three pieces:
+
+```json
+{
+  "command": "shortcut-mcp",
+  "args": [],
+  "env": { "SHORTCUT_API_TOKEN": "your-token" }
+}
+```
+
+Add `"SHORTCUT_MODE": "readwrite"` (and `"SHORTCUT_ALLOW_DESTRUCTIVE": "true"`)
+to the `env` block to expose the write and destructive tiers — see
+[Safety model](#safety-model).
 
 ## Configuration
 
