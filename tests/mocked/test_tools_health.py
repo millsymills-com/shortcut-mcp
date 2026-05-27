@@ -166,3 +166,43 @@ async def test_update_health_rejects_empty_text(monkeypatch: pytest.MonkeyPatch,
         )
     assert result.is_error
     assert not put_route.called
+
+
+@pytest.mark.asyncio
+@respx.mock
+@pytest.mark.parametrize("text", ["", "   "])
+async def test_create_epic_health_rejects_empty_text(monkeypatch: pytest.MonkeyPatch, text: str) -> None:
+    monkeypatch.setenv("SHORTCUT_API_TOKEN", "x")
+    monkeypatch.setenv("SHORTCUT_MODE", "readwrite")
+    monkeypatch.setenv("SHORTCUT_PROFILE", "all")
+    respx.get(f"{BASE}/member").mock(return_value=httpx.Response(200, json={"id": "u"}))
+    post_route = respx.post(f"{BASE}/epics/1/health").mock(return_value=httpx.Response(201, json={"id": HEALTH}))
+    server = create_server()
+    async with Client(server) as client:
+        result = await client.call_tool(
+            "shortcut_create_epic_health", {"epic_id": 1, "status": "On Track", "text": text}, raise_on_error=False
+        )
+    assert result.is_error
+    assert "non-empty" in result.content[0].text
+    assert not post_route.called
+
+
+@pytest.mark.asyncio
+@respx.mock
+@pytest.mark.parametrize("text", ["", "   "])
+async def test_create_objective_health_rejects_empty_text(monkeypatch: pytest.MonkeyPatch, text: str) -> None:
+    monkeypatch.setenv("SHORTCUT_API_TOKEN", "x")
+    monkeypatch.setenv("SHORTCUT_MODE", "readwrite")
+    monkeypatch.setenv("SHORTCUT_PROFILE", "all")
+    respx.get(f"{BASE}/member").mock(return_value=httpx.Response(200, json={"id": "u"}))
+    post_route = respx.post(f"{BASE}/objectives/2/health").mock(return_value=httpx.Response(201, json={"id": "h2"}))
+    server = create_server()
+    async with Client(server) as client:
+        result = await client.call_tool(
+            "shortcut_create_objective_health",
+            {"objective_id": 2, "status": "On Track", "text": text},
+            raise_on_error=False,
+        )
+    assert result.is_error
+    assert "non-empty" in result.content[0].text
+    assert not post_route.called
