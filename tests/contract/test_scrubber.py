@@ -40,6 +40,27 @@ def test_scrub_consumes_full_sha256_hash_no_trailing_remnant() -> None:
     assert out["display_icon"] == f"https://www.gravatar.com/avatar/{REDACTED_GRAVATAR_HASH}?s=40"
 
 
+def test_scrub_rewrites_userimage_path_preserving_id() -> None:
+    # Non-avatar paths the scrubber must also redact; the numeric id (not the
+    # email-derived hash) is preserved so the URL shape survives.
+    out = _scrub_pii({"display_icon": f"https://0.gravatar.com/userimage/12345678/{_REAL_MD5}?size=80"})
+    assert _REAL_MD5 not in out["display_icon"]
+    assert out["display_icon"] == f"https://0.gravatar.com/userimage/12345678/{REDACTED_GRAVATAR_HASH}?size=80"
+
+
+def test_scrub_rewrites_multi_segment_and_blavatar_paths() -> None:
+    out = _scrub_pii(
+        {
+            "a": f"https://gravatar.com/userimage/12/34/{_REAL_MD5}",
+            "b": f"https://gravatar.com/blavatar/{_REAL_MD5}",
+        }
+    )
+    assert _REAL_MD5 not in out["a"]
+    assert _REAL_MD5 not in out["b"]
+    assert out["a"] == f"https://gravatar.com/userimage/12/34/{REDACTED_GRAVATAR_HASH}"
+    assert out["b"] == f"https://gravatar.com/blavatar/{REDACTED_GRAVATAR_HASH}"
+
+
 def test_scrub_still_redacts_known_keys_and_emails() -> None:
     out = _scrub_pii(
         {

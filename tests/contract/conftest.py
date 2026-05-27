@@ -38,9 +38,18 @@ _EMAIL_RE = re.compile(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}")
 
 # The same reversible hash redacted from `gravatar_hash` also rides inside avatar
 # URLs (e.g. `display_icon`), so rewrite it wherever it appears in a string. The
-# run is `{32,}` not `{32}`: Gravatar now emits SHA-256 (64 hex) as well as MD5,
-# and a fixed-32 match would leave the hash's trailing half in the cassette.
-_GRAVATAR_URL_RE = re.compile(r"(gravatar\.com/avatar/)[0-9a-fA-F]{32,}")
+# pattern is path-agnostic — it keys on host + trailing hex run and tolerates any
+# intervening path (`/avatar/`, `/userimage/<id>/<hash>`, `/blavatar/`, future
+# endpoints) so no hash survives on a non-avatar path; group 1 preserves the
+# host+path so only the hash is replaced. This stays aligned with the broader
+# guard in `test_cassette_privacy.py` (guard ⊇ scrubber). The run is `{32,}` not
+# `{32}`: Gravatar now emits SHA-256 (64 hex) as well as MD5, and a fixed-32 match
+# would leave the hash's trailing half in the cassette.
+_GRAVATAR_URL_RE = re.compile(
+    r"(gravatar\.com(?:(?:/|%2[fF])[0-9a-z._-]+)*(?:/|%2[fF]))"  # host + path + separator
+    r"[0-9a-fA-F]{32,}",  # reversible MD5/SHA-256 hex run
+    re.IGNORECASE,
+)
 
 
 def _scrub_pii(value: Any) -> Any:
