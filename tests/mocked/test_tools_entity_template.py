@@ -121,3 +121,23 @@ async def test_update_entity_template_story_contents(monkeypatch: pytest.MonkeyP
         )
     assert result.data == {"id": ET}
     assert json.loads(route.calls.last.request.content) == {"story_contents": {"story_type": "chore"}}
+
+
+@pytest.mark.asyncio
+@respx.mock
+async def test_delete_entity_template_runtime_guard_blocks_without_destructive(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("SHORTCUT_API_TOKEN", "x")
+    monkeypatch.setenv("SHORTCUT_MODE", "readwrite")
+    monkeypatch.setenv("SHORTCUT_PROFILE", "all")
+    respx.get(f"{BASE}/member").mock(return_value=httpx.Response(200, json={"id": "u"}))
+    route = respx.delete(f"{BASE}/entity-templates/{ET}").mock(return_value=httpx.Response(204))
+    server = create_server()
+    # Re-enable the tag the visibility gate stripped, so the call reaches the
+    # in-body require_destructive() guard instead of failing at "unknown tool".
+    server.enable(tags={"destructive"})
+    async with Client(server) as client:
+        result = await client.call_tool(
+            "shortcut_delete_entity_template", {"entity_template_id": ET}, raise_on_error=False
+        )
+    assert result.is_error
+    assert not route.called

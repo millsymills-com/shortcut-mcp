@@ -212,3 +212,21 @@ async def test_link_document_returns_api_body_when_present(monkeypatch: pytest.M
     async with Client(server) as client:
         result = await client.call_tool("shortcut_link_document_to_epic", {"doc_id": DOC, "epic_id": 5})
     assert result.data == {"id": DOC, "title": "T"}
+
+
+@pytest.mark.asyncio
+@respx.mock
+async def test_delete_document_runtime_guard_blocks_without_destructive(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("SHORTCUT_API_TOKEN", "x")
+    monkeypatch.setenv("SHORTCUT_MODE", "readwrite")
+    monkeypatch.setenv("SHORTCUT_PROFILE", "all")
+    respx.get(f"{BASE}/member").mock(return_value=httpx.Response(200, json={"id": "u"}))
+    route = respx.delete(f"{BASE}/documents/{DOC}").mock(return_value=httpx.Response(204))
+    server = create_server()
+    # Re-enable the tag the visibility gate stripped, so the call reaches the
+    # in-body require_destructive() guard instead of failing at "unknown tool".
+    server.enable(tags={"destructive"})
+    async with Client(server) as client:
+        result = await client.call_tool("shortcut_delete_document", {"doc_id": DOC}, raise_on_error=False)
+    assert result.is_error
+    assert not route.called

@@ -130,3 +130,21 @@ async def test_update_custom_field_description_and_icon(monkeypatch: pytest.Monk
         )
     assert result.data == {"id": CF}
     assert json.loads(route.calls.last.request.content) == {"description": "d", "icon_set_identifier": "icon"}
+
+
+@pytest.mark.asyncio
+@respx.mock
+async def test_delete_custom_field_runtime_guard_blocks_without_destructive(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("SHORTCUT_API_TOKEN", "x")
+    monkeypatch.setenv("SHORTCUT_MODE", "readwrite")
+    monkeypatch.setenv("SHORTCUT_PROFILE", "all")
+    respx.get(f"{BASE}/member").mock(return_value=httpx.Response(200, json={"id": "u"}))
+    route = respx.delete(f"{BASE}/custom-fields/{CF}").mock(return_value=httpx.Response(204))
+    server = create_server()
+    # Re-enable the tag the visibility gate stripped, so the call reaches the
+    # in-body require_destructive() guard instead of failing at "unknown tool".
+    server.enable(tags={"destructive"})
+    async with Client(server) as client:
+        result = await client.call_tool("shortcut_delete_custom_field", {"custom_field_id": CF}, raise_on_error=False)
+    assert result.is_error
+    assert not route.called
