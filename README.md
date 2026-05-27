@@ -68,7 +68,7 @@ to fail faster, or raise it for flaky networks.
 | `core` (default) | story, story_comment, story_task, story_link, epic, epic_comment, epic_workflow, iteration, objective, member, workflow, label, search |
 | `planning` | core + group, project |
 | `files` | core + file, linked_file |
-| `all` | all 17 modules (43 read + 38 write + 13 destructive tools at the matching gates) |
+| `all` | all 20 modules (47 read + 39 write + 13 destructive tools at the matching gates) |
 
 `SHORTCUT_TOOLS` accepts a comma-separated list of module names and **overrides**
 the profile entirely. Unknown module names are rejected at startup.
@@ -85,9 +85,9 @@ SHORTCUT_PROFILE=planning shortcut-mcp
 
 | `SHORTCUT_MODE` | `SHORTCUT_ALLOW_DESTRUCTIVE` | Tools exposed |
 |---|---|---|
-| `readonly` (default) | _(ignored)_ | 43 read tools only |
-| `readwrite` | `false` | 43 read + 38 write tools (81 total) |
-| `readwrite` | `true` | 43 read + 38 write + 13 destructive tools (94 total) |
+| `readonly` (default) | _(ignored)_ | 47 read tools only |
+| `readwrite` | `false` | 47 read + 39 write tools (86 total) |
+| `readwrite` | `true` | 47 read + 39 write + 13 destructive tools (99 total) |
 
 Write tools are hidden entirely in readonly mode — they do not appear in
 `list_tools()` output and cannot be called. Setting `SHORTCUT_MODE=readwrite`
