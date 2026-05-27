@@ -187,3 +187,8 @@ def shape_linked_file_summary(raw: dict[str, Any]) -> dict[str, Any]:
 def shape_comment_summary(raw: dict[str, Any]) -> dict[str, Any]:
     """Pick key fields from a comment for list display."""
     return _pick(raw, ("id", "author_id", "created_at", "text"))
+
+
+def shape_repository_summary(raw: dict[str, Any]) -> dict[str, Any]:
+    """Pick key fields from a VCS repository for list display."""
+    return _pick(raw, ("id", "name", "full_name", "type", "url"))

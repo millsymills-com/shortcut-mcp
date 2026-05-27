@@ -1,8 +1,8 @@
 # shortcut-mcp
 
 Python FastMCP server for the Shortcut REST API. v0.4 ships a complete read
-surface, a write tier, and a destructive tier: **43 read + 38 write + 13
-destructive tools across 17 resource modules** (94 tools total). Write tools
+surface, a write tier, and a destructive tier: **47 read + 39 write + 13
+destructive tools across 20 resource modules** (99 tools total). Write tools
 require `SHORTCUT_MODE=readwrite`; destructive (delete) tools additionally
 require `SHORTCUT_ALLOW_DESTRUCTIVE=true`.
 
@@ -98,7 +98,7 @@ raises `mode_denied` if reached without both gates.
 
 ## Tool catalog
 
-### Read tools (43)
+### Read tools (47)
 
 `list_*` tools return a shaped envelope `{items: [...], truncated: bool, total?: int}`
 and accept a `limit` parameter (default 50; search tools default 25). `get_*`
@@ -189,6 +189,19 @@ tools return the full API object.
 - `shortcut_list_linked_files` — List all linked files (summary rows).
 - `shortcut_get_linked_file` — Fetch one linked file by ID (full object).
 
+#### repository (2 tools)
+
+- `shortcut_list_repositories` — List all VCS repositories (summary rows).
+- `shortcut_get_repository` — Fetch one VCS repository by ID (full object).
+
+#### external_link (1 tool)
+
+- `shortcut_list_external_link_stories` — List the stories referencing an external link URL (summary rows).
+
+#### key_result (1 tool)
+
+- `shortcut_get_key_result` — Fetch one objective key-result by ID (full object).
+
 #### search (6 tools)
 
 - `shortcut_search_stories` — Search stories with Shortcut query syntax (e.g. `state:done owner:me`).
@@ -198,7 +211,7 @@ tools return the full API object.
 - `shortcut_search` — Global multi-entity search; returns `{stories: {items, truncated}, epics: {items, truncated}}`.
 - `shortcut_query_stories` — Search stories by structured filter (POST query; read-only despite POST).
 
-### Write tools (38)
+### Write tools (39)
 
 Require `SHORTCUT_MODE=readwrite`. Hidden entirely in readonly mode.
 
@@ -289,6 +302,10 @@ Two behaviors to be aware of:
 
 - `shortcut_create_linked_file` — Create a linked file (external URL reference).
 - `shortcut_update_linked_file` — Update a linked file's metadata.
+
+#### key_result (1 tool)
+
+- `shortcut_update_key_result` — Update an objective key-result's name or observed/initial/target value.
 
 ### Destructive tools (13)
 

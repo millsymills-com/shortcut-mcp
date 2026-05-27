@@ -7,6 +7,14 @@ This project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- **v0.5 niche read modules — 4 read tools + 1 write tool** across 3 new resource
+  modules (exposed under `SHORTCUT_PROFILE=all` or an explicit `SHORTCUT_TOOLS`
+  allowlist): `list_repositories` / `get_repository`, `list_external_link_stories`,
+  `get_key_result`, and `update_key_result` (write-tier). Brings totals to 47 read +
+  39 write + 13 destructive tools across 20 modules.
+
 ### Changed
 
 - Transport errors `RemoteProtocolError` ("server disconnected"), `DecodingError`
