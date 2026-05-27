@@ -140,6 +140,7 @@ async def test_delete_entity_template_runtime_guard_blocks_without_destructive(m
             "shortcut_delete_entity_template", {"entity_template_id": ET}, raise_on_error=False
         )
     assert result.is_error
+    assert "mode_denied" in result.content[0].text
     assert not route.called
 
 
@@ -192,3 +193,4 @@ async def test_get_entity_template_propagates_404(monkeypatch: pytest.MonkeyPatc
             "shortcut_get_entity_template", {"entity_template_id": ET}, raise_on_error=False
         )
     assert result.is_error
+    assert "404" in result.content[0].text

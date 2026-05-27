@@ -149,6 +149,7 @@ async def test_delete_category_runtime_guard_blocks_without_destructive(monkeypa
     async with Client(server) as client:
         result = await client.call_tool("shortcut_delete_category", {"category_id": 9}, raise_on_error=False)
     assert result.is_error
+    assert "mode_denied" in result.content[0].text
     assert not route.called
 
 
@@ -178,3 +179,4 @@ async def test_get_category_propagates_404(monkeypatch: pytest.MonkeyPatch) -> N
     async with Client(server) as client:
         result = await client.call_tool("shortcut_get_category", {"category_id": 404}, raise_on_error=False)
     assert result.is_error
+    assert "404" in result.content[0].text
