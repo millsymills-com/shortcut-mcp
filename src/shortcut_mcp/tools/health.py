@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import Any, Literal
 
 from fastmcp import Context, FastMCP
+from fastmcp.exceptions import ToolError
 
 from shortcut_mcp.clients.shortcut import _seg
 from shortcut_mcp.tools._common import (
@@ -112,6 +113,8 @@ def register(server: FastMCP) -> None:
         if status is not None:
             body["status"] = status
         if text is not None:
+            if not text.strip():
+                raise ToolError("text must be non-empty when provided (omit it to leave the note unchanged)")
             body["text"] = text
         require_update_fields(body)
         result = await get_client(ctx).put(f"/health/{_seg(health_id)}", json=body)

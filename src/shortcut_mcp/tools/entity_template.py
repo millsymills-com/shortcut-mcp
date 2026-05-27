@@ -9,6 +9,7 @@ from __future__ import annotations
 from typing import Any
 
 from fastmcp import Context, FastMCP
+from fastmcp.exceptions import ToolError
 
 from shortcut_mcp.clients.shortcut import _seg
 from shortcut_mcp.tools._common import (
@@ -89,6 +90,8 @@ def register(server: FastMCP) -> None:
         if name is not None:
             body["name"] = name
         if story_contents is not None:
+            if not story_contents:
+                raise ToolError("story_contents must be a non-empty object when provided")
             body["story_contents"] = story_contents
         require_update_fields(body)
         result = await get_client(ctx).put(f"/entity-templates/{_seg(entity_template_id)}", json=body)
