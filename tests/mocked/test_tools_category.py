@@ -132,3 +132,21 @@ async def test_update_category_name_and_color(monkeypatch: pytest.MonkeyPatch) -
         result = await client.call_tool("shortcut_update_category", {"category_id": 9, "name": "N", "color": "#1"})
     assert result.data == {"id": 9}
     assert json.loads(route.calls.last.request.content) == {"name": "N", "color": "#1"}
+
+
+@pytest.mark.asyncio
+@respx.mock
+async def test_delete_category_runtime_guard_blocks_without_destructive(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("SHORTCUT_API_TOKEN", "x")
+    monkeypatch.setenv("SHORTCUT_MODE", "readwrite")
+    monkeypatch.setenv("SHORTCUT_PROFILE", "all")
+    respx.get(f"{BASE}/member").mock(return_value=httpx.Response(200, json={"id": "u"}))
+    route = respx.delete(f"{BASE}/categories/9").mock(return_value=httpx.Response(204))
+    server = create_server()
+    # Re-enable the tag the visibility gate stripped, so the call reaches the
+    # in-body require_destructive() guard instead of failing at "unknown tool".
+    server.enable(tags={"destructive"})
+    async with Client(server) as client:
+        result = await client.call_tool("shortcut_delete_category", {"category_id": 9}, raise_on_error=False)
+    assert result.is_error
+    assert not route.called

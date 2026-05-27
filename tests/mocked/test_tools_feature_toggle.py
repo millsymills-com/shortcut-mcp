@@ -63,3 +63,32 @@ async def test_toggles_gated_at_destructive_tier(monkeypatch: pytest.MonkeyPatch
         names = {t.name for t in await client.list_tools()}
     assert "shortcut_enable_iterations" not in names
     assert "shortcut_disable_story_templates" not in names
+
+
+@pytest.mark.asyncio
+@respx.mock
+@pytest.mark.parametrize(
+    ("tool", "endpoint"),
+    [
+        ("shortcut_enable_iterations", "/iterations/enable"),
+        ("shortcut_disable_iterations", "/iterations/disable"),
+        ("shortcut_enable_story_templates", "/entity-templates/enable"),
+        ("shortcut_disable_story_templates", "/entity-templates/disable"),
+    ],
+)
+async def test_toggle_runtime_guard_blocks_without_destructive(
+    monkeypatch: pytest.MonkeyPatch, tool: str, endpoint: str
+) -> None:
+    monkeypatch.setenv("SHORTCUT_API_TOKEN", "x")
+    monkeypatch.setenv("SHORTCUT_MODE", "readwrite")
+    monkeypatch.setenv("SHORTCUT_PROFILE", "all")
+    respx.get(f"{BASE}/member").mock(return_value=httpx.Response(200, json={"id": "u"}))
+    route = respx.put(f"{BASE}{endpoint}").mock(return_value=httpx.Response(204))
+    server = create_server()
+    # Re-enable the tag the visibility gate stripped, so the call reaches the
+    # in-body require_destructive() guard instead of failing at "unknown tool".
+    server.enable(tags={"destructive"})
+    async with Client(server) as client:
+        result = await client.call_tool(tool, {}, raise_on_error=False)
+    assert result.is_error
+    assert not route.called
