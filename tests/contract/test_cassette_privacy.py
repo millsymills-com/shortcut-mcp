@@ -28,9 +28,29 @@ _PII_FIELD_RES = {
 }
 # The gravatar hash is reversible (rainbow tables) and the same value rides
 # inside avatar URLs (e.g. display_icon), bypassing the key-based field guards.
+# This guard is deliberately broader than the `conftest` scrubber so a scrubber
+# regression fails loudly here rather than leaking silently:
+#   - matches both `/avatar/` and non-avatar `/userimage/<id>/<hash>` paths
+#   - `re.IGNORECASE` covers an uppercase host (`GRAVATAR.COM`)
+#   - `%2F`-encoded separators are matched alongside literal `/`
+#   - host shard / `secure.` variants (e.g. `0.gravatar.com`) match implicitly:
+#     `findall` scans for the `gravatar.com` substring anywhere in the bytes
 # `{32,}` captures the full hex run so a partially-scrubbed SHA-256 (sentinel
 # prefix + real trailing half) is still flagged rather than masked by the prefix.
-_GRAVATAR_URL_RE = re.compile(rb"gravatar\.com/avatar/([0-9a-fA-F]{32,})")
+#
+# Accepted residual gaps (documented, not guarded — no live leak today):
+#   - JSON-escaped slash `gravatar.com\/avatar\/`: benign in our pipeline
+#     (`json.dumps` does not escape `/`); only a hand-edited/external cassette
+#     could carry it.
+#   - A bare MD5/SHA-256 in free text outside a gravatar URL: not redacted, to
+#     avoid clobbering legitimate 32-hex IDs that share the hash's shape.
+_GRAVATAR_URL_RE = re.compile(
+    rb"gravatar\.com(?:/|%2[fF])"  # host + path separator (literal or %2F-encoded)
+    rb"(?:avatar|userimage)(?:/|%2[fF])"  # avatar or non-avatar image path segment
+    rb"(?:[0-9]+(?:/|%2[fF]))?"  # optional numeric userimage id before the hash
+    rb"([0-9a-fA-F]{32,})",  # reversible MD5/SHA-256 hex run
+    re.IGNORECASE,
+)
 
 
 def _unredacted_gravatar_hashes(raw: bytes) -> set[str]:
@@ -82,6 +102,39 @@ def test_unredacted_gravatar_hashes_flags_partial_sha256_leak() -> None:
     tail = "00112233445566778899aabbccddeeff"
     raw = f'{{"display_icon": "https://www.gravatar.com/avatar/{REDACTED_GRAVATAR_HASH}{tail}"}}'.encode()
     assert _unredacted_gravatar_hashes(raw) == {f"{REDACTED_GRAVATAR_HASH}{tail}"}
+
+
+def test_unredacted_gravatar_hashes_flags_userimage_path() -> None:
+    # `/userimage/<id>/<hash>` is unscrubbed today; the guard must over-match it.
+    md5 = "d41d8cd98f00b204e9800998ecf8427e"
+    raw = f'{{"display_icon": "https://0.gravatar.com/userimage/12345678/{md5}?size=80"}}'.encode()
+    assert _unredacted_gravatar_hashes(raw) == {md5}
+
+
+def test_unredacted_gravatar_hashes_flags_secure_shard_host() -> None:
+    md5 = "d41d8cd98f00b204e9800998ecf8427e"
+    raw = f'{{"display_icon": "https://secure.gravatar.com/avatar/{md5}"}}'.encode()
+    assert _unredacted_gravatar_hashes(raw) == {md5}
+
+
+def test_unredacted_gravatar_hashes_flags_uppercase_host() -> None:
+    md5 = "d41d8cd98f00b204e9800998ecf8427e"
+    raw = f'{{"display_icon": "https://GRAVATAR.COM/AVATAR/{md5}"}}'.encode()
+    assert _unredacted_gravatar_hashes(raw) == {md5}
+
+
+def test_unredacted_gravatar_hashes_flags_percent_encoded_slashes() -> None:
+    md5 = "d41d8cd98f00b204e9800998ecf8427e"
+    raw = f'{{"display_icon": "https://gravatar.com%2Favatar%2F{md5}"}}'.encode()
+    assert _unredacted_gravatar_hashes(raw) == {md5}
+
+
+def test_unredacted_gravatar_hashes_ignores_json_escaped_slash() -> None:
+    # Documented residual: an escaped `\/` separator is not guarded (benign in
+    # our pipeline — `json.dumps` emits a literal `/`).
+    md5 = "d41d8cd98f00b204e9800998ecf8427e"
+    raw = rb'{"display_icon": "https://gravatar.com\/avatar\/' + md5.encode() + rb'"}'
+    assert _unredacted_gravatar_hashes(raw) == set()
 
 
 @pytest.mark.contract
