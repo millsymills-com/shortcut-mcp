@@ -230,3 +230,22 @@ async def test_delete_document_runtime_guard_blocks_without_destructive(monkeypa
         result = await client.call_tool("shortcut_delete_document", {"doc_id": DOC}, raise_on_error=False)
     assert result.is_error
     assert not route.called
+
+
+@pytest.mark.asyncio
+@respx.mock
+@pytest.mark.parametrize(("limit", "expected_page_size"), [(50, "25"), (10, "10")])
+async def test_search_documents_clamps_page_size(
+    monkeypatch: pytest.MonkeyPatch, limit: int, expected_page_size: str
+) -> None:
+    monkeypatch.setenv("SHORTCUT_API_TOKEN", "x")
+    monkeypatch.setenv("SHORTCUT_PROFILE", "all")
+    respx.get(f"{BASE}/member").mock(return_value=httpx.Response(200, json={"id": "u"}))
+    route = respx.get(f"{BASE}/search/documents").mock(
+        return_value=httpx.Response(200, json={"data": [], "total": 0, "next": None})
+    )
+    server = create_server()
+    async with Client(server) as client:
+        result = await client.call_tool("shortcut_search_documents", {"title": "x", "limit": limit})
+    assert not result.is_error
+    assert dict(route.calls.last.request.url.params)["page_size"] == expected_page_size
