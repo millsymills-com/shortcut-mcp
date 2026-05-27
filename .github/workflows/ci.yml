@@ -50,6 +50,19 @@ jobs:
       - run: uv sync --extra dev --frozen
       - run: uv run pytest -m "not live and not live_write" --cov=shortcut_mcp --cov-fail-under=90
 
+  catalog:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
+        with:
+          enable-cache: true
+      - run: uv sync --extra dev --frozen
+      - name: README tool catalog drift check
+        run: uv run python scripts/generate_tool_catalog.py --check
+
   security:
     runs-on: ubuntu-latest
     steps:
