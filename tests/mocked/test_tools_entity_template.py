@@ -141,3 +141,22 @@ async def test_delete_entity_template_runtime_guard_blocks_without_destructive(m
         )
     assert result.is_error
     assert not route.called
+
+
+@pytest.mark.asyncio
+@respx.mock
+async def test_update_entity_template_rejects_empty_story_contents(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("SHORTCUT_API_TOKEN", "x")
+    monkeypatch.setenv("SHORTCUT_MODE", "readwrite")
+    monkeypatch.setenv("SHORTCUT_PROFILE", "all")
+    respx.get(f"{BASE}/member").mock(return_value=httpx.Response(200, json={"id": "u"}))
+    put_route = respx.put(f"{BASE}/entity-templates/{ET}").mock(return_value=httpx.Response(200, json={"id": ET}))
+    server = create_server()
+    async with Client(server) as client:
+        result = await client.call_tool(
+            "shortcut_update_entity_template",
+            {"entity_template_id": ET, "story_contents": {}},
+            raise_on_error=False,
+        )
+    assert result.is_error
+    assert not put_route.called

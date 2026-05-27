@@ -148,3 +148,21 @@ async def test_update_health_text_only(monkeypatch: pytest.MonkeyPatch) -> None:
         result = await client.call_tool("shortcut_update_health", {"health_id": HEALTH, "text": "note"})
     assert result.data == {"id": HEALTH}
     assert json.loads(route.calls.last.request.content) == {"text": "note"}
+
+
+@pytest.mark.asyncio
+@respx.mock
+@pytest.mark.parametrize("text", ["", "   "])
+async def test_update_health_rejects_empty_text(monkeypatch: pytest.MonkeyPatch, text: str) -> None:
+    monkeypatch.setenv("SHORTCUT_API_TOKEN", "x")
+    monkeypatch.setenv("SHORTCUT_MODE", "readwrite")
+    monkeypatch.setenv("SHORTCUT_PROFILE", "all")
+    respx.get(f"{BASE}/member").mock(return_value=httpx.Response(200, json={"id": "u"}))
+    put_route = respx.put(f"{BASE}/health/{HEALTH}").mock(return_value=httpx.Response(200, json={"id": HEALTH}))
+    server = create_server()
+    async with Client(server) as client:
+        result = await client.call_tool(
+            "shortcut_update_health", {"health_id": HEALTH, "text": text}, raise_on_error=False
+        )
+    assert result.is_error
+    assert not put_route.called
