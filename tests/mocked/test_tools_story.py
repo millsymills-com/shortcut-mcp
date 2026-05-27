@@ -105,6 +105,21 @@ async def test_list_story_history_returns_items(monkeypatch: pytest.MonkeyPatch)
     assert result.data["truncated"] is False
 
 
+@pytest.mark.asyncio
+@respx.mock
+async def test_list_story_sub_tasks_shapes_child_stories(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("SHORTCUT_API_TOKEN", "x")
+    _mock_member()
+    respx.get(f"{BASE}/stories/7/sub-tasks").mock(
+        return_value=httpx.Response(200, json=[{"id": 8, "name": "child", "story_type": "feature", "drop": 1}])
+    )
+    server = create_server()
+    async with Client(server) as client:
+        result = await client.call_tool("shortcut_list_story_sub_tasks", {"story_id": 7})
+    assert not result.is_error
+    assert result.data["items"][0] == {"id": 8, "name": "child", "story_type": "feature"}
+
+
 # ---------------------------------------------------------------------------
 # Write tool tests
 # ---------------------------------------------------------------------------

@@ -1,10 +1,10 @@
 # shortcut-mcp
 
-Python FastMCP server for the Shortcut REST API. v0.4 ships a complete read
-surface, a write tier, and a destructive tier: **47 read + 39 write + 13
-destructive tools across 20 resource modules** (99 tools total). Write tools
-require `SHORTCUT_MODE=readwrite`; destructive (delete) tools additionally
-require `SHORTCUT_ALLOW_DESTRUCTIVE=true`.
+Python FastMCP server for the Shortcut REST API. v0.5 ships a complete read
+surface, a write tier, and a destructive tier: **65 read + 51 write + 21
+destructive tools across 26 resource modules** (137 tools total). Write tools
+require `SHORTCUT_MODE=readwrite`; destructive tools (deletes and workspace-wide
+feature toggles) additionally require `SHORTCUT_ALLOW_DESTRUCTIVE=true`.
 
 ## Installation
 
@@ -26,7 +26,7 @@ shortcut-mcp
 |---|---|---|
 | `SHORTCUT_API_TOKEN` | _(required)_ | Shortcut API token |
 | `SHORTCUT_MODE` | `readonly` | `readonly` or `readwrite` |
-| `SHORTCUT_ALLOW_DESTRUCTIVE` | `false` | With `readwrite`, expose the 13 destructive delete tools |
+| `SHORTCUT_ALLOW_DESTRUCTIVE` | `false` | With `readwrite`, expose the 21 destructive tools (deletes + workspace toggles) |
 | `SHORTCUT_PROFILE` | `core` | Named tool bundle — see [Tool profiles](#tool-profiles--gating) |
 | `SHORTCUT_TOOLS` | _(unset)_ | Comma-separated module allowlist; overrides `SHORTCUT_PROFILE` |
 | `SHORTCUT_API_BASE_URL` | `https://api.app.shortcut.com/api/v3` | API base URL |
@@ -68,7 +68,7 @@ to fail faster, or raise it for flaky networks.
 | `core` (default) | story, story_comment, story_task, story_link, epic, epic_comment, epic_workflow, iteration, objective, member, workflow, label, search |
 | `planning` | core + group, project |
 | `files` | core + file, linked_file |
-| `all` | all 20 modules (47 read + 39 write + 13 destructive tools at the matching gates) |
+| `all` | all 26 modules (65 read + 51 write + 21 destructive tools at the matching gates) |
 
 `SHORTCUT_TOOLS` accepts a comma-separated list of module names and **overrides**
 the profile entirely. Unknown module names are rejected at startup.
@@ -85,9 +85,9 @@ SHORTCUT_PROFILE=planning shortcut-mcp
 
 | `SHORTCUT_MODE` | `SHORTCUT_ALLOW_DESTRUCTIVE` | Tools exposed |
 |---|---|---|
-| `readonly` (default) | _(ignored)_ | 47 read tools only |
-| `readwrite` | `false` | 47 read + 39 write tools (86 total) |
-| `readwrite` | `true` | 47 read + 39 write + 13 destructive tools (99 total) |
+| `readonly` (default) | _(ignored)_ | 65 read tools only |
+| `readwrite` | `false` | 65 read + 51 write tools (116 total) |
+| `readwrite` | `true` | 65 read + 51 write + 21 destructive tools (137 total) |
 
 Write tools are hidden entirely in readonly mode — they do not appear in
 `list_tools()` output and cannot be called. Setting `SHORTCUT_MODE=readwrite`
@@ -98,16 +98,17 @@ raises `mode_denied` if reached without both gates.
 
 ## Tool catalog
 
-### Read tools (47)
+### Read tools (65)
 
 `list_*` tools return a shaped envelope `{items: [...], truncated: bool, total?: int}`
 and accept a `limit` parameter (default 50; search tools default 25). `get_*`
 tools return the full API object.
 
-#### story (2 tools)
+#### story (3 tools)
 
 - `shortcut_get_story` — Fetch a story by numeric ID.
 - `shortcut_list_story_history` — List change history for a story (most recent first).
+- `shortcut_list_story_sub_tasks` — List a story's sub-tasks (child stories; distinct from checklist tasks).
 
 #### story_comment (2 tools)
 
@@ -202,6 +203,38 @@ tools return the full API object.
 
 - `shortcut_get_key_result` — Fetch one objective key-result by ID (full object).
 
+#### custom_field (2 tools)
+
+- `shortcut_list_custom_fields` — List all custom fields (summary rows).
+- `shortcut_get_custom_field` — Fetch one custom field by ID (full object).
+
+#### category (4 tools)
+
+- `shortcut_list_categories` — List all categories (summary rows).
+- `shortcut_get_category` — Fetch one category by ID (full object).
+- `shortcut_list_category_milestones` — List the milestones associated with a category.
+- `shortcut_list_category_objectives` — List the objectives associated with a category.
+
+#### entity_template (2 tools)
+
+- `shortcut_list_entity_templates` — List all story templates (summary rows).
+- `shortcut_get_entity_template` — Fetch one story template by ID (full object).
+
+#### document (5 tools)
+
+- `shortcut_list_documents` — List all documents (summary rows).
+- `shortcut_get_document` — Fetch one document by ID (full object).
+- `shortcut_list_document_epics` — List the epics linked to a document.
+- `shortcut_load_document_tiptap` — Load a document's content as Tiptap JSON.
+- `shortcut_search_documents` — Search documents by title (shaped summary rows).
+
+#### health (4 tools)
+
+- `shortcut_get_epic_health` — Fetch an epic's current health.
+- `shortcut_list_epic_health_history` — List an epic's health history (most recent first).
+- `shortcut_get_objective_health` — Fetch an objective's current health.
+- `shortcut_list_objective_health_history` — List an objective's health history.
+
 #### search (6 tools)
 
 - `shortcut_search_stories` — Search stories with Shortcut query syntax (e.g. `state:done owner:me`).
@@ -211,7 +244,7 @@ tools return the full API object.
 - `shortcut_search` — Global multi-entity search; returns `{stories: {items, truncated}, epics: {items, truncated}}`.
 - `shortcut_query_stories` — Search stories by structured filter (POST query; read-only despite POST).
 
-### Write tools (39)
+### Write tools (51)
 
 Require `SHORTCUT_MODE=readwrite`. Hidden entirely in readonly mode.
 
@@ -307,11 +340,42 @@ Two behaviors to be aware of:
 
 - `shortcut_update_key_result` — Update an objective key-result's name or observed/initial/target value.
 
-### Destructive tools (13)
+#### custom_field (1 tool)
+
+- `shortcut_update_custom_field` — Update a custom field's name, description, enabled state, or icon set.
+
+#### category (2 tools)
+
+- `shortcut_create_category` — Create a new category.
+- `shortcut_update_category` — Update a category's name, color, or archived state.
+
+#### entity_template (2 tools)
+
+- `shortcut_create_entity_template` — Create a story template (pass `story_contents` as the template body).
+- `shortcut_update_entity_template` — Update a story template's name or `story_contents`.
+
+#### document (4 tools)
+
+- `shortcut_create_document` — Create a document.
+- `shortcut_update_document` — Update a document's title, content, or content_format.
+- `shortcut_link_document_to_epic` — Link a document to an epic (reversible association).
+- `shortcut_unlink_document_from_epic` — Remove a document↔epic link (reversible; neither is deleted).
+
+#### health (3 tools)
+
+- `shortcut_create_epic_health` — Set an epic's health status, with optional text.
+- `shortcut_create_objective_health` — Set an objective's health status, with optional text.
+- `shortcut_update_health` — Update an existing health entry's status and/or text by ID.
+
+### Destructive tools (21)
 
 Require **both** `SHORTCUT_MODE=readwrite` and `SHORTCUT_ALLOW_DESTRUCTIVE=true`.
-Hidden unless both are set. Every delete is **irreversible** and returns a
-structured confirmation (`{"id": <id>, "deleted": true}`).
+Hidden unless both are set. The delete tools are **irreversible** and return a
+structured confirmation (`{"id": <id>, "deleted": true}`). The workspace feature
+toggles below are also gated here for their workspace-wide blast radius, even
+though they are not deletes.
+
+#### Deletes (17)
 
 - `shortcut_delete_story` — Delete a story.
 - `shortcut_bulk_delete_stories` — Delete multiple stories in one request.
@@ -327,9 +391,22 @@ structured confirmation (`{"id": <id>, "deleted": true}`).
   project still has stories — move or delete them first).
 - `shortcut_delete_file` — Delete an uploaded file.
 - `shortcut_delete_linked_file` — Delete a linked file.
+- `shortcut_delete_custom_field` — Delete a custom field.
+- `shortcut_delete_category` — Delete a category.
+- `shortcut_delete_entity_template` — Delete a story template.
+- `shortcut_delete_document` — Delete a document.
 
 There is **no `delete_group`** — the Shortcut API exposes no `DELETE /groups/{id}`
 endpoint.
+
+#### Workspace feature toggles (4)
+
+These flip a feature on or off for the **entire workspace** — every member is
+affected. They carry the widest blast radius of any tool here and are gated at
+the destructive tier for that reason. They return `{"feature": <name>, "enabled": <bool>}`.
+
+- `shortcut_enable_iterations` / `shortcut_disable_iterations` — Toggle the Iterations feature workspace-wide.
+- `shortcut_enable_story_templates` / `shortcut_disable_story_templates` — Toggle Story Templates workspace-wide.
 
 ## Testing destructive tools against a live workspace
 
