@@ -41,6 +41,12 @@ ALL_MODULES: frozenset[str] = frozenset(
         "repository",
         "external_link",
         "key_result",
+        "custom_field",
+        "category",
+        "entity_template",
+        "document",
+        "health",
+        "feature_toggle",
         "search",
     }
 )

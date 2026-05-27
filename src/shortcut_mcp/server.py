@@ -82,12 +82,18 @@ def _build_lifespan(
 def _register_all_tools(server: FastMCP) -> None:
     """Register every read module. Imported lazily to avoid circular deps."""
     from shortcut_mcp.tools import (
+        category,
+        custom_field,
+        document,
+        entity_template,
         epic,
         epic_comment,
         epic_workflow,
         external_link,
+        feature_toggle,
         file,
         group,
+        health,
         iteration,
         key_result,
         label,
@@ -124,6 +130,12 @@ def _register_all_tools(server: FastMCP) -> None:
         repository,
         external_link,
         key_result,
+        custom_field,
+        category,
+        entity_template,
+        document,
+        health,
+        feature_toggle,
         search,
     ):
         module.register(server)

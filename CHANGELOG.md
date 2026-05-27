@@ -14,6 +14,14 @@ This project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   allowlist): `list_repositories` / `get_repository`, `list_external_link_stories`,
   `get_key_result`, and `update_key_result` (write-tier). Brings totals to 47 read +
   39 write + 13 destructive tools across 20 modules.
+- **v0.5 niche CRUD modules — 18 read + 12 write + 8 destructive tools** across 6
+  new modules: `custom_field` (R/U/D), `category` (CRUD + objective/milestone
+  association lists), `entity_template` (CRUD), `document` (CRUD + epic link/unlink
+  + tiptap-load + title search), `health` (epic/objective health get/history/set +
+  `update_health`), and `feature_toggle` (workspace-wide iteration / story-template
+  enable+disable, gated at the destructive tier for blast radius). Also adds
+  `list_story_sub_tasks` to the `story` module. Brings totals to 65 read + 51 write +
+  21 destructive tools across 26 modules.
 
 ### Changed
 

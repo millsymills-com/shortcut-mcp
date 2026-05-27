@@ -192,6 +192,25 @@ async def test_all_profile_exposes_full_read_surface(monkeypatch: pytest.MonkeyP
         "shortcut_search_iterations",
         "shortcut_search_objectives",
         "shortcut_search_stories",
+        # v0.5 niche read surface
+        "shortcut_list_story_sub_tasks",
+        "shortcut_list_custom_fields",
+        "shortcut_get_custom_field",
+        "shortcut_list_categories",
+        "shortcut_get_category",
+        "shortcut_list_category_milestones",
+        "shortcut_list_category_objectives",
+        "shortcut_list_entity_templates",
+        "shortcut_get_entity_template",
+        "shortcut_list_documents",
+        "shortcut_get_document",
+        "shortcut_list_document_epics",
+        "shortcut_load_document_tiptap",
+        "shortcut_search_documents",
+        "shortcut_get_epic_health",
+        "shortcut_list_epic_health_history",
+        "shortcut_get_objective_health",
+        "shortcut_list_objective_health_history",
     }
     server = create_server()
     async with Client(server) as client:
@@ -251,7 +270,7 @@ async def test_core_profile_is_smaller_than_all(monkeypatch: pytest.MonkeyPatch)
 @pytest.mark.asyncio
 @respx.mock
 async def test_readonly_hides_all_writes(monkeypatch: pytest.MonkeyPatch) -> None:
-    """Default readonly mode + profile=all must expose exactly 47 read tools and no writes."""
+    """Default readonly mode + profile=all must expose exactly 65 read tools and no writes."""
     from fastmcp import Client
 
     monkeypatch.setenv("SHORTCUT_API_TOKEN", "x")
@@ -274,13 +293,13 @@ async def test_readonly_hides_all_writes(monkeypatch: pytest.MonkeyPatch) -> Non
     assert not representative_writes & names, (
         f"Write tools unexpectedly visible in readonly mode: {representative_writes & names}"
     )
-    assert len(names) == 47, f"Expected 47 read tools, got {len(names)}: {sorted(names)}"
+    assert len(names) == 65, f"Expected 65 read tools, got {len(names)}: {sorted(names)}"
 
 
 @pytest.mark.asyncio
 @respx.mock
 async def test_readwrite_exposes_write_surface(monkeypatch: pytest.MonkeyPatch) -> None:
-    """SHORTCUT_MODE=readwrite + profile=all must expose all 86 tools (47 read + 39 write)."""
+    """SHORTCUT_MODE=readwrite + profile=all must expose all 116 tools (65 read + 51 write)."""
     from fastmcp import Client
 
     monkeypatch.setenv("SHORTCUT_API_TOKEN", "x")
@@ -333,9 +352,22 @@ async def test_readwrite_exposes_write_surface(monkeypatch: pytest.MonkeyPatch) 
         "shortcut_update_story_link",
         "shortcut_update_story_task",
         "shortcut_upload_file",
+        # v0.5 niche write surface
+        "shortcut_update_custom_field",
+        "shortcut_create_category",
+        "shortcut_update_category",
+        "shortcut_create_entity_template",
+        "shortcut_update_entity_template",
+        "shortcut_create_document",
+        "shortcut_update_document",
+        "shortcut_link_document_to_epic",
+        "shortcut_unlink_document_from_epic",
+        "shortcut_create_epic_health",
+        "shortcut_create_objective_health",
+        "shortcut_update_health",
     }
     assert expected_writes <= names, f"Missing write tools: {expected_writes - names}"
-    assert len(names) == 86, f"Expected 86 tools (47 read + 39 write), got {len(names)}: {sorted(names)}"
+    assert len(names) == 116, f"Expected 116 tools (65 read + 51 write), got {len(names)}: {sorted(names)}"
 
 
 @pytest.mark.asyncio
@@ -356,13 +388,15 @@ async def test_deletes_hidden_without_destructive_flag(monkeypatch: pytest.Monke
 
     delete_tools = {n for n in names if "delete" in n}
     assert not delete_tools, f"Unexpected delete tools visible without ALLOW_DESTRUCTIVE: {delete_tools}"
-    assert len(names) == 86, f"Expected 86 tools (47 read + 39 write, no destructive), got {len(names)}"
+    # Workspace toggles are destructive-tier too — they must stay hidden here.
+    assert "shortcut_disable_iterations" not in names
+    assert len(names) == 116, f"Expected 116 tools (65 read + 51 write, no destructive), got {len(names)}"
 
 
 @pytest.mark.asyncio
 @respx.mock
 async def test_destructive_exposes_delete_surface(monkeypatch: pytest.MonkeyPatch) -> None:
-    """readwrite + ALLOW_DESTRUCTIVE=true + profile=all exposes all 13 deletes (99 total)."""
+    """readwrite + ALLOW_DESTRUCTIVE=true + profile=all exposes all 17 deletes + 4 toggles (137 total)."""
     from fastmcp import Client
 
     monkeypatch.setenv("SHORTCUT_API_TOKEN", "x")
@@ -390,8 +424,21 @@ async def test_destructive_exposes_delete_surface(monkeypatch: pytest.MonkeyPatc
         "shortcut_delete_project",
         "shortcut_delete_file",
         "shortcut_delete_linked_file",
+        # v0.5 niche deletes
+        "shortcut_delete_custom_field",
+        "shortcut_delete_category",
+        "shortcut_delete_entity_template",
+        "shortcut_delete_document",
+    }
+    # Workspace toggles are destructive but not deletes; verified separately.
+    expected_toggles = {
+        "shortcut_enable_iterations",
+        "shortcut_disable_iterations",
+        "shortcut_enable_story_templates",
+        "shortcut_disable_story_templates",
     }
     assert expected_deletes <= names, f"Missing delete tools: {expected_deletes - names}"
+    assert expected_toggles <= names, f"Missing toggle tools: {expected_toggles - names}"
     assert "shortcut_delete_group" not in names, "groups have no DELETE endpoint"
     assert {n for n in names if "delete" in n} == expected_deletes
-    assert len(names) == 99, f"Expected 99 tools (47 read + 39 write + 13 destructive), got {len(names)}"
+    assert len(names) == 137, f"Expected 137 tools (65 read + 51 write + 21 destructive), got {len(names)}"

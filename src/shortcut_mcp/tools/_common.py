@@ -192,3 +192,33 @@ def shape_comment_summary(raw: dict[str, Any]) -> dict[str, Any]:
 def shape_repository_summary(raw: dict[str, Any]) -> dict[str, Any]:
     """Pick key fields from a VCS repository for list display."""
     return _pick(raw, ("id", "name", "full_name", "type", "url"))
+
+
+def shape_custom_field_summary(raw: dict[str, Any]) -> dict[str, Any]:
+    """Pick key fields from a custom field for list display."""
+    return _pick(raw, ("id", "name", "field_type", "entity_type", "enabled", "position"))
+
+
+def shape_category_summary(raw: dict[str, Any]) -> dict[str, Any]:
+    """Pick key fields from a category for list display."""
+    return _pick(raw, ("id", "name", "color", "type", "archived"))
+
+
+def shape_milestone_summary(raw: dict[str, Any]) -> dict[str, Any]:
+    """Pick key fields from a milestone/objective for list display."""
+    return _pick(raw, ("id", "name", "state", "archived", "app_url"))
+
+
+def shape_entity_template_summary(raw: dict[str, Any]) -> dict[str, Any]:
+    """Pick key fields from an entity (story) template for list display."""
+    return _pick(raw, ("id", "name", "author_id", "entity_type", "last_used_at"))
+
+
+def shape_document_summary(raw: dict[str, Any]) -> dict[str, Any]:
+    """Pick key fields from a document for list display."""
+    return _pick(raw, ("id", "title", "app_url", "archived"))
+
+
+def shape_health_summary(raw: dict[str, Any]) -> dict[str, Any]:
+    """Pick key fields from an epic/objective health entry for list display."""
+    return _pick(raw, ("id", "status", "text", "author_id", "updated_at"))

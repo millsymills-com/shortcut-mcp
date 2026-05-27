@@ -16,6 +16,7 @@ from shortcut_mcp.tools._common import (
     require_destructive,
     require_update_fields,
     require_writes,
+    shape_story_summary,
     shaped_list,
     write_tags,
 )
@@ -44,6 +45,19 @@ def register(server: FastMCP) -> None:
     async def shortcut_list_story_history(ctx: Context, story_id: int, limit: LimitParam = 50) -> dict[str, Any]:
         rows = await get_client(ctx).get(f"/stories/{_seg(str(story_id))}/history")
         return shaped_list(rows, lambda r: r, limit=limit)
+
+    @server.tool(
+        name="shortcut_list_story_sub_tasks",
+        description=(
+            "List a story's sub-tasks — the child stories under it (summary rows). "
+            "Distinct from checklist tasks (see shortcut_get_story_task)."
+        ),
+        tags=read_tags(_MODULE),
+        annotations={"readOnlyHint": True, "openWorldHint": True},
+    )
+    async def shortcut_list_story_sub_tasks(ctx: Context, story_id: int, limit: LimitParam = 50) -> dict[str, Any]:
+        rows = await get_client(ctx).get(f"/stories/{_seg(str(story_id))}/sub-tasks")
+        return shaped_list(rows, shape_story_summary, limit=limit)
 
     @server.tool(
         name="shortcut_create_story",
