@@ -38,6 +38,9 @@ ALL_MODULES: frozenset[str] = frozenset(
         "project",
         "file",
         "linked_file",
+        "repository",
+        "external_link",
+        "key_result",
         "search",
     }
 )

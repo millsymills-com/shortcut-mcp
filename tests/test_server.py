@@ -175,10 +175,14 @@ async def test_all_profile_exposes_full_read_surface(monkeypatch: pytest.MonkeyP
         "shortcut_list_labels",
         "shortcut_list_linked_files",
         "shortcut_list_members",
+        "shortcut_get_key_result",
+        "shortcut_get_repository",
+        "shortcut_list_external_link_stories",
         "shortcut_list_objective_epics",
         "shortcut_list_objectives",
         "shortcut_list_project_stories",
         "shortcut_list_projects",
+        "shortcut_list_repositories",
         "shortcut_list_story_comments",
         "shortcut_list_story_history",
         "shortcut_list_workflows",
@@ -247,7 +251,7 @@ async def test_core_profile_is_smaller_than_all(monkeypatch: pytest.MonkeyPatch)
 @pytest.mark.asyncio
 @respx.mock
 async def test_readonly_hides_all_writes(monkeypatch: pytest.MonkeyPatch) -> None:
-    """Default readonly mode + profile=all must expose exactly 43 read tools and no writes."""
+    """Default readonly mode + profile=all must expose exactly 47 read tools and no writes."""
     from fastmcp import Client
 
     monkeypatch.setenv("SHORTCUT_API_TOKEN", "x")
@@ -270,13 +274,13 @@ async def test_readonly_hides_all_writes(monkeypatch: pytest.MonkeyPatch) -> Non
     assert not representative_writes & names, (
         f"Write tools unexpectedly visible in readonly mode: {representative_writes & names}"
     )
-    assert len(names) == 43, f"Expected 43 read tools, got {len(names)}: {sorted(names)}"
+    assert len(names) == 47, f"Expected 47 read tools, got {len(names)}: {sorted(names)}"
 
 
 @pytest.mark.asyncio
 @respx.mock
 async def test_readwrite_exposes_write_surface(monkeypatch: pytest.MonkeyPatch) -> None:
-    """SHORTCUT_MODE=readwrite + profile=all must expose all 81 tools (43 read + 38 write)."""
+    """SHORTCUT_MODE=readwrite + profile=all must expose all 86 tools (47 read + 39 write)."""
     from fastmcp import Client
 
     monkeypatch.setenv("SHORTCUT_API_TOKEN", "x")
@@ -319,6 +323,7 @@ async def test_readwrite_exposes_write_surface(monkeypatch: pytest.MonkeyPatch) 
         "shortcut_update_file",
         "shortcut_update_group",
         "shortcut_update_iteration",
+        "shortcut_update_key_result",
         "shortcut_update_label",
         "shortcut_update_linked_file",
         "shortcut_update_objective",
@@ -330,7 +335,7 @@ async def test_readwrite_exposes_write_surface(monkeypatch: pytest.MonkeyPatch) 
         "shortcut_upload_file",
     }
     assert expected_writes <= names, f"Missing write tools: {expected_writes - names}"
-    assert len(names) == 81, f"Expected 81 tools (43 read + 38 write), got {len(names)}: {sorted(names)}"
+    assert len(names) == 86, f"Expected 86 tools (47 read + 39 write), got {len(names)}: {sorted(names)}"
 
 
 @pytest.mark.asyncio
@@ -351,13 +356,13 @@ async def test_deletes_hidden_without_destructive_flag(monkeypatch: pytest.Monke
 
     delete_tools = {n for n in names if "delete" in n}
     assert not delete_tools, f"Unexpected delete tools visible without ALLOW_DESTRUCTIVE: {delete_tools}"
-    assert len(names) == 81, f"Expected 81 tools (43 read + 38 write, no destructive), got {len(names)}"
+    assert len(names) == 86, f"Expected 86 tools (47 read + 39 write, no destructive), got {len(names)}"
 
 
 @pytest.mark.asyncio
 @respx.mock
 async def test_destructive_exposes_delete_surface(monkeypatch: pytest.MonkeyPatch) -> None:
-    """readwrite + ALLOW_DESTRUCTIVE=true + profile=all exposes all 13 deletes (94 total)."""
+    """readwrite + ALLOW_DESTRUCTIVE=true + profile=all exposes all 13 deletes (99 total)."""
     from fastmcp import Client
 
     monkeypatch.setenv("SHORTCUT_API_TOKEN", "x")
@@ -389,4 +394,4 @@ async def test_destructive_exposes_delete_surface(monkeypatch: pytest.MonkeyPatc
     assert expected_deletes <= names, f"Missing delete tools: {expected_deletes - names}"
     assert "shortcut_delete_group" not in names, "groups have no DELETE endpoint"
     assert {n for n in names if "delete" in n} == expected_deletes
-    assert len(names) == 94, f"Expected 94 tools (43 read + 38 write + 13 destructive), got {len(names)}"
+    assert len(names) == 99, f"Expected 99 tools (47 read + 39 write + 13 destructive), got {len(names)}"
