@@ -177,6 +177,7 @@ async def test_update_entity_template_no_fields_fails_fast(monkeypatch: pytest.M
             "shortcut_update_entity_template", {"entity_template_id": ET}, raise_on_error=False
         )
     assert result.is_error
+    assert "at least one field" in result.content[0].text
     assert not put_route.called
 
 

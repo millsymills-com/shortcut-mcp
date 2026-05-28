@@ -102,6 +102,7 @@ async def test_update_key_result_no_fields_fails_fast(monkeypatch: pytest.Monkey
     async with Client(server) as client:
         result = await client.call_tool("shortcut_update_key_result", {"key_result_id": KR}, raise_on_error=False)
     assert result.is_error
+    assert "at least one field" in result.content[0].text
     assert not put_route.called
 
 

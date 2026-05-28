@@ -42,6 +42,7 @@ async def test_list_external_link_stories_rejects_non_url(monkeypatch: pytest.Mo
             "shortcut_list_external_link_stories", {"external_link": "not-a-url"}, raise_on_error=False
         )
     assert result.is_error
+    assert "https?://" in result.content[0].text
     assert not route.called
 
 
