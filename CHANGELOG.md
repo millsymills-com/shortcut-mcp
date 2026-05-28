@@ -7,6 +7,8 @@ This project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-05-28
+
 ### Added
 
 - **v0.5 niche read modules — 4 read tools + 1 write tool** across 3 new resource
@@ -113,7 +115,8 @@ This project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - `SHORTCUT_MODE` and `SHORTCUT_ALLOW_DESTRUCTIVE` safety gates.
 - `SHORTCUT_API_TOKEN` authentication via env / `.env` file.
 
-[Unreleased]: https://github.com/millsymills-com/shortcut-mcp/compare/v0.4.0...HEAD
+[Unreleased]: https://github.com/millsymills-com/shortcut-mcp/compare/v0.5.0...HEAD
+[0.5.0]: https://github.com/millsymills-com/shortcut-mcp/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/millsymills-com/shortcut-mcp/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/millsymills-com/shortcut-mcp/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/millsymills-com/shortcut-mcp/compare/v0.1.0...v0.2.0
