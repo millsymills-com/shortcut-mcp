@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import importlib.util
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -38,12 +39,12 @@ def test_readme_tool_catalog_is_in_sync() -> None:
 
 
 def test_splice_raises_for_missing_begin_marker() -> None:
-    with pytest.raises(ValueError, match=_gtc.BEGIN):
+    with pytest.raises(ValueError, match=re.escape(_gtc.BEGIN)):
         _gtc._splice(f"no markers here\n{_gtc.END}\n", "block")
 
 
 def test_splice_raises_for_missing_end_marker() -> None:
-    with pytest.raises(ValueError, match=_gtc.END):
+    with pytest.raises(ValueError, match=re.escape(_gtc.END)):
         _gtc._splice(f"{_gtc.BEGIN}\nopen but never closed\n", "block")
 
 
@@ -74,3 +75,13 @@ def test_rows_fails_fast_on_empty_description(desc: str | None) -> None:
 def test_rows_maps_tier_module_and_strips_description() -> None:
     tools = [SimpleNamespace(name="shortcut_do", tags={"write", "mod:widget"}, description="  Do it.  ")]
     assert _gtc._rows(tools) == [("write", "widget", "shortcut_do", "Do it.")]
+
+
+def test_rows_maps_destructive_tier() -> None:
+    tools = [SimpleNamespace(name="shortcut_nuke", tags={"destructive", "mod:widget"}, description="Nuke it.")]
+    assert _gtc._rows(tools) == [("destructive", "widget", "shortcut_nuke", "Nuke it.")]
+
+
+def test_rows_falls_back_to_other_module_without_mod_tag() -> None:
+    tools = [SimpleNamespace(name="shortcut_misc", tags={"read"}, description="Misc.")]
+    assert _gtc._rows(tools) == [("read", "other", "shortcut_misc", "Misc.")]
