@@ -51,6 +51,7 @@ async def test_list_epics_raises_on_empty_body(monkeypatch):
     async with Client(server) as client:
         result = await client.call_tool("shortcut_list_epics", {}, raise_on_error=False)
     assert result.is_error
+    assert "expected a list" in result.content[0].text.lower()
 
 
 @pytest.mark.asyncio

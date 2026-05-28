@@ -167,6 +167,7 @@ async def test_tiptap_load_rejects_non_object(monkeypatch: pytest.MonkeyPatch) -
     async with Client(server) as client:
         result = await client.call_tool("shortcut_load_document_tiptap", {"doc_id": DOC}, raise_on_error=False)
     assert result.is_error
+    assert "tiptap json object" in result.content[0].text.lower()
 
 
 @pytest.mark.asyncio

@@ -344,6 +344,9 @@ async def test_create_story_denied_in_readonly(monkeypatch: pytest.MonkeyPatch) 
     # SHORTCUT_MODE defaults to readonly — no setenv needed
     _mock_member()
     server = create_server()
+    # Re-enable the tag the visibility gate stripped, so the call reaches the
+    # in-body require_writes() guard instead of failing at "unknown tool".
+    server.enable(tags={"write"})
     async with Client(server) as client:
         result = await client.call_tool(
             "shortcut_create_story",
@@ -351,6 +354,7 @@ async def test_create_story_denied_in_readonly(monkeypatch: pytest.MonkeyPatch) 
             raise_on_error=False,
         )
     assert result.is_error
+    assert "mode_denied" in result.content[0].text
 
 
 @pytest.mark.asyncio
@@ -409,4 +413,5 @@ async def test_update_story_with_no_fields_fails_fast(monkeypatch: pytest.Monkey
     async with Client(server) as client:
         result = await client.call_tool("shortcut_update_story", {"story_id": 5}, raise_on_error=False)
     assert result.is_error
+    assert "at least one field" in result.content[0].text
     assert not put_route.called  # guard raises before any HTTP call

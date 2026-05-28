@@ -87,6 +87,7 @@ async def test_create_health_rejects_invalid_status(monkeypatch: pytest.MonkeyPa
             "shortcut_create_epic_health", {"epic_id": 1, "status": "Great"}, raise_on_error=False
         )
     assert result.is_error
+    assert "At Risk" in result.content[0].text
     assert not post_route.called
 
 
@@ -102,6 +103,7 @@ async def test_update_health_no_fields_fails_fast(monkeypatch: pytest.MonkeyPatc
     async with Client(server) as client:
         result = await client.call_tool("shortcut_update_health", {"health_id": HEALTH}, raise_on_error=False)
     assert result.is_error
+    assert "at least one field" in result.content[0].text
     assert not put_route.called
 
 

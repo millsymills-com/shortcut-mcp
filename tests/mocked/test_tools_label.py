@@ -150,6 +150,7 @@ async def test_delete_label_surfaces_client_error(monkeypatch: pytest.MonkeyPatc
     async with Client(server) as client:
         result = await client.call_tool("shortcut_delete_label", {"label_id": 15}, raise_on_error=False)
     assert result.is_error
+    assert "404" in result.content[0].text
 
 
 @pytest.mark.asyncio
@@ -163,4 +164,5 @@ async def test_update_label_with_no_fields_fails_fast(monkeypatch: pytest.Monkey
     async with Client(server) as client:
         result = await client.call_tool("shortcut_update_label", {"label_id": 1}, raise_on_error=False)
     assert result.is_error
+    assert "at least one field" in result.content[0].text
     assert not put_route.called

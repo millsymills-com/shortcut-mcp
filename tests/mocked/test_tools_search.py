@@ -104,6 +104,7 @@ async def test_query_stories_raises_on_empty_body(monkeypatch):
     async with Client(server) as client:
         result = await client.call_tool("shortcut_query_stories", {}, raise_on_error=False)
     assert result.is_error
+    assert "empty body" in result.content[0].text.lower()
 
 
 @pytest.mark.asyncio
@@ -150,6 +151,7 @@ async def test_search_stories_rejects_limit_below_one(monkeypatch):
     async with Client(server) as client:
         result = await client.call_tool("shortcut_search_stories", {"query": "x", "limit": 0}, raise_on_error=False)
     assert result.is_error
+    assert "greater than or equal to 1" in result.content[0].text
     assert not route.called  # validation rejects before any HTTP call
 
 
@@ -163,6 +165,7 @@ async def test_search_stories_rejects_negative_limit(monkeypatch):
     async with Client(server) as client:
         result = await client.call_tool("shortcut_search_stories", {"query": "x", "limit": -5}, raise_on_error=False)
     assert result.is_error
+    assert "greater than or equal to 1" in result.content[0].text
     assert not route.called
 
 

@@ -128,3 +128,4 @@ async def test_delete_project_surfaces_422_when_not_empty(monkeypatch: pytest.Mo
     async with Client(server) as client:
         result = await client.call_tool("shortcut_delete_project", {"project_id": 21}, raise_on_error=False)
     assert result.is_error
+    assert "422" in result.content[0].text

@@ -165,6 +165,7 @@ async def test_update_category_no_fields_fails_fast(monkeypatch: pytest.MonkeyPa
     async with Client(server) as client:
         result = await client.call_tool("shortcut_update_category", {"category_id": 9}, raise_on_error=False)
     assert result.is_error
+    assert "at least one field" in result.content[0].text
     assert not put_route.called
 
 
@@ -174,9 +175,9 @@ async def test_get_category_propagates_404(monkeypatch: pytest.MonkeyPatch) -> N
     monkeypatch.setenv("SHORTCUT_API_TOKEN", "x")
     monkeypatch.setenv("SHORTCUT_PROFILE", "all")
     respx.get(f"{BASE}/member").mock(return_value=httpx.Response(200, json={"id": "u"}))
-    respx.get(f"{BASE}/categories/404").mock(return_value=httpx.Response(404, json={"message": "Not Found"}))
+    respx.get(f"{BASE}/categories/7").mock(return_value=httpx.Response(404, json={"message": "Not Found"}))
     server = create_server()
     async with Client(server) as client:
-        result = await client.call_tool("shortcut_get_category", {"category_id": 404}, raise_on_error=False)
+        result = await client.call_tool("shortcut_get_category", {"category_id": 7}, raise_on_error=False)
     assert result.is_error
-    assert "404" in result.content[0].text
+    assert "404" in result.content[0].text  # the status code, not the echoed id
