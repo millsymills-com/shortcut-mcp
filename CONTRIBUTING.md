@@ -51,3 +51,9 @@ add mocked tests for both the success path and the gating guard.
 - Branch off `main`; `main` is protected and accepts changes only via PR.
 - Keep one logical change per PR. Use a clear, imperative title.
 - Make sure all checks above pass locally.
+
+## Releasing
+
+Cutting a tagged release is documented in [RELEASING.md](RELEASING.md): bump the
+single-sourced version, update the changelog, then tag and publish a signed
+GitHub Release.
