@@ -16,8 +16,12 @@ import argparse
 import asyncio
 import sys
 from pathlib import Path
+from typing import TYPE_CHECKING, Any
 
 from pydantic import SecretStr
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable
 
 from shortcut_mcp.config import ShortcutConfig, ShortcutMode, ToolProfile
 from shortcut_mcp.server import create_server
@@ -47,6 +51,16 @@ def _module(tags: set[str]) -> str:
     return "other"
 
 
+def _rows(tools: Iterable[Any]) -> list[_Row]:
+    rows: list[_Row] = []
+    for t in tools:
+        desc = (t.description or "").strip()
+        if not desc:
+            raise ValueError(f"tool {t.name!r} has an empty description; every catalog tool must describe itself")
+        rows.append((_tier(set(t.tags)), _module(set(t.tags)), t.name, desc))
+    return rows
+
+
 async def _collect() -> list[_Row]:
     # A non-empty token registers the tools without authenticating; every gate is
     # opened so all three tiers are visible. list_tools() never touches the network.
@@ -56,8 +70,7 @@ async def _collect() -> list[_Row]:
         shortcut_allow_destructive=True,
         shortcut_profile=ToolProfile.ALL,
     )
-    tools = await create_server(config).list_tools()
-    return [(_tier(set(t.tags)), _module(set(t.tags)), t.name, (t.description or "").strip()) for t in tools]
+    return _rows(await create_server(config).list_tools())
 
 
 def _render(rows: list[_Row]) -> str:
