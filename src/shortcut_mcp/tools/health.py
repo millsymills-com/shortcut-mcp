@@ -60,6 +60,8 @@ def register(server: FastMCP) -> None:
         require_writes(ctx)
         body: dict[str, Any] = {"status": status}
         if text is not None:
+            if not text.strip():
+                raise ToolError("text must be non-empty when provided (omit it to leave the note empty)")
             body["text"] = text
         return await get_client(ctx).post(f"/epics/{_seg(str(epic_id))}/health", json=body)
 
@@ -96,6 +98,8 @@ def register(server: FastMCP) -> None:
         require_writes(ctx)
         body: dict[str, Any] = {"status": status}
         if text is not None:
+            if not text.strip():
+                raise ToolError("text must be non-empty when provided (omit it to leave the note empty)")
             body["text"] = text
         return await get_client(ctx).post(f"/objectives/{_seg(str(objective_id))}/health", json=body)
 
