@@ -120,7 +120,7 @@ def register(server: FastMCP) -> None:
         if status is not None:
             body["status"] = status
         if text is not None:
-            _reject_empty_text(text, empty_hint="leave the note unchanged")
+            _reject_empty_text(text, empty_hint="omit it to leave the note unchanged")
             body["text"] = text
         require_update_fields(body)
         result = await get_client(ctx).put(f"/health/{_seg(health_id)}", json=body)
