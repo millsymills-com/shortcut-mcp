@@ -147,4 +147,5 @@ async def test_delete_custom_field_runtime_guard_blocks_without_destructive(monk
     async with Client(server) as client:
         result = await client.call_tool("shortcut_delete_custom_field", {"custom_field_id": CF}, raise_on_error=False)
     assert result.is_error
+    assert "mode_denied" in result.content[0].text
     assert not route.called

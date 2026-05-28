@@ -63,6 +63,7 @@ async def test_get_story_propagates_404(monkeypatch: pytest.MonkeyPatch) -> None
     async with Client(server) as client:
         result = await client.call_tool("shortcut_get_story", {"story_id": 9999}, raise_on_error=False)
     assert result.is_error
+    assert "404" in result.content[0].text
 
 
 @pytest.mark.asyncio
