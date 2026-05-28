@@ -167,6 +167,7 @@ async def test_update_health_rejects_empty_text(monkeypatch: pytest.MonkeyPatch,
             "shortcut_update_health", {"health_id": HEALTH, "text": text}, raise_on_error=False
         )
     assert result.is_error
+    assert "omit it to leave the note unchanged" in result.content[0].text
     assert not put_route.called
 
 
@@ -185,7 +186,7 @@ async def test_create_epic_health_rejects_empty_text(monkeypatch: pytest.MonkeyP
             "shortcut_create_epic_health", {"epic_id": 1, "status": "On Track", "text": text}, raise_on_error=False
         )
     assert result.is_error
-    assert "non-empty" in result.content[0].text
+    assert "omit it to leave the note empty" in result.content[0].text
     assert not post_route.called
 
 
@@ -206,5 +207,5 @@ async def test_create_objective_health_rejects_empty_text(monkeypatch: pytest.Mo
             raise_on_error=False,
         )
     assert result.is_error
-    assert "non-empty" in result.content[0].text
+    assert "omit it to leave the note empty" in result.content[0].text
     assert not post_route.called

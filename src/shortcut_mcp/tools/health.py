@@ -28,6 +28,11 @@ HealthStatus = Literal["At Risk", "On Track", "Off Track", "No Health"]
 """The four health states the API accepts."""
 
 
+def _reject_empty_text(text: str, *, empty_hint: str) -> None:
+    if not text.strip():
+        raise ToolError(f"text must be non-empty when provided ({empty_hint})")
+
+
 def register(server: FastMCP) -> None:
     @server.tool(
         name="shortcut_get_epic_health",
@@ -60,8 +65,7 @@ def register(server: FastMCP) -> None:
         require_writes(ctx)
         body: dict[str, Any] = {"status": status}
         if text is not None:
-            if not text.strip():
-                raise ToolError("text must be non-empty when provided (omit it to leave the note empty)")
+            _reject_empty_text(text, empty_hint="omit it to leave the note empty")
             body["text"] = text
         return await get_client(ctx).post(f"/epics/{_seg(str(epic_id))}/health", json=body)
 
@@ -98,8 +102,7 @@ def register(server: FastMCP) -> None:
         require_writes(ctx)
         body: dict[str, Any] = {"status": status}
         if text is not None:
-            if not text.strip():
-                raise ToolError("text must be non-empty when provided (omit it to leave the note empty)")
+            _reject_empty_text(text, empty_hint="omit it to leave the note empty")
             body["text"] = text
         return await get_client(ctx).post(f"/objectives/{_seg(str(objective_id))}/health", json=body)
 
@@ -117,8 +120,7 @@ def register(server: FastMCP) -> None:
         if status is not None:
             body["status"] = status
         if text is not None:
-            if not text.strip():
-                raise ToolError("text must be non-empty when provided (omit it to leave the note unchanged)")
+            _reject_empty_text(text, empty_hint="omit it to leave the note unchanged")
             body["text"] = text
         require_update_fields(body)
         result = await get_client(ctx).put(f"/health/{_seg(health_id)}", json=body)
