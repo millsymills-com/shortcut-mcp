@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "shortcut-mcp"
-version = "0.4.0"
+version = "0.5.0"
 description = "Python FastMCP server for the Shortcut REST API (read, write, and destructive tiers)."
 readme = "README.md"
 license = "Apache-2.0"
