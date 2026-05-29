@@ -1,0 +1,71 @@
+{
+  "manifest_version": "0.4",
+  "name": "shortcut-mcp",
+  "display_name": "Shortcut MCP",
+  "version": "0.5.0",
+  "description": "FastMCP server for the Shortcut REST API (read, write, and destructive tiers).",
+  "long_description": "Exposes the Shortcut project-management REST API as MCP tools across read, write, and destructive safety tiers. Ships as a UV-runtime bundle: the host installs Python dependencies from the embedded pyproject.toml and uv.lock, then runs the server over stdio.",
+  "author": {
+    "name": "millsmillsymills",
+    "url": "https://github.com/millsymills-com/shortcut-mcp"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/millsymills-com/shortcut-mcp.git"
+  },
+  "homepage": "https://github.com/millsymills-com/shortcut-mcp",
+  "documentation": "https://github.com/millsymills-com/shortcut-mcp#readme",
+  "support": "https://github.com/millsymills-com/shortcut-mcp/issues",
+  "license": "Apache-2.0",
+  "keywords": ["shortcut", "project-management", "mcp", "fastmcp"],
+  "server": {
+    "type": "uv",
+    "entry_point": "src/shortcut_mcp/__main__.py",
+    "mcp_config": {
+      "command": "uv",
+      "args": ["run", "--directory", "${__dirname}", "shortcut-mcp"],
+      "env": {
+        "SHORTCUT_API_TOKEN": "${user_config.shortcut_api_token}",
+        "SHORTCUT_MODE": "${user_config.shortcut_mode}",
+        "SHORTCUT_PROFILE": "${user_config.shortcut_profile}",
+        "SHORTCUT_ALLOW_DESTRUCTIVE": "${user_config.shortcut_allow_destructive}"
+      }
+    }
+  },
+  "user_config": {
+    "shortcut_api_token": {
+      "type": "string",
+      "title": "Shortcut API Token",
+      "description": "Shortcut API token from Settings → API Tokens. Stored securely by the host.",
+      "sensitive": true,
+      "required": true
+    },
+    "shortcut_mode": {
+      "type": "string",
+      "title": "Mode",
+      "description": "readonly (default) or readwrite. readwrite enables create/update tools.",
+      "default": "readonly",
+      "required": false
+    },
+    "shortcut_profile": {
+      "type": "string",
+      "title": "Tool Profile",
+      "description": "Tool set to expose: core (default), planning, files, or all.",
+      "default": "core",
+      "required": false
+    },
+    "shortcut_allow_destructive": {
+      "type": "boolean",
+      "title": "Allow Destructive Tools",
+      "description": "Permit delete tools. Requires readwrite mode. Off by default.",
+      "default": false,
+      "required": false
+    }
+  },
+  "compatibility": {
+    "platforms": ["darwin", "win32", "linux"],
+    "runtimes": {
+      "python": ">=3.13,<4"
+    }
+  }
+}
