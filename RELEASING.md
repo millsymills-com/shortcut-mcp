@@ -69,3 +69,33 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html):
    uv tool install --force git+https://github.com/millsymills-com/shortcut-mcp@vX.Y.Z
    python -c "import shortcut_mcp; print(shortcut_mcp.__version__)"  # → X.Y.Z
    ```
+
+8. **Bundle attaches automatically.** Publishing the release triggers the
+   `mcpb` workflow's `attach` job, which builds `shortcut-mcp.mcpb` and
+   `server.json` and uploads both to the release as assets.
+
+## MCP registry (MCPB)
+
+The server is distributed to the MCP registry as an [MCPB](https://github.com/anthropics/mcpb)
+bundle — a UV-runtime `.mcpb` that embeds the source plus `pyproject.toml` and
+`uv.lock`; the host installs dependencies with uv at runtime. This avoids a PyPI
+package (the registry has no git-install package type).
+
+- `mcpb/manifest.json` is the bundle manifest (version is synced from
+  `pyproject.toml` at build time).
+- `scripts/build_mcpb.py` stages the payload, packs the `.mcpb` via the `mcpb`
+  CLI (validating the manifest), and renders `server.json` with the release
+  download URL and the bundle's SHA-256.
+
+Build locally:
+
+```bash
+uv run python scripts/build_mcpb.py --output dist
+```
+
+Registry submission (operator, **blocked until the repo is public** — see #73):
+
+1. Cut the release (steps above); the `.mcpb` and `server.json` are attached.
+2. Authenticate and publish with the registry's `mcp-publisher` CLI against the
+   attached `server.json` (GitHub namespace `io.github.millsymills-com`).
+3. Link the registry entry from the README.
