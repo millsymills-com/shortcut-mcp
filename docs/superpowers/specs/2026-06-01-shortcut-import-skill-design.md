@@ -48,6 +48,13 @@ Default heuristic, applied to every project:
 **`story_type` heuristic:** new tool/capability → `feature`; tests/CI/docs/
 hygiene/renames → `chore`; defect work → `bug`.
 
+**Deterministic story titles:** so a re-run regenerates identical names (titles
+feed the name fallback and the `external_id` slug), derive each title as the
+source bullet's leading clause, cut at the first of: an em-dash ` — `, a colon
+introducing a list, an opening paren `(`, or a "links"/"Links" marker. Push the
+full bullet text (paths, tool lists, issue links) into the description. Never
+editorialize titles beyond this rule.
+
 **GitHub links:** when the repo has issues, embed markdown links
 (`[#27](https://github.com/<owner>/<repo>/issues/27)`) in the relevant story/epic
 descriptions. Resolve `<owner>/<repo>` from the **git remote** (authoritative),
@@ -107,18 +114,29 @@ embedded GH links. Use the version fallback for projects with no versions.
 
 See `references/sync-algorithm.md`. Summary:
 
-1. `shortcut_list_objectives` → match each planned Objective to an existing one
-   **by name**. Within a matched Objective, `shortcut_list_objective_epics` →
-   match Epics by name. Within a matched Epic, `shortcut_list_epic_stories` →
-   match Stories by name.
-2. For stories, also stamp/read a stable `external_id` of the form
-   `<repo>:<objective-slug>/<epic-slug>/<story-slug>` to survive renames in
-   future runs (best-effort; name match is the primary key).
+1. **Objectives/Epics — match by name.** `shortcut_list_objectives` → match each
+   planned Objective by name; within it, `shortcut_list_objective_epics` → match
+   Epics by name. Their names come verbatim from version/workstream headings and
+   are stable, so name-matching is reliable for these two tiers.
+2. **Stories — match by `external_id` first, name as fallback.** On create, every
+   story is stamped with a **required** deterministic
+   `external_id = "<repo>:<objective-slug>/<epic-slug>/<story-slug>"` (each slug
+   is the kebab-case of that entity's title). On reconcile, match an existing
+   story by `external_id` when present; fall back to name only for legacy stories
+   that predate the stamp. `external_id` is **not optional** — story titles alone
+   are too unstable (they are editorial paraphrases of source bullets) to be a
+   reliable key, and without the stamp a re-run can duplicate stories.
 3. Classify every planned item as **CREATE** (no match), **UPDATE** (matched but
    state/description/links differ), or **UNCHANGED**.
 
-Matching is name-scoped to the parent, so two projects can share a story title
+Matching is scoped to the parent, so two projects can share a story title
 without colliding.
+
+**Ambiguity guard (legacy imports).** If a matched epic contains existing stories
+with null `external_id` *and* some planned titles don't match any existing title,
+a genuine new story is indistinguishable from a rename. Do not auto-create —
+surface these as "ambiguous (possible rename)" in the dry-run and ask. Recommend
+a one-time `external_id` backfill on the legacy stories to make future runs clean.
 
 ### Phase 5 — Dry-run approval gate
 
@@ -128,6 +146,8 @@ Present, and **write nothing** until the user approves:
 - counts: N objectives / M epics / K stories, broken into CREATE / UPDATE /
   UNCHANGED;
 - the per-item diff for anything being created or changed (esp. state changes);
+- any **ambiguous (possible rename)** stories (matched epic, legacy null
+  `external_id`, title doesn't match) — asked about, never silently created;
 - any **flagged** items: work that exists in Shortcut but no longer appears in
   the repo (candidate for archive — reported, never auto-archived).
 
@@ -138,7 +158,8 @@ Present, and **write nothing** until the user approves:
 2. Create/update Epics (`shortcut_create_epic` with `milestone_id` /
    `update_epic` with `epic_state_id`).
 3. Create Stories (`shortcut_bulk_create_stories` with `epic_id` + `group_id` +
-   `workflow_state_id` + description) / `update_story` for changed ones.
+   `workflow_state_id` + description + the required `external_id` stamp) /
+   `update_story` for changed ones.
 4. **Revalidate**: re-read objectives, `list_objective_epics`,
    `list_epic_stories`, and spot-fetch stories that carry GH links; cross-check
    counts, parent mapping, states, and that links persisted.
