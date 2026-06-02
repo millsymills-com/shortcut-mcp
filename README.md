@@ -6,7 +6,13 @@ destructive tools across 26 resource modules** (137 tools total). Write tools
 require `SHORTCUT_MODE=readwrite`; destructive tools (deletes and workspace-wide
 feature toggles) additionally require `SHORTCUT_ALLOW_DESTRUCTIVE=true`.
 
-## Installation
+## Status
+
+Stage: S3 (single-node, deployable). Graded against the canonical MCP standards
+(`consistency-check/docs/standards/`). The S3→S4 gate is MCP-registry submission
+(tracked in [#74](https://github.com/millsymills-com/shortcut-mcp/issues/74)).
+
+## Install
 
 shortcut-mcp is **not published to PyPI** — install it from source:
 
@@ -544,3 +550,20 @@ gone. It skips unless **both** of these are set:
 SHORTCUT_LIVE_WRITE_TESTS=true SHORTCUT_TEST_WORKSPACE_TOKEN=<token> \
     uv run pytest tests/integration/test_live_destructive.py -m live_write -v
 ```
+
+## Development
+
+```bash
+uv sync --extra dev                       # install (dev)
+uv run ruff check src/ tests/             # lint
+uv run ruff format --check src/ tests/    # format check
+uv run ty check src/shortcut_mcp/         # type check
+uv run pytest tests/ -v                   # tests
+```
+
+See [CLAUDE.md](CLAUDE.md) for architecture and conventions, and
+[CONTRIBUTING.md](CONTRIBUTING.md) for the contribution workflow.
+
+## License
+
+Apache License 2.0 — see [LICENSE](LICENSE).
