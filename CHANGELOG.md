@@ -15,6 +15,17 @@ This project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   `external_id` when set, enabling idempotent reconcile-by-`external_id` off a
   single list call (#96).
 
+### Changed
+
+- Logs are now emitted as structured JSON to stderr (`JSONFormatter`).
+
+### Fixed
+
+- README adds `Status`, `Install`, `Development`, and `License` sections;
+  `.gitignore` lists `*.pyc`; `__init__.py` imports future annotations; unit
+  tests moved under `tests/unit/`. Resolves the consistency-audit MUST/SHOULD
+  findings (MCP-006, MCP-007, MCP-012, MCP-022, PY-015).
+
 ## [0.5.0] - 2026-05-28
 
 ### Added

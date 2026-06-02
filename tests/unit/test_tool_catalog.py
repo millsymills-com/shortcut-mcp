@@ -11,7 +11,7 @@ from types import SimpleNamespace
 
 import pytest
 
-_REPO_ROOT = Path(__file__).resolve().parent.parent
+_REPO_ROOT = Path(__file__).resolve().parent.parent.parent
 
 
 def _load_generator():
