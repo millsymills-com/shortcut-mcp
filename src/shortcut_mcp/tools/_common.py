@@ -127,6 +127,7 @@ def shape_story_summary(raw: dict[str, Any]) -> dict[str, Any]:
             "owner_ids",
             "app_url",
             "archived",
+            "external_id",
         ),
     )
 

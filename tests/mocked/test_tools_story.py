@@ -183,6 +183,21 @@ async def test_update_story_returns_id(monkeypatch: pytest.MonkeyPatch) -> None:
 
 @pytest.mark.asyncio
 @respx.mock
+async def test_update_story_sets_external_id(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("SHORTCUT_API_TOKEN", "x")
+    monkeypatch.setenv("SHORTCUT_MODE", "readwrite")
+    _mock_member()
+    route = respx.put(f"{BASE}/stories/5").mock(return_value=httpx.Response(200, json={"id": 5}))
+    server = create_server()
+    async with Client(server) as client:
+        result = await client.call_tool("shortcut_update_story", {"story_id": 5, "external_id": "repo#42"})
+    assert not result.is_error
+    body = json.loads(route.calls.last.request.content)
+    assert body["external_id"] == "repo#42"
+
+
+@pytest.mark.asyncio
+@respx.mock
 async def test_update_story_tolerates_empty_put_response(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setenv("SHORTCUT_API_TOKEN", "x")
     monkeypatch.setenv("SHORTCUT_MODE", "readwrite")

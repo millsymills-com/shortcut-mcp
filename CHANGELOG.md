@@ -7,6 +7,14 @@ This project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- `shortcut_update_story` accepts an `external_id` argument, enabling
+  `external_id` backfill onto existing stories (#97).
+- Story summary rows (`shortcut_list_epic_stories` etc.) now include
+  `external_id` when set, enabling idempotent reconcile-by-`external_id` off a
+  single list call (#96).
+
 ### Changed
 
 - Logs are now emitted as structured JSON to stderr (`JSONFormatter`).

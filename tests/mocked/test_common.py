@@ -93,6 +93,15 @@ def test_shape_story_summary_picks_key_fields():
     }
 
 
+def test_shape_story_summary_includes_external_id_when_present():
+    out = shape_story_summary({"id": 1, "name": "S", "external_id": "repo#42"})
+    assert out["external_id"] == "repo#42"
+
+
+def test_shape_story_summary_omits_external_id_when_absent():
+    assert "external_id" not in shape_story_summary({"id": 1, "name": "S"})
+
+
 def test_shape_member_summary_flattens_profile():
     raw = {"id": "m1", "disabled": False, "profile": {"name": "Ada", "mention_name": "ada", "email_address": "a@b.c"}}
     out = shape_member_summary(raw)
