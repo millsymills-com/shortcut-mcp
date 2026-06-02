@@ -50,8 +50,12 @@ hygiene/renames → `chore`; defect work → `bug`.
 
 **Deterministic story titles:** so a re-run regenerates identical names (titles
 feed the name fallback and the `external_id` slug), derive each title in order:
-(1) strip a leading conventional-commit prefix `^\w+(\([^)]*\))?:\s*` for
-issue/commit sources (`fix(clients): x` → `x`); (2) strip a *trailing*
+(1) strip a leading conventional-commit prefix `^\w+(\([^)]*\))?:\s*` and/or one
+or more leading bracketed severity/category tags `^(\[[A-Z][A-Z ]*\]\s*)+` for
+issue/commit sources (`fix(clients): x` → `x`, `[DOCS] y` → `y`) — stripping the
+bracket tag is **required** for idempotency, since the cleaned title is the
+`external_id` slug and the name-match key, so a run that keeps it and one that
+strips it would not match and would duplicate the story; (2) strip a *trailing*
 audit-metadata paren `\s*\([A-Z]+-\d+(,\s*[A-Z]+-\d+)*\)\.?$` (`… (PY-013).` →
 `…`), never touching identifier parens like `main()`; (3) keep the clause before
 any ` — ` em-dash; (4) drop a trailing "links/Links" clause. Push the full
@@ -82,8 +86,10 @@ in Shortcut".
 
 ### Phase 1 — Preflight
 
-1. Confirm the Shortcut MCP tools are available and `SHORTCUT_MODE=readwrite`
-   (if `readonly`, abort with the env-var guidance).
+1. Confirm the Shortcut MCP tools are available and the server runs in
+   `SHORTCUT_MODE=readwrite`. This is the **shortcut-mcp server's** env (its `.env`
+   / MCP config `env`), not the calling shell — the shell shows it unset even when
+   writes are enabled. If `readonly`, abort with the env-var guidance.
 2. `shortcut_get_current_member` — confirm auth + identity.
 3. `shortcut_list_workflows` — cache workflow state IDs (backlog/unstarted/
    started/done) and note the default workflow.
@@ -152,14 +158,19 @@ Present, and **write nothing** until the user approves:
 - any **ambiguous (possible rename)** stories (matched epic, legacy null
   `external_id`, title doesn't match) — asked about, never silently created;
 - any **flagged** items: work that exists in Shortcut but no longer appears in
-  the repo (candidate for archive — reported, never auto-archived).
+  the repo (candidate for archive — reported, never auto-archived);
+- for a workstream that is a cluster of N similar issues (e.g. a bug-fix round),
+  a **granularity choice** — one story per issue vs a single rolled-up story —
+  rather than deciding it unilaterally.
 
 ### Phase 6 — Execute + validate
 
-1. Create/update Objectives (`shortcut_create_objective` / `update_objective`),
-   set states.
-2. Create/update Epics (`shortcut_create_epic` with `milestone_id` /
-   `update_epic` with `epic_state_id`).
+1. Create/update Objectives — `shortcut_create_objective` accepts `state`
+   (`to do`/`in progress`/`done`) directly on create; `update_objective` for
+   changes.
+2. Create/update Epics — `shortcut_create_epic` takes `milestone_id` but has
+   **no** state field; after creating, set state with `shortcut_update_epic`
+   passing an **integer** `epic_state_id`.
 3. Create Stories (`shortcut_bulk_create_stories` with `epic_id` + `group_id` +
    `workflow_state_id` + description + the required `external_id` stamp) /
    `update_story` for changed ones.
@@ -167,6 +178,10 @@ Present, and **write nothing** until the user approves:
    `list_epic_stories`, and spot-fetch stories that carry GH links; cross-check
    counts, parent mapping, states, and that links persisted.
 5. Report a summary table with `app.shortcut.com` URLs at all three levels.
+
+**Tool-arg gotchas (shortcut-mcp):** the read/verify tools take integer IDs named
+`objective_id` / `epic_id` / `story_id` (not `*_public_id`); `epic_state_id` and
+`workflow_state_id` are integers from Phase 1's cache, not strings.
 
 ## Edge cases
 
@@ -176,7 +191,10 @@ Present, and **write nothing** until the user approves:
   (`SHORTCUT_MODE=readwrite`).
 - **Project with no versions** — fall back to phases/milestones as Objectives.
 - **Stale repo slugs** — derive issue-link owner/repo from `git remote`, and if a
-  CHANGELOG/footer slug disagrees, flag it (don't silently trust it).
+  CHANGELOG/footer slug disagrees, flag it (don't silently trust it). If the
+  repo's own docs (README/CHANGELOG/pyproject/User-Agent) use a different,
+  redirecting slug, flag it as a repo-side fix too — the source should match the
+  links persisted in Shortcut, not just be silently overridden.
 - **Partial prior run** — idempotent reconcile makes a re-run safe; it fills gaps
   rather than duplicating.
 - **Removed work** — reported as archive candidates; never auto-archived (archive

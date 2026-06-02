@@ -37,6 +37,13 @@ Skills install as symlinks on this machine (verified): real files live under
 Neither skills tree is a git repo, so the skill files are not committed anywhere
 by default. The spec and this plan remain committed in `shortcut-mcp`.
 
+> **Post-build note.** The skill shipped and has since been refined from real
+> imports (flipperzero-mcp, gandi-mcp). The transcribed snippets below are the
+> original build seed; the **live skill** (`~/.agents/skills/shortcut-import/`)
+> and the design **spec** are authoritative. Beyond the snippets here, the live
+> files also carry the legacy-import ambiguity guard and full
+> deterministic-title rules in `sync-algorithm.md` / `mapping.md`.
+
 ---
 
 ### Task 1: Scaffold skill + frontmatter + symlink, verify activation
@@ -115,8 +122,10 @@ User asks to import / lift / drop / represent a repo or its roadmap in Shortcut.
 Create a TodoWrite item per phase, then work them in order.
 
 ### Phase 1 — Preflight
-- Confirm `mcp__shortcut__*` tools are available and `SHORTCUT_MODE=readwrite`
-  (if readonly, STOP and tell the user to set `SHORTCUT_MODE=readwrite` and reload).
+- Confirm `mcp__shortcut__*` tools are available and the server runs in
+  `SHORTCUT_MODE=readwrite` — this is the shortcut-mcp server's env (its `.env` /
+  MCP config `env`), not the calling shell, which shows it unset even when writes
+  work. If readonly, STOP and tell the user to set `SHORTCUT_MODE=readwrite` and reload.
 - `shortcut_get_current_member` (auth + identity).
 - `shortcut_list_workflows` → cache state IDs (backlog/unstarted/started/done) +
   default workflow.
@@ -141,21 +150,28 @@ objectives/epics/stories.
 ### Phase 5 — Dry-run approval gate
 Present team + workflow, counts (CREATE/UPDATE/UNCHANGED), the per-item diff for
 created/changed items, and any flagged archive-candidates. WRITE NOTHING until
-the user approves.
+the user approves. When a workstream is a cluster of N similar issues (e.g. a
+bug-fix round), offer a granularity choice — one story per issue vs a single
+rolled-up story — rather than deciding for them.
 
 ### Phase 6 — Execute + validate
-Create/update Objectives → Epics (`milestone_id`/`epic_state_id`) → Stories
-(`bulk_create_stories` with `epic_id`+`group_id`+`workflow_state_id`+description;
-`update_story` for changes). Then re-read (`list_objectives`,
-`list_objective_epics`, `list_epic_stories`, spot-fetch link-bearing stories) and
-cross-check counts, parent mapping, states, and persisted links. Report a summary
-table with `app.shortcut.com` URLs.
+Write in tiers: Objectives (`create_objective` takes `state` on create) → Epics
+(`create_epic` takes `milestone_id` but **no** state; set state afterward with
+`update_epic(epic_id, epic_state_id=<int>)`) → Stories (`bulk_create_stories`
+with `epic_id`+`group_id`+`workflow_state_id`+description; `update_story` for
+changes). Then re-read (`list_objectives`, `list_objective_epics`,
+`list_epic_stories`, spot-fetch link-bearing stories) and cross-check counts,
+parent mapping, states, and persisted links. Report a summary table with
+`app.shortcut.com` URLs. Tool-arg gotcha: read tools take integer `objective_id`/
+`epic_id`/`story_id` (not `*_public_id`); `epic_state_id`/`workflow_state_id` are
+integers.
 
 ## Rules
 - Idempotent: re-runs never duplicate.
 - Never auto-archive removed work — flag it.
 - Never use destructive Shortcut tools.
-- Derive issue-link `owner/repo` from `git remote`, not CHANGELOG footers.
+- Derive issue-link `owner/repo` from `git remote`, not CHANGELOG footers; if the
+  repo's own docs use a different, redirecting slug, flag it as a repo-side fix.
 ```
 
 - [ ] **Step 2: Verify the file is well-formed and references resolve**
@@ -197,6 +213,15 @@ spec's `## Canonical mapping` section verbatim:
 
 ## story_type
 new tool/capability → feature; tests/CI/docs/hygiene/renames → chore; defects → bug.
+
+## Story titles (deterministic)
+Regenerate identical names on re-run (the cleaned title is the `external_id` slug
+and the name-match key). In order: (1) strip a leading conventional-commit prefix
+`^\w+(\([^)]*\))?:\s*` and/or leading bracketed severity/category tags
+`^(\[[A-Z][A-Z ]*\]\s*)+` (`[DOCS] x` → `x`) — required for idempotency; (2) strip
+a trailing audit paren `\s*\([A-Z]+-\d+(,\s*[A-Z]+-\d+)*\)\.?$`; (3) keep the
+clause before any ` — ` em-dash; (4) drop a trailing links clause. Put the full
+original text in the description; the slug is the kebab-case of the result.
 
 ## GitHub links
 When the repo has issues, embed markdown links
