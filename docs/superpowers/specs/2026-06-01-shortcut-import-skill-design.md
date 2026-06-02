@@ -141,11 +141,20 @@ See `references/sync-algorithm.md`. Summary:
 Matching is scoped to the parent, so two projects can share a story title
 without colliding.
 
+**Tool-surface constraint (current shortcut-mcp).** `shortcut_list_epic_stories`
+returns the shaped story summary, which omits `external_id` and `description`.
+So the `external_id` match and the description/link drift check both require a
+per-story `shortcut_get_story` fetch (N+1) on the candidate set — the list call
+alone is insufficient. Tracked in #96; if the story summary is extended to carry
+`external_id`, the reconcile collapses back to a single list call.
+
 **Ambiguity guard (legacy imports).** If a matched epic contains existing stories
 with null `external_id` *and* some planned titles don't match any existing title,
 a genuine new story is indistinguishable from a rename. Do not auto-create —
 surface these as "ambiguous (possible rename)" in the dry-run and ask. Recommend
-a one-time `external_id` backfill on the legacy stories to make future runs clean.
+a one-time `external_id` backfill on the legacy stories to make future runs clean
+— note `shortcut_update_story` has no `external_id` arg today, so the backfill is
+blocked until #97 lands (`external_id` only reaches the API via create).
 
 ### Phase 5 — Dry-run approval gate
 

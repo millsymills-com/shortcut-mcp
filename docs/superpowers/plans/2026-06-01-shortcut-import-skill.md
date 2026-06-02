@@ -256,12 +256,17 @@ Goal: a re-run produces zero duplicates and applies only the real diff.
 ## Matching (name-scoped to parent)
 1. `shortcut_list_objectives` → match each planned Objective by **name**.
 2. For a matched Objective: `shortcut_list_objective_epics` → match Epics by name.
-3. For a matched Epic: `shortcut_list_epic_stories` → match Stories by name.
+3. For a matched Epic: `shortcut_list_epic_stories` → candidate stories.
 
-Name match is the primary key. Optionally stamp each created story with
+`external_id` is the primary key for stories — **required**, not optional. Stamp
+every created story with
 `external_id = "<repo>:<objective-slug>/<epic-slug>/<story-slug>"` (passed in the
-`bulk_create_stories` story object) so future runs survive renames; read it back
-when present and prefer it over the name match.
+`bulk_create_stories` story object). On reconcile, match by `external_id` first
+and fall back to name only for legacy stories that predate the stamp.
+
+`shortcut_list_epic_stories` does not return `external_id` (it's stripped from the
+story summary), so reading it back needs a per-story `shortcut_get_story` fetch on
+the candidates — see spec "Tool-surface constraint" and #96/#97.
 
 ## Classification
 For every planned item:
