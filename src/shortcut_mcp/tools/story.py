@@ -114,6 +114,7 @@ def register(server: FastMCP) -> None:
         archived: bool | None = None,
         owner_ids: list[str] | None = None,
         labels: list[str] | None = None,
+        external_id: str | None = None,
     ) -> dict[str, Any]:
         require_writes(ctx)
         body: dict[str, Any] = {}
@@ -135,6 +136,8 @@ def register(server: FastMCP) -> None:
             body["owner_ids"] = owner_ids
         if labels is not None:
             body["labels"] = [{"name": n} for n in labels]
+        if external_id is not None:
+            body["external_id"] = external_id
         require_update_fields(body)
         client = get_client(ctx)
         result = await client.put(f"/stories/{_seg(str(story_id))}", json=body)
