@@ -49,11 +49,14 @@ Default heuristic, applied to every project:
 hygiene/renames → `chore`; defect work → `bug`.
 
 **Deterministic story titles:** so a re-run regenerates identical names (titles
-feed the name fallback and the `external_id` slug), derive each title as the
-source bullet's leading clause, cut at the first of: an em-dash ` — `, a colon
-introducing a list, an opening paren `(`, or a "links"/"Links" marker. Push the
-full bullet text (paths, tool lists, issue links) into the description. Never
-editorialize titles beyond this rule.
+feed the name fallback and the `external_id` slug), derive each title in order:
+(1) strip a leading conventional-commit prefix `^\w+(\([^)]*\))?:\s*` for
+issue/commit sources (`fix(clients): x` → `x`); (2) strip a *trailing*
+audit-metadata paren `\s*\([A-Z]+-\d+(,\s*[A-Z]+-\d+)*\)\.?$` (`… (PY-013).` →
+`…`), never touching identifier parens like `main()`; (3) keep the clause before
+any ` — ` em-dash; (4) drop a trailing "links/Links" clause. Push the full
+original text into the description. The slug is the kebab-case of the result.
+Never editorialize beyond these steps.
 
 **GitHub links:** when the repo has issues, embed markdown links
 (`[#27](https://github.com/<owner>/<repo>/issues/27)`) in the relevant story/epic
