@@ -32,6 +32,14 @@ Set `SHORTCUT_API_TOKEN` and run:
 shortcut-mcp
 ```
 
+## Agent skill
+
+`skills/shortcut-import/` bundles an agent skill that drives this server to lift
+an existing repo into Shortcut as Objectives/Epics/Stories — idempotent and
+interactive (read-tree → derive → dry-run approval → write → validate). Point
+your agent's skill directory at it (e.g. symlink it into `~/.claude/skills/`) and
+invoke it when you want to import or mirror a repo's roadmap into Shortcut.
+
 ## Client configuration
 
 shortcut-mcp speaks MCP over stdio, so any stdio-capable client launches it the
