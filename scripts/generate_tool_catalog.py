@@ -64,11 +64,14 @@ def _rows(tools: Iterable[Any]) -> list[_Row]:
 async def _collect() -> list[_Row]:
     # A non-empty token registers the tools without authenticating; every gate is
     # opened so all three tiers are visible. list_tools() never touches the network.
+    # _env_file=None ignores any local .env so the catalog is the full surface
+    # regardless of the developer's SHORTCUT_TOOLS / SHORTCUT_PROFILE.
     config = ShortcutConfig(
         shortcut_api_token=SecretStr("catalog"),
         shortcut_mode=ShortcutMode.READWRITE,
         shortcut_allow_destructive=True,
         shortcut_profile=ToolProfile.ALL,
+        _env_file=None,  # ty: ignore[unknown-argument]  # pydantic-settings runtime kwarg
     )
     return _rows(await create_server(config).list_tools())
 
