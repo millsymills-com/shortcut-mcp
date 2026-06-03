@@ -86,7 +86,7 @@ def _render(rows: list[_Row]) -> str:
             mod_rows = [r for r in tier_rows if r[1] == module]
             noun = "tool" if len(mod_rows) == 1 else "tools"
             lines += [f"#### {module} ({len(mod_rows)} {noun})", ""]
-            lines += [f"- `{name}` — {desc}" for _, _, name, desc in mod_rows]
+            lines += [f"- `{name}`: {desc}" for _, _, name, desc in mod_rows]
             lines.append("")
     return "\n".join(lines).rstrip() + "\n"
 

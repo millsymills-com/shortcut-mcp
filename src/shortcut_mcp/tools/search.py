@@ -79,7 +79,7 @@ def register(server: FastMCP) -> None:
         name="shortcut_search",
         description=(
             "Global multi-entity search. Returns {stories: {items, truncated}, "
-            "epics: {items, truncated}} — NOT a top-level items list. For a single "
+            "epics: {items, truncated}}, NOT a top-level items list. For a single "
             "entity use shortcut_search_stories / shortcut_search_epics."
         ),
         tags=read_tags(_MODULE),

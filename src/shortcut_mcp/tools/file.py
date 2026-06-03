@@ -51,7 +51,7 @@ def register(server: FastMCP) -> None:
         name="shortcut_upload_file",
         description=(
             "Upload a local file to Shortcut. The server reads ANY filesystem path "
-            "readable by its process and uploads the bytes — do not expose this server "
+            "readable by its process and uploads the bytes. Do not expose this server "
             "to untrusted prompts when sensitive files are on disk. Requires SHORTCUT_MODE=readwrite."
         ),
         tags=write_tags(_MODULE),

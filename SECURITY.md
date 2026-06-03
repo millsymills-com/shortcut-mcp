@@ -12,7 +12,7 @@ receives security fixes.
 
 ## Reporting a vulnerability
 
-Please report vulnerabilities privately — do not open a public issue.
+Please report vulnerabilities privately. Do not open a public issue.
 
 Use GitHub's [private vulnerability reporting](https://docs.github.com/en/code-security/security-advisories/guidance-on-reporting-and-writing-information-about-vulnerabilities/privately-reporting-a-security-vulnerability):
 open the repository's **Security** tab and choose **Report a vulnerability**.
