@@ -18,6 +18,7 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 MANIFEST_SRC = REPO_ROOT / "mcpb" / "manifest.json"
+ICON_SRC = REPO_ROOT / "mcpb" / "icon.png"
 BUNDLE_PAYLOAD = ("pyproject.toml", "uv.lock", "README.md", "LICENSE", "src")
 SERVER_NAME = "io.github.millsymills-com/shortcut-mcp"
 RELEASE_URL = "https://github.com/millsymills-com/shortcut-mcp/releases/download/v{version}/shortcut-mcp.mcpb"
@@ -39,6 +40,9 @@ def stage_bundle(stage_dir: Path, version: str) -> None:
     manifest = json.loads(MANIFEST_SRC.read_text())
     manifest["version"] = version
     (stage_dir / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n")
+
+    if "icon" in manifest:
+        shutil.copy2(ICON_SRC, stage_dir / manifest["icon"])
 
     for name in BUNDLE_PAYLOAD:
         source = REPO_ROOT / name

@@ -1,3 +1,5 @@
+<p align="center"><img src="assets/logo.svg" alt="shortcut-mcp" width="200"></p>
+
 # shortcut-mcp
 
 Python FastMCP server for the Shortcut REST API. v0.5 ships a complete read
