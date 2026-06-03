@@ -71,7 +71,7 @@ async def _collect() -> list[_Row]:
         shortcut_mode=ShortcutMode.READWRITE,
         shortcut_allow_destructive=True,
         shortcut_profile=ToolProfile.ALL,
-        _env_file=None,
+        _env_file=None,  # ty: ignore[unknown-argument]  # pydantic-settings runtime kwarg
     )
     return _rows(await create_server(config).list_tools())
 
