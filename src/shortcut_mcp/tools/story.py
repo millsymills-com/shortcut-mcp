@@ -49,7 +49,7 @@ def register(server: FastMCP) -> None:
     @server.tool(
         name="shortcut_list_story_sub_tasks",
         description=(
-            "List a story's sub-tasks — the child stories under it (summary rows). "
+            "List a story's sub-tasks: the child stories under it (summary rows). "
             "Distinct from checklist tasks (see shortcut_get_story_task)."
         ),
         tags=read_tags(_MODULE),

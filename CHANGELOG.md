@@ -30,12 +30,12 @@ This project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
-- **v0.5 niche read modules — 4 read tools + 1 write tool** across 3 new resource
+- **v0.5 niche read modules: 4 read tools + 1 write tool** across 3 new resource
   modules (exposed under `SHORTCUT_PROFILE=all` or an explicit `SHORTCUT_TOOLS`
   allowlist): `list_repositories` / `get_repository`, `list_external_link_stories`,
   `get_key_result`, and `update_key_result` (write-tier). Brings totals to 47 read +
   39 write + 13 destructive tools across 20 modules.
-- **v0.5 niche CRUD modules — 18 read + 12 write + 8 destructive tools** across 6
+- **v0.5 niche CRUD modules: 18 read + 12 write + 8 destructive tools** across 6
   new modules: `custom_field` (R/U/D), `category` (CRUD + objective/milestone
   association lists), `entity_template` (CRUD), `document` (CRUD + epic link/unlink
   + tiptap-load + title search), `health` (epic/objective health get/history/set +
@@ -60,7 +60,7 @@ This project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
-- **v0.4 destructive tier — 13 delete tools**, gated by `SHORTCUT_MODE=readwrite`
+- **v0.4 destructive tier: 13 delete tools**, gated by `SHORTCUT_MODE=readwrite`
   **and** `SHORTCUT_ALLOW_DESTRUCTIVE=true` (hidden unless both are set):
   `delete_story`, `bulk_delete_stories`, `delete_story_comment`, `delete_story_task`,
   `delete_story_link`, `delete_epic`, `delete_epic_comment`, `delete_iteration`,
@@ -76,7 +76,7 @@ This project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
-- **v0.3 write tier — 38 write tools across all resource modules**, gated by
+- **v0.3 write tier: 38 write tools across all resource modules**, gated by
   `SHORTCUT_MODE=readwrite` (hidden entirely in readonly mode):
   - `story`: create, update, archive, unarchive, add labels, add owners,
     bulk create, bulk update, create from template (9 tools)
@@ -92,7 +92,7 @@ This project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   - `project`: create, update (2 tools)
   - `file`: upload (multipart), update metadata (2 tools)
   - `linked_file`: create, update (2 tools)
-- **`require_writes` runtime guard** — write tools raise `ToolError` (`mode_denied`)
+- **`require_writes` runtime guard**: write tools raise `ToolError` (`mode_denied`)
   if called outside a `readwrite` context, even if somehow invoked directly.
 - **Multipart upload + DELETE-with-body client support** in `ShortcutClient`.
 
@@ -100,7 +100,7 @@ This project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
-- **Complete read surface — 43 read tools across 17 resource modules:**
+- **Complete read surface: 43 read tools across 17 resource modules:**
   - `story`: get story, list story history
   - `story_comment`: list and get story comments
   - `story_task`: get story task

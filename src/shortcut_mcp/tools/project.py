@@ -114,7 +114,7 @@ def register(server: FastMCP) -> None:
         name="shortcut_delete_project",
         description=(
             "Permanently delete a project. Irreversible. The Shortcut API rejects this "
-            "with a 422 if the project still has stories — move or delete them first. "
+            "with a 422 if the project still has stories. Move or delete them first. "
             "Requires SHORTCUT_MODE=readwrite and SHORTCUT_ALLOW_DESTRUCTIVE=true."
         ),
         tags=destructive_tags(_MODULE),
