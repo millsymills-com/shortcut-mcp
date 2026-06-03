@@ -9,6 +9,18 @@ import pytest
 from shortcut_mcp.config import ShortcutConfig
 
 
+@pytest.fixture(autouse=True)
+def _isolate_env_file(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Keep a developer's local .env out of the suite.
+
+    ShortcutConfig auto-loads .env in production, so a local SHORTCUT_TOOLS or
+    SHORTCUT_MODE would otherwise change which tools register and silently break
+    gating/catalog tests on the dev's machine while CI (no .env) stays green.
+    Explicit monkeypatch.setenv values still apply; only the .env file is cut.
+    """
+    monkeypatch.setitem(ShortcutConfig.model_config, "env_file", None)
+
+
 @pytest.fixture
 def fake_config(monkeypatch: pytest.MonkeyPatch) -> ShortcutConfig:
     """A valid config with a fake token. Use for mocked tests."""
