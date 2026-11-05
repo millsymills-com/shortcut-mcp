@@ -21,7 +21,7 @@ classifiers = [
     "Typing :: Typed",
 ]
 dependencies = [
-    "fastmcp>=3.2.4,<4.0.0",
+    "fastmcp>=3.4.11,<4.0.0",
     "httpx>=0.27.0",
     "pydantic>=2.13.3",
     "pydantic-settings>=2.14.0",
@@ -88,3 +88,20 @@ exclude_also = ["if TYPE_CHECKING:", "raise NotImplementedError"]
 
 [tool.bandit]
 exclude_dirs = ["tests"]
+
+# Security floors for the uv-managed environment. Preserve the tested FastMCP
+# 3.x / MCP SDK 1.x line; these constraints do not replace package metadata.
+[tool.uv]
+constraint-dependencies = [
+    "mcp>=1.30.0,<2",
+    "anyio>=4.14.2",
+    "authlib>=1.9.1",
+    "certifi>=2026.10.19",
+    "cryptography>=50.0.2",
+    "dnspython>=2.9.0",
+    "filelock>=4.2.9",
+    "joserfc>=1.7.6",
+    "opentelemetry-api>=1.45.1",
+    "pyjwt>=2.15.1",
+    "virtualenv>=21.14.13",
+]
